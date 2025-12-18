@@ -22,24 +22,41 @@ const Navbar = ({ onNavigate }) => {
                             Início
                         </a>
                     </li>
-                    <li>
-                        <a
-                            href="#"
-                            className="navbar-link"
-                            onClick={(e) => { e.preventDefault(); onNavigate('login'); }}
-                        >
-                            Login
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="#"
-                            className="navbar-link"
-                            onClick={(e) => { e.preventDefault(); onNavigate('register'); }}
-                        >
-                            Sign Up
-                        </a>
-                    </li>
+                    {user ? (
+                        <>
+                            <li><span className="navbar-user">Olá, {user.name}</span></li>
+                            <li>
+                                <a
+                                    href="#"
+                                    className="navbar-link"
+                                    onClick={(e) => { e.preventDefault(); onNavigate('logout'); }}
+                                >
+                                    Sair
+                                </a>
+                            </li>
+                        </>
+                    ) : (
+                        <>
+                            <li>
+                                <a
+                                    href="#"
+                                    className="navbar-link"
+                                    onClick={(e) => { e.preventDefault(); onNavigate('login'); }}
+                                >
+                                    Login
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    className="navbar-link"
+                                    onClick={(e) => { e.preventDefault(); onNavigate('register'); }}
+                                >
+                                    Sign Up
+                                </a>
+                            </li>
+                        </>
+                    )}
                 </ul>
             </div>
         </nav>

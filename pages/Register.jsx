@@ -6,14 +6,32 @@ const Register = ({ onNavigate }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
             alert('As senhas não coincidem!');
             return;
         }
-        alert(`Conta criada com sucesso para: ${email}`);
-        onNavigate('login');
+
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Conta criada com sucesso! Faça login para continuar.');
+                onNavigate('login');
+            } else {
+                alert(data.error || 'Erro ao criar conta');
+            }
+        } catch (error) {
+            console.error('Registration fetch error:', error);
+            alert('Erro de conexão com o servidor');
+        }
     };
 
     return (

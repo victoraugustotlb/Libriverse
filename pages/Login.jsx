@@ -4,9 +4,29 @@ const Login = ({ onNavigate }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        alert(`Login realizado com sucesso para: ${email}`);
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('libriverse_token', data.token);
+                localStorage.setItem('libriverse_user', JSON.stringify(data.user));
+                onNavigate('home');
+            } else {
+                alert(data.error || 'Credenciais inválidas');
+            }
+        } catch (error) {
+            console.error('Login fetch error:', error);
+            alert('Erro de conexão com o servidor');
+        }
     };
 
     return (
