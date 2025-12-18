@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Login = () => {
+const Login = ({ onNavigate }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -51,7 +51,7 @@ const Login = () => {
 
                 <div className="auth-footer">
                     <p>
-                        Não tem uma conta? <a href="#" className="auth-link">Crie uma agora</a>
+                        Não tem uma conta? <a href="#" className="auth-link" onClick={() => onNavigate('register')}>Crie uma agora</a>
                     </p>
                 </div>
             </div>
