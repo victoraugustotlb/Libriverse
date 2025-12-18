@@ -3,10 +3,10 @@ import Hero from '../components/Hero';
 import BookCard from '../components/BookCard';
 import { booksData } from '../data/books';
 
-const Home = () => {
+const Home = ({ onNavigate }) => {
     return (
         <div>
-            <Hero />
+            <Hero onNavigate={onNavigate} />
 
             <section className="books-section">
                 <div className="container">
