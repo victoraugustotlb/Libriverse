@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Hero = () => {
+const Hero = ({ onNavigate }) => {
     return (
         <section className="hero">
             <div className="container">
@@ -8,7 +8,10 @@ const Hero = () => {
                 <p className="hero-subtitle">
                     Explore milhares de livros e descubra sua próxima grande leitura
                 </p>
-                <button className="hero-cta" onClick={() => alert('Bem-vindo! Criando sua conta...')}>
+                <button
+                    className="hero-cta"
+                    onClick={() => onNavigate('login')}
+                >
                     Crie agora a sua conta
                 </button>
             </div>
