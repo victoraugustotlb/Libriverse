@@ -35,7 +35,7 @@ const Navbar = ({ onNavigate }) => {
                         <a
                             href="#"
                             className="navbar-link"
-                            onClick={(e) => { e.preventDefault(); onNavigate('register'); }}
+                            onClick={(e) => { e.preventDefault(); onNavigate('login'); }}
                         >
                             Sign Up
                         </a>

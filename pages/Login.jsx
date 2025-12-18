@@ -49,11 +49,7 @@ const Login = ({ onNavigate }) => {
                     </button>
                 </form>
 
-                <div className="auth-footer">
-                    <p>
-                        Não tem uma conta? <a href="#" className="auth-link" onClick={() => onNavigate('register')}>Crie uma agora</a>
-                    </p>
-                </div>
+
             </div>
         </div>
     );

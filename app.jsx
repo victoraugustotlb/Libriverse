@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
-import Register from './pages/register.jsx';
 import Footer from './components/Footer.jsx';
 
 const App = () => {
@@ -18,7 +17,7 @@ const App = () => {
             <Navbar onNavigate={handleNavigate} />
             {view === 'home' && <Home onNavigate={handleNavigate} />}
             {view === 'login' && <Login onNavigate={handleNavigate} />}
-            {view === 'register' && <Register onNavigate={handleNavigate} />}
+
             <Footer />
         </div>
     );
