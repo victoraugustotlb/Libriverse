@@ -23,8 +23,22 @@ const Register = ({ onNavigate }) => {
             const data = await response.json();
 
             if (response.ok) {
-                alert('Conta criada com sucesso! Faça login para continuar.');
-                onNavigate('login');
+                // Auto-login after registration
+                const loginResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (loginResponse.ok) {
+                    const loginData = await loginResponse.json();
+                    localStorage.setItem('libriverse_token', loginData.token);
+                    localStorage.setItem('libriverse_user', JSON.stringify(loginData.user));
+                    onNavigate('library');
+                } else {
+                    alert('Conta criada! Por favor, faça login.');
+                    onNavigate('login');
+                }
             } else {
                 alert(data.error || 'Erro ao criar conta');
             }

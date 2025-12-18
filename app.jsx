@@ -3,6 +3,7 @@ import Navbar from './components/Navbar.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import Library from './pages/Library.jsx';
 import Footer from './components/Footer.jsx';
 
 const App = () => {
@@ -37,6 +38,7 @@ const App = () => {
             {view === 'home' && <Home onNavigate={handleNavigate} />}
             {view === 'login' && <Login onNavigate={handleNavigate} />}
             {view === 'register' && <Register onNavigate={handleNavigate} />}
+            {view === 'library' && <Library onNavigate={handleNavigate} />}
             <Footer />
         </div>
     );
