@@ -7,7 +7,7 @@ const Navbar = ({ onNavigate, user }) => {
                 <a
                     href="#"
                     className="navbar-logo"
-                    onClick={(e) => { e.preventDefault(); onNavigate('home'); }}
+                    onClick={(e) => { e.preventDefault(); onNavigate(user ? 'library' : 'home'); }}
                 >
                     Libriverse
                 </a>
@@ -17,7 +17,7 @@ const Navbar = ({ onNavigate, user }) => {
                         <a
                             href="#"
                             className="navbar-link"
-                            onClick={(e) => { e.preventDefault(); onNavigate('home'); }}
+                            onClick={(e) => { e.preventDefault(); onNavigate(user ? 'library' : 'home'); }}
                         >
                             Início
                         </a>
