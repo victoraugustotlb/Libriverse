@@ -10,7 +10,7 @@ const Hero = ({ onNavigate }) => {
                 </p>
                 <button
                     className="hero-cta"
-                    onClick={() => onNavigate('login')}
+                    onClick={() => onNavigate('register')}
                 >
                     Crie agora a sua conta
                 </button>
