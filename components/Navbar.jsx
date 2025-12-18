@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Navbar = ({ onNavigate }) => {
+const Navbar = ({ onNavigate, user }) => {
     return (
         <nav className="navbar">
             <div className="navbar-content">

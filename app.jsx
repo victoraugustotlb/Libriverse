@@ -6,7 +6,8 @@ import Register from './pages/Register.jsx';
 import Footer from './components/Footer.jsx';
 
 const App = () => {
-    const [user, setUser] = React.useState(() => {
+    const [view, setView] = useState('home');
+    const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem('libriverse_user');
         return savedUser ? JSON.parse(savedUser) : null;
     });
