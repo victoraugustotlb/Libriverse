@@ -19,10 +19,10 @@ export default async function handler(req, res) {
             // Search for matches in title or author, case-insensitive
             // DISTINCT ON (title, author) to avoid showing duplicate books from multiple users
             const result = await pool.query(
-                `SELECT DISTINCT ON (title, author) id, title, author, publisher, cover_url 
+                `SELECT id, title, author, publisher, cover_url 
                  FROM books 
                  WHERE title ILIKE $1 OR author ILIKE $1 
-                 ORDER BY title, author, created_at DESC
+                 ORDER BY created_at DESC
                  LIMIT 20`,
                 [`%${q}%`]
             );
