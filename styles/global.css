@@ -515,23 +515,17 @@ body {
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
-}
 
-.bookshelf-grid::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 130px;
-    /* Adjusted visually for the new shelf */
+    /* Shelf Container Styles */
     background-image: var(--shelf-bg);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center bottom;
-    z-index: 1;
-    pointer-events: none;
+    padding: 35px 45px 35px 45px;
+    /* Padding to place books inside the frame */
 }
+
+
 
 .shelf-book {
     position: relative;
