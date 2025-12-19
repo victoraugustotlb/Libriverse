@@ -518,7 +518,7 @@ body {
 .bookshelf-grid::after {
     content: '';
     position: absolute;
-    bottom: -45px;
+    bottom: -5px;
     left: 50%;
     transform: translateX(-50%);
     width: 110%;
@@ -527,7 +527,7 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center bottom;
-    z-index: -1;
+    z-index: 1;
     pointer-events: none;
 }
 
@@ -539,6 +539,7 @@ body {
     transition: all var(--transition-base);
     cursor: pointer;
     width: 65px;
+    z-index: 5;
 }
 
 .shelf-book:hover {
@@ -581,7 +582,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 70px 5px 95px 5px;
+    padding: 45px 5px 65px 5px;
     position: relative;
     z-index: 2;
 }
@@ -590,16 +591,16 @@ body {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
     color: #2c1a1a;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 80%;
     text-align: center;
     opacity: 0.85;
+    /* Remove constraints to show full title */
+    display: block;
+    max-height: none;
+    overflow: visible;
 }
 
 .shelf-book::after {
@@ -618,7 +619,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     z-index: 100;
     pointer-events: none;
 }
@@ -714,7 +715,9 @@ body {
     .book-details-content {
         grid-template-columns: 1fr;
     }
-    .details-cover, .details-placeholder {
+
+    .details-cover,
+    .details-placeholder {
         height: 250px;
         width: 180px;
         margin: 0 auto;
