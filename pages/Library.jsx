@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import BookDetailsModal from '../components/BookDetailsModal';
-import lombadaImg from '../images/lombada.png';
+import lombadaImg from '../images/lombada final.png';
 
 const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook }) => {
     const [selectedBook, setSelectedBook] = useState(null);
-    const spineColors = ["#ff3b30", "#ff9500", "#ffcc00", "#4cd964", "#007aff", "#5856d6", "#ff2d55"];
     const sizes = ["small", "medium", "large", "xlarge"];
 
     // Group books into shelves of 15
@@ -44,15 +43,13 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook }) => {
                                 {shelfBooks.map((book) => {
                                     const deterministicIndex = book.id % 20;
                                     const size = sizes[deterministicIndex % sizes.length];
-                                    const bgColor = spineColors[deterministicIndex % spineColors.length];
 
                                     return (
                                         <div
                                             key={book.id}
                                             className={`shelf-book ${size}`}
                                             style={{
-                                                "--spine-color": bgColor,
-                                                "--spine-bg": `url(${lombadaImg})`
+                                                "--spine-bg": `url("${lombadaImg}")`
                                             }}
                                             data-tooltip={`${book.title} - ${book.author}`}
                                             onClick={() => setSelectedBook(book)}

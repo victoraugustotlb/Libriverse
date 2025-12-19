@@ -527,14 +527,12 @@ body {
 
 .book-spine {
     width: 100%;
-    border-radius: 12px;
+    border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    background-color: var(--spine-color, #2c3e50);
     background-image: var(--spine-bg);
     background-size: cover;
     background-position: center;
-    background-blend-mode: multiply;
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all var(--transition-base);
@@ -566,6 +564,7 @@ body {
     text-align: center;
     opacity: 0.85;
 }
+
 /* Tooltip style for author/title on hover */
 .shelf-book::after {
     content: attr(data-tooltip);
@@ -583,7 +582,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     z-index: 100;
     pointer-events: none;
 }
@@ -675,12 +674,12 @@ body {
         grid-template-columns: 1fr;
         text-align: center;
     }
-    
+
     .book-details-visual {
         max-width: 200px;
         margin: 0 auto;
     }
-    
+
     .delete-button {
         justify-content: center;
         width: 100%;
@@ -691,14 +690,9 @@ body {
     border-bottom: 8px solid #3e2723;
     margin-bottom: 40px;
     padding-bottom: 0;
-    background: linear-gradient(to bottom, transparent 90%, rgba(0,0,0,0.05) 100%);
+    background: linear-gradient(to bottom, transparent 90%, rgba(0, 0, 0, 0.05) 100%);
     width: 100%;
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
 }
-
-
-
-
-
