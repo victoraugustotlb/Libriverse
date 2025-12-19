@@ -504,9 +504,10 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    justify-content: center;
-    width: fit-content;
-    /* Ensure container matches exact width of books */
+    justify-content: flex-start;
+    /* Align books to left */
+    width: 1125px;
+    /* Fixed width to ensure shelf image is always full size */
     align-items: flex-end;
     padding: var(--spacing-xl) 0;
     position: relative;
@@ -521,8 +522,8 @@ body {
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center bottom;
-    padding: 35px 45px 35px 45px;
-    /* Padding to place books inside the frame */
+    padding: 75px 45px 35px 45px;
+    /* Increased top padding to 75px */
 }
 
 
