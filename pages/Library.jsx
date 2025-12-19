@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import BookDetailsModal from '../components/BookDetailsModal';
 import lombadaImg from '../images/lombada final.png';
+import bookshelfImg from '../images/bookshelf.PNG';
 
 const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook }) => {
     const [selectedBook, setSelectedBook] = useState(null);
@@ -39,7 +40,11 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook }) => {
                 <section className="bookshelf-section">
                     <div className="container bookshelf-container">
                         {shelves.map((shelfBooks, shelfIndex) => (
-                            <div key={shelfIndex} className="bookshelf-grid">
+                            <div
+                                key={shelfIndex}
+                                className="bookshelf-grid"
+                                style={{ "--shelf-bg": `url("${bookshelfImg}")` }}
+                            >
                                 {shelfBooks.map((book) => {
                                     const deterministicIndex = book.id % 20;
                                     const size = sizes[deterministicIndex % sizes.length];
