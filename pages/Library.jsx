@@ -1,4 +1,6 @@
 const Library = ({ onNavigate, onOpenAddModal, books = [] }) => {
+    const spineColors = ['#ff3b30', '#ff9500', '#ffcc00', '#4cd964', '#007aff', '#5856d6', '#ff2d55'];
+
     return (
         <div className="library-page">
             <section className="hero">
@@ -16,7 +18,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [] }) => {
                         </>
                     ) : (
                         <p className="hero-subtitle">
-                            Você tem {books.length} {books.length === 1 ? 'livro' : 'livros'} na sua coleção
+                            Explore sua coleção pessoal de {books.length} {books.length === 1 ? 'livro' : 'livros'}
                         </p>
                     )}
                 </div>
@@ -24,26 +26,28 @@ const Library = ({ onNavigate, onOpenAddModal, books = [] }) => {
 
             {books.length > 0 && (
                 <section className="bookshelf-section">
-                    <div className="container">
+                    <div className="container bookshelf-container">
                         <div className="bookshelf-grid">
                             {books.map((book, index) => {
-                                // Deterministic "random" size based on index
-                                const sizes = ['small', 'medium', 'large'];
-                                const size = sizes[index % 3];
+                                const sizes = ['small', 'medium', 'large', 'xlarge'];
+                                const size = sizes[index % 4];
+                                const bgColor = spineColors[index % spineColors.length];
+
                                 return (
-                                    <div key={book.id} className={`shelf-book ${size}`}>
+                                    <div
+                                        key={book.id}
+                                        className={`shelf-book ${size}`}
+                                        style={{ '--spine-color': bgColor }}
+                                        data-tooltip={`${book.title} - ${book.author}`}
+                                    >
                                         <div className="book-spine">
                                             {book.coverUrl ? (
                                                 <img src={book.coverUrl} alt={book.title} className="spine-cover" />
                                             ) : (
                                                 <div className="spine-placeholder">
-                                                    <span>{book.title}</span>
+                                                    <span className="spine-title">{book.title}</span>
                                                 </div>
                                             )}
-                                        </div>
-                                        <div className="shelf-book-info">
-                                            <h3>{book.title}</h3>
-                                            <p>{book.author}</p>
                                         </div>
                                     </div>
                                 );

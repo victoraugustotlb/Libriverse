@@ -485,22 +485,28 @@ body {
     color: var(--color-text-primary);
 }
 
-/* ===== BOOKSHELF STYLES ===== */
+/* ===== BOOKSHELF STYLES (SPINE VIEW) ===== */
 .bookshelf-section {
     padding: var(--spacing-2xl) 0;
-    min-height: 400px;
+    background: var(--color-bg-primary);
+    /* Dark background as in the image */
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+}
+
+.bookshelf-container {
+    max-width: 1400px !important;
 }
 
 .bookshelf-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-xl);
+    gap: 12px;
     justify-content: center;
     align-items: flex-end;
-    padding: var(--spacing-xl);
-    border-bottom: 12px solid #5d2e0a;
-    border-radius: 4px;
-    background: linear-gradient(to bottom, transparent 95%, rgba(0, 0, 0, 0.1) 100%);
+    /* Align all books to the bottom */
+    padding: var(--spacing-xl) 0;
 }
 
 .shelf-book {
@@ -510,102 +516,103 @@ body {
     align-items: center;
     transition: all var(--transition-base);
     cursor: pointer;
+    width: 65px;
+    /* Narrower width for a spine look */
 }
 
 .shelf-book:hover {
-    transform: translateY(-15px) rotate(-1deg);
+    transform: translateY(-15px);
     z-index: 10;
 }
 
 .book-spine {
-    border-radius: 2px 8px 8px 2px;
+    width: 100%;
+    border-radius: 4px;
     overflow: hidden;
-    box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2);
-    border-left: 4px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    background: var(--spine-color, #2c3e50);
     position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all var(--transition-base);
 }
 
 .shelf-book:hover .book-spine {
-    box-shadow: 12px 12px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
+/* Height Variations */
 .shelf-book.small .book-spine {
-    height: 200px;
-    width: 130px;
+    height: 240px;
 }
 
 .shelf-book.medium .book-spine {
-    height: 240px;
-    width: 160px;
+    height: 280px;
 }
 
 .shelf-book.large .book-spine {
-    height: 280px;
-    width: 190px;
+    height: 320px;
+}
+
+.shelf-book.xlarge .book-spine {
+    height: 360px;
 }
 
 .spine-cover {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    opacity: 0.85;
 }
 
 .spine-placeholder {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-md);
-    text-align: center;
-    color: #f1c40f;
-    border: 2px solid rgba(241, 196, 15, 0.3);
+    padding: 10px 0;
 }
 
-.spine-placeholder span {
-    font-size: var(--font-size-sm);
+.spine-title {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: white;
+    font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    display: -webkit-box;
-    -webkit-line-clamp: 5;
-    -webkit-box-orient: vertical;
-    line-clamp: 5;
+    letter-spacing: 0.15em;
+    white-space: nowrap;
     overflow: hidden;
-}
-
-.shelf-book-info {
-    margin-top: var(--spacing-md);
+    text-overflow: ellipsis;
+    max-height: 90%;
     text-align: center;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all var(--transition-base);
+    opacity: 0.9;
+}
+/* Tooltip style for author/title on hover */
+.shelf-book::after {
+    content: attr(data-tooltip);
     position: absolute;
-    bottom: -80px;
-    width: 200px;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
     background: white;
-    padding: 10px;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
+    color: #1a1a1a;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 100;
     pointer-events: none;
-    z-index: 20;
 }
 
-.shelf-book:hover .shelf-book-info {
+.shelf-book:hover::after {
     opacity: 1;
-    transform: translateY(0);
-}
-
-.shelf-book-info h3 {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    margin-bottom: 2px;
-    color: var(--color-text-primary);
-}
-
-.shelf-book-info p {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-secondary);
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
 }
