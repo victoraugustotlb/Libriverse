@@ -522,8 +522,8 @@ body {
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center bottom;
-    padding: 75px 45px 35px 45px;
-    /* Increased top padding to 75px */
+    padding: 75px 45px 55px 45px;
+    /* Increased bottom padding to lift books */
 }
 
 
@@ -546,7 +546,8 @@ body {
 
 .book-spine {
     width: 100%;
-    border-radius: 15px;
+    border-radius: 3px;
+    /* Made books squarer */
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     background-image: var(--spine-bg);
