@@ -103,24 +103,26 @@ const App = () => {
         }
     };
 
-    const handleDeleteBook = async (bookId) => {
+    const handleUpdateBook = async (bookId, updates) => {
         try {
             const token = localStorage.getItem('libriverse_token');
             const response = await fetch(`/api/books/${bookId}`, {
-                method: 'DELETE',
+                method: 'PUT',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
-                }
+                },
+                body: JSON.stringify(updates)
             });
 
             if (response.ok) {
-                setUserBooks(userBooks.filter(book => book.id !== bookId));
+                const updatedBook = await response.json();
+                setUserBooks(userBooks.map(b => b.id === bookId ? { ...b, ...updatedBook } : b));
             } else {
-                alert('Erro ao excluir livro.');
+                alert('Erro ao atualizar livro.');
             }
         } catch (error) {
-            console.error('Error deleting book:', error);
-            alert('Erro de conexão.');
+            console.error('Error updating book:', error);
         }
     };
 
@@ -141,6 +143,7 @@ const App = () => {
                     onOpenAddModal={() => setIsMethodModalOpen(true)}
                     books={userBooks}
                     onDeleteBook={handleDeleteBook}
+                    onUpdateBook={handleUpdateBook}
                 />
             )}
             <Footer />

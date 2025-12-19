@@ -6,6 +6,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
     const [publisher, setPublisher] = useState('');
     const [coverUrl, setCoverUrl] = useState('');
     const [pageCount, setPageCount] = useState('');
+    const [currentPage, setCurrentPage] = useState('');
     const [language, setLanguage] = useState('');
     const [isRead, setIsRead] = useState(false);
 
@@ -22,6 +23,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
         onAddBook({
             title, author, publisher, coverUrl,
             pageCount: pageCount ? parseInt(pageCount) : null,
+            currentPage: currentPage ? parseInt(currentPage) : 0,
             language,
             isRead,
             purchaseDate: purchaseDate || null,
@@ -36,6 +38,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
         setPublisher('');
         setCoverUrl('');
         setPageCount('');
+        setCurrentPage('');
         setLanguage('');
         setIsRead(false);
         setPurchaseDate('');
@@ -52,7 +55,8 @@ const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
                 position: 'relative',
                 maxHeight: '90vh',
                 overflowY: 'auto',
-                width: '600px'
+                width: '800px',
+                padding: '40px'
             }}>
                 <button className="modal-close-btn" onClick={onClose}>&times;</button>
 
@@ -102,13 +106,23 @@ const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                         <div className="form-group">
-                            <label htmlFor="pageCount">Páginas</label>
+                            <label htmlFor="pageCount">Páginas Totais</label>
                             <input
                                 type="number"
                                 id="pageCount"
                                 className="auth-input"
                                 value={pageCount}
                                 onChange={(e) => setPageCount(e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="currentPage">Página Atual</label>
+                            <input
+                                type="number"
+                                id="currentPage"
+                                className="auth-input"
+                                value={currentPage}
+                                onChange={(e) => setCurrentPage(e.target.value)}
                             />
                         </div>
                         <div className="form-group">

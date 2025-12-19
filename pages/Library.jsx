@@ -3,7 +3,7 @@ import BookDetailsModal from '../components/BookDetailsModal';
 import lombadaImg from '../images/lombada-final.png';
 import bookshelfImg from '../images/estante.png';
 
-const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook }) => {
+const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdateBook }) => {
     const safeBooks = Array.isArray(books) ? books : [];
     const [selectedBook, setSelectedBook] = useState(null);
     const sizes = ["small", "medium", "large", "xlarge"];
@@ -79,6 +79,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook }) => {
                 isOpen={!!selectedBook}
                 onClose={() => setSelectedBook(null)}
                 onDelete={onDeleteBook}
+                onUpdate={onUpdateBook}
             />
         </div>
     );

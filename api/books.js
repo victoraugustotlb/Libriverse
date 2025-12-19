@@ -26,7 +26,8 @@ export default async function handler(req, res) {
                     purchase_date DATE,
                     purchase_price DECIMAL(10, 2),
                     loaned_to TEXT,
-                    loan_date DATE
+                    loan_date DATE,
+                    current_page INTEGER DEFAULT 0
                 )
             `);
 
@@ -49,7 +50,8 @@ export default async function handler(req, res) {
                 purchaseDate: book.purchase_date,
                 purchasePrice: book.purchase_price,
                 loanedTo: book.loaned_to,
-                loanDate: book.loan_date
+                loanDate: book.loan_date,
+                currentPage: book.current_page
             }));
 
             return res.status(200).json(books);
@@ -65,7 +67,7 @@ export default async function handler(req, res) {
             title, author, publisher, coverUrl,
             pageCount, language, isRead,
             purchaseDate, purchasePrice,
-            loanedTo, loanDate
+            loanedTo, loanDate, currentPage
         } = req.body;
 
         if (!title || !author) {
@@ -82,7 +84,8 @@ export default async function handler(req, res) {
                 'ADD COLUMN IF NOT EXISTS purchase_date DATE',
                 'ADD COLUMN IF NOT EXISTS purchase_price DECIMAL(10, 2)',
                 'ADD COLUMN IF NOT EXISTS loaned_to TEXT',
-                'ADD COLUMN IF NOT EXISTS loan_date DATE'
+                'ADD COLUMN IF NOT EXISTS loan_date DATE',
+                'ADD COLUMN IF NOT EXISTS current_page INTEGER DEFAULT 0'
             ];
 
             for (const col of columnsToAdd) {
@@ -93,13 +96,15 @@ export default async function handler(req, res) {
             const result = await pool.query(
                 `INSERT INTO books (
                     user_id, title, author, publisher, cover_url,
-                    page_count, language, is_read, 
-                    purchase_date, purchase_price, loaned_to, loan_date
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+                    page_count, language, is_read,
+                    purchase_date, purchase_price, loaned_to, loan_date,
+                    current_page
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
                 [
                     user.userId, title, author, publisher, coverUrl,
                     pageCount || null, language || 'Português', isRead || false,
-                    purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null
+                    purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null,
+                    currentPage || 0
                 ]
             );
             console.log('Book added, ID:', result.rows[0].id);
@@ -119,7 +124,8 @@ export default async function handler(req, res) {
                 purchaseDate: newBook.purchase_date,
                 purchasePrice: newBook.purchase_price,
                 loanedTo: newBook.loaned_to,
-                loanDate: newBook.loan_date
+                loanDate: newBook.loan_date,
+                currentPage: newBook.current_page
             });
 
         } catch (error) {
