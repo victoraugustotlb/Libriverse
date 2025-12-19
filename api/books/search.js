@@ -30,6 +30,22 @@ export default async function handler(req, res) {
             `);
 
             // Search for matches in title or author, case-insensitive
+            if (q === 'DEBUG') {
+                const result = await pool.query(
+                    `SELECT id, title, author, publisher, cover_url 
+                    FROM books 
+                    ORDER BY created_at DESC
+                    LIMIT 20`
+                );
+                const books = result.rows.map(book => ({
+                    id: book.id,
+                    title: book.title,
+                    author: book.author,
+                    publisher: book.publisher,
+                    coverUrl: book.cover_url
+                }));
+                return res.status(200).json(books);
+            }
             console.log('Searching for:', q);
             const result = await pool.query(
                 `SELECT id, title, author, publisher, cover_url 
