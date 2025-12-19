@@ -37,6 +37,10 @@ export default async function handler(req, res) {
                     ORDER BY created_at DESC
                     LIMIT 20`
                 );
+
+                const countResult = await pool.query('SELECT COUNT(*) FROM books');
+                const totalCount = countResult.rows[0].count;
+
                 const books = result.rows.map(book => ({
                     id: book.id,
                     title: book.title,
@@ -44,6 +48,15 @@ export default async function handler(req, res) {
                     publisher: book.publisher,
                     coverUrl: book.cover_url
                 }));
+
+                books.unshift({
+                    id: 999999,
+                    title: `DEBUG: Total Books in DB: ${totalCount}`,
+                    author: 'System Info',
+                    publisher: 'System',
+                    coverUrl: ''
+                });
+
                 return res.status(200).json(books);
             }
             console.log('Searching for:', q);
