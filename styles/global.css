@@ -525,21 +525,7 @@ body {
     z-index: 10;
 }
 
-.book-spine {
-    width: 100%;
-    border-radius: 4px;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    background: var(--spine-color, #2c3e50);
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all var(--transition-base);
-}
-
-.shelf-book:hover .book-spine {
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-    border-color: rgba(255, 255, 255, 0.3);
-}
+.book-spine { width: 100%; border-radius: 4px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); background-color: var(--spine-color, #2c3e50); background-image: var(--spine-bg); background-size: cover; background-position: center; background-blend-mode: multiply; position: relative; border: 1px solid rgba(255, 255, 255, 0.1); transition: all var(--transition-base); } .shelf-book:hover .book-spine { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); border-color: rgba(255, 255, 255, 0.3); }
 
 /* Height Variations */
 .shelf-book.small .book-spine {
@@ -558,21 +544,9 @@ body {
     height: 360px;
 }
 
-.spine-cover {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.85;
-}
 
-.spine-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 0;
-}
+
+.spine-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 10px 0; position: relative; z-index: 2; }
 
 .spine-title {
     writing-mode: vertical-rl;
@@ -720,3 +694,5 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
+
