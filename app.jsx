@@ -8,7 +8,10 @@ import AddBookModal from './components/AddBookModal.jsx';
 import Footer from './components/Footer.jsx';
 
 const App = () => {
-    const [view, setView] = useState('home');
+    const [view, setView] = useState(() => {
+        const savedUser = localStorage.getItem('libriverse_user');
+        return savedUser ? 'library' : 'home';
+    });
     const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem('libriverse_user');
         return savedUser ? JSON.parse(savedUser) : null;
