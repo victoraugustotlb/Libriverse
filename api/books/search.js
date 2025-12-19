@@ -22,6 +22,7 @@ export default async function handler(req, res) {
                 `SELECT DISTINCT ON (title, author) id, title, author, publisher, cover_url 
                  FROM books 
                  WHERE title ILIKE $1 OR author ILIKE $1 
+                 ORDER BY title, author, created_at DESC
                  LIMIT 20`,
                 [`%${q}%`]
             );
