@@ -18,6 +18,7 @@ export default async function handler(req, res) {
         try {
             // Search for matches in title or author, case-insensitive
             // DISTINCT ON (title, author) to avoid showing duplicate books from multiple users
+            console.log('Searching for:', q);
             const result = await pool.query(
                 `SELECT id, title, author, publisher, cover_url 
                  FROM books 
@@ -26,6 +27,7 @@ export default async function handler(req, res) {
                  LIMIT 20`,
                 [`%${q}%`]
             );
+            console.log('Found results:', result.rows.length);
 
             const books = result.rows.map(book => ({
                 id: book.id,
