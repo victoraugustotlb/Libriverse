@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BookDetailsModal from '../components/BookDetailsModal';
-import lombadaImg from '../images/lombada final.png';
-import bookshelfImg from '../images/bookshelf.PNG';
+import lombadaImg from '../images/lombada-final.png';
+import bookshelfImg from '../images/bookshelf.png';
 
 const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook }) => {
     const [selectedBook, setSelectedBook] = useState(null);
