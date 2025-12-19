@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Navbar = ({ onNavigate, user }) => {
+const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
     return (
         <nav className="navbar">
             <div className="navbar-content">
@@ -22,6 +22,17 @@ const Navbar = ({ onNavigate, user }) => {
                             Início
                         </a>
                     </li>
+                    {view === 'library' && (
+                        <li>
+                            <a
+                                href="#"
+                                className="navbar-link highlight"
+                                onClick={(e) => { e.preventDefault(); onOpenAddModal(); }}
+                            >
+                                Adicionar
+                            </a>
+                        </li>
+                    )}
                     {user ? (
                         <>
                             <li><span className="navbar-user">Olá, {user.name}</span></li>

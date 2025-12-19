@@ -4,6 +4,7 @@ import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Library from './pages/Library.jsx';
+import AddBookModal from './components/AddBookModal.jsx';
 import Footer from './components/Footer.jsx';
 
 const App = () => {
@@ -12,6 +13,8 @@ const App = () => {
         const savedUser = localStorage.getItem('libriverse_user');
         return savedUser ? JSON.parse(savedUser) : null;
     });
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     const handleNavigate = (newView) => {
         if (newView === 'logout') {
@@ -34,12 +37,27 @@ const App = () => {
 
     return (
         <div className="app">
-            <Navbar onNavigate={handleNavigate} user={user} />
+            <Navbar
+                onNavigate={handleNavigate}
+                user={user}
+                view={view}
+                onOpenAddModal={() => setIsAddModalOpen(true)}
+            />
             {view === 'home' && <Home onNavigate={handleNavigate} />}
             {view === 'login' && <Login onNavigate={handleNavigate} />}
             {view === 'register' && <Register onNavigate={handleNavigate} />}
-            {view === 'library' && <Library onNavigate={handleNavigate} />}
+            {view === 'library' && (
+                <Library
+                    onNavigate={handleNavigate}
+                    onOpenAddModal={() => setIsAddModalOpen(true)}
+                />
+            )}
             <Footer />
+
+            <AddBookModal
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+            />
         </div>
     );
 };

@@ -1,9 +1,4 @@
-import React, { useState } from 'react';
-import AddBookModal from '../components/AddBookModal';
-
-const Library = ({ onNavigate }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
+const Library = ({ onNavigate, onOpenAddModal }) => {
     return (
         <div className="library-page">
             <section className="hero">
@@ -12,17 +7,12 @@ const Library = ({ onNavigate }) => {
                     <p className="hero-subtitle">Não há nenhum livro em sua biblioteca</p>
                     <button
                         className="hero-cta"
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => onOpenAddModal()}
                     >
                         Adicionar agora
                     </button>
                 </div>
             </section>
-
-            <AddBookModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-            />
         </div>
     );
 };
