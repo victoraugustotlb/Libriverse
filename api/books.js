@@ -67,10 +67,12 @@ export default async function handler(req, res) {
                 )
             `);
 
+            console.log('Adding book:', title, author);
             const result = await pool.query(
                 'INSERT INTO books (user_id, title, author, publisher, cover_url) VALUES ($1, $2, $3, $4, $5) RETURNING *',
                 [user.userId, title, author, publisher, coverUrl]
             );
+            console.log('Book added, ID:', result.rows[0].id);
 
             const newBook = result.rows[0];
             return res.status(201).json({
