@@ -14,12 +14,26 @@ const SearchBookModal = ({ isOpen, onClose, onAddBook }) => {
         setLoading(true);
         try {
             const token = localStorage.getItem('libriverse_token');
+            console.log('Sending search request for:', query);
+
             const response = await fetch(`/api/books/search?q=${encodeURIComponent(query)}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+
+            console.log('Search response status:', response.status);
+
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Search failed:', text);
+                alert(`Erro na pesquisa: ${response.status}`);
+                setResults([]);
+                return;
+            }
+
             const data = await response.json();
+            console.log('Search results:', data);
             setResults(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Search error:', error);
