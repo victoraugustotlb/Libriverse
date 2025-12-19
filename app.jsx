@@ -14,6 +14,11 @@ const App = () => {
         return savedUser ? JSON.parse(savedUser) : null;
     });
 
+    const [userBooks, setUserBooks] = useState(() => {
+        const savedBooks = localStorage.getItem('libriverse_library');
+        return savedBooks ? JSON.parse(savedBooks) : [];
+    });
+
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     const handleNavigate = (newView) => {
@@ -35,6 +40,17 @@ const App = () => {
         window.scrollTo(0, 0);
     };
 
+    const handleAddBook = (bookData) => {
+        const newBook = {
+            id: Date.now(),
+            ...bookData,
+            createdAt: new Date().toISOString()
+        };
+        const updatedBooks = [...userBooks, newBook];
+        setUserBooks(updatedBooks);
+        localStorage.setItem('libriverse_library', JSON.stringify(updatedBooks));
+    };
+
     return (
         <div className="app">
             <Navbar
@@ -50,6 +66,7 @@ const App = () => {
                 <Library
                     onNavigate={handleNavigate}
                     onOpenAddModal={() => setIsAddModalOpen(true)}
+                    books={userBooks}
                 />
             )}
             <Footer />
@@ -57,6 +74,7 @@ const App = () => {
             <AddBookModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
+                onAddBook={handleAddBook}
             />
         </div>
     );

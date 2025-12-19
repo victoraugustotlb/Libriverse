@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const AddBookModal = ({ isOpen, onClose }) => {
+const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [publisher, setPublisher] = useState('');
@@ -10,14 +10,13 @@ const AddBookModal = ({ isOpen, onClose }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log({ title, author, publisher, coverUrl });
+        onAddBook({ title, author, publisher, coverUrl });
         // Reset form and close
         setTitle('');
         setAuthor('');
         setPublisher('');
         setCoverUrl('');
         onClose();
-        alert('Livro adicionado com sucesso! (Simulado)');
     };
 
     return (
