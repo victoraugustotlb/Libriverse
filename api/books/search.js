@@ -16,8 +16,20 @@ export default async function handler(req, res) {
         }
 
         try {
+            // Ensure table exists just in case
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS books (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER REFERENCES users(id),
+                    title TEXT NOT NULL,
+                    author TEXT NOT NULL,
+                    publisher TEXT,
+                    cover_url TEXT,
+                    created_at TIMESTAMP DEFAULT NOW()
+                )
+            `);
+
             // Search for matches in title or author, case-insensitive
-            // DISTINCT ON (title, author) to avoid showing duplicate books from multiple users
             console.log('Searching for:', q);
             const result = await pool.query(
                 `SELECT id, title, author, publisher, cover_url 
@@ -41,7 +53,7 @@ export default async function handler(req, res) {
 
         } catch (error) {
             console.error('Search books error:', error);
-            return res.status(500).json({ error: 'Internal server error' });
+            return res.status(500).json({ error: error.message || 'Internal server error' });
         }
     }
 

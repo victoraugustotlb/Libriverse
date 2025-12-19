@@ -25,9 +25,10 @@ const SearchBookModal = ({ isOpen, onClose, onAddBook }) => {
             console.log('Search response status:', response.status);
 
             if (!response.ok) {
-                const text = await response.text();
-                console.error('Search failed:', text);
-                alert(`Erro na pesquisa: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error || await response.text();
+                console.error('Search failed:', errorMessage);
+                alert(`Erro na pesquisa: ${errorMessage}`);
                 setResults([]);
                 return;
             }
