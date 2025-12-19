@@ -5,6 +5,8 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Library from './pages/Library.jsx';
 import AddBookModal from './components/AddBookModal.jsx';
+import AddBookMethodModal from './components/AddBookMethodModal.jsx';
+import SearchBookModal from './components/SearchBookModal.jsx';
 import Footer from './components/Footer.jsx';
 
 const App = () => {
@@ -25,6 +27,8 @@ const App = () => {
 
     const [userBooks, setUserBooks] = useState([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isMethodModalOpen, setIsMethodModalOpen] = useState(false);
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
     // Fetch books when user is logged in
     React.useEffect(() => {
@@ -126,7 +130,7 @@ const App = () => {
                 onNavigate={handleNavigate}
                 user={user}
                 view={view}
-                onOpenAddModal={() => setIsAddModalOpen(true)}
+                onOpenAddModal={() => setIsMethodModalOpen(true)}
             />
             {view === 'home' && <Home onNavigate={handleNavigate} />}
             {view === 'login' && <Login onNavigate={handleNavigate} />}
@@ -134,16 +138,29 @@ const App = () => {
             {view === 'library' && (
                 <Library
                     onNavigate={handleNavigate}
-                    onOpenAddModal={() => setIsAddModalOpen(true)}
+                    onOpenAddModal={() => setIsMethodModalOpen(true)}
                     books={userBooks}
                     onDeleteBook={handleDeleteBook}
                 />
             )}
             <Footer />
 
+            <AddBookMethodModal
+                isOpen={isMethodModalOpen}
+                onClose={() => setIsMethodModalOpen(false)}
+                onSelectManual={() => setIsAddModalOpen(true)}
+                onSelectSearch={() => setIsSearchModalOpen(true)}
+            />
+
             <AddBookModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
+                onAddBook={handleAddBook}
+            />
+
+            <SearchBookModal
+                isOpen={isSearchModalOpen}
+                onClose={() => setIsSearchModalOpen(false)}
                 onAddBook={handleAddBook}
             />
         </div>
