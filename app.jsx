@@ -13,8 +13,14 @@ const App = () => {
         return savedUser ? 'library' : 'home';
     });
     const [user, setUser] = useState(() => {
-        const savedUser = localStorage.getItem('libriverse_user');
-        return savedUser ? JSON.parse(savedUser) : null;
+        try {
+            const savedUser = localStorage.getItem('libriverse_user');
+            return savedUser ? JSON.parse(savedUser) : null;
+        } catch (error) {
+            console.error('Error parsing user data:', error);
+            localStorage.removeItem('libriverse_user');
+            return null;
+        }
     });
 
     const [userBooks, setUserBooks] = useState([]);
@@ -32,7 +38,12 @@ const App = () => {
                     });
                     if (response.ok) {
                         const data = await response.json();
-                        setUserBooks(data);
+                        if (Array.isArray(data)) {
+                            setUserBooks(data);
+                        } else {
+                            console.error('API returned non-array books data:', data);
+                            setUserBooks([]);
+                        }
                     }
                 } catch (error) {
                     console.error('Failed to fetch books:', error);

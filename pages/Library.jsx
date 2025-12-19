@@ -4,13 +4,14 @@ import lombadaImg from '../images/lombada-final.png';
 import bookshelfImg from '../images/estante.png';
 
 const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook }) => {
+    const safeBooks = Array.isArray(books) ? books : [];
     const [selectedBook, setSelectedBook] = useState(null);
     const sizes = ["small", "medium", "large", "xlarge"];
 
     // Group books into shelves of 15
     const shelves = [];
-    for (let i = 0; i < books.length; i += 15) {
-        shelves.push(books.slice(i, i + 15));
+    for (let i = 0; i < safeBooks.length; i += 15) {
+        shelves.push(safeBooks.slice(i, i + 15));
     }
 
     return (
