@@ -103,6 +103,27 @@ const App = () => {
         }
     };
 
+    const handleDeleteBook = async (bookId) => {
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            const response = await fetch(`/api/books/${bookId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                setUserBooks(userBooks.filter(book => book.id !== bookId));
+            } else {
+                alert('Erro ao excluir livro.');
+            }
+        } catch (error) {
+            console.error('Error deleting book:', error);
+            alert('Erro de conexão.');
+        }
+    };
+
     const handleUpdateBook = async (bookId, updates) => {
         try {
             const token = localStorage.getItem('libriverse_token');
