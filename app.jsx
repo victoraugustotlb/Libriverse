@@ -51,6 +51,12 @@ const App = () => {
         localStorage.setItem('libriverse_library', JSON.stringify(updatedBooks));
     };
 
+    const handleDeleteBook = (bookId) => {
+        const updatedBooks = userBooks.filter(book => book.id !== bookId);
+        setUserBooks(updatedBooks);
+        localStorage.setItem('libriverse_library', JSON.stringify(updatedBooks));
+    };
+
     return (
         <div className="app">
             <Navbar
@@ -67,6 +73,7 @@ const App = () => {
                     onNavigate={handleNavigate}
                     onOpenAddModal={() => setIsAddModalOpen(true)}
                     books={userBooks}
+                    onDeleteBook={handleDeleteBook}
                 />
             )}
             <Footer />

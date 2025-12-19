@@ -1,4 +1,8 @@
-const Library = ({ onNavigate, onOpenAddModal, books = [] }) => {
+import React, { useState } from 'react';
+import BookDetailsModal from '../components/BookDetailsModal';
+
+const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook }) => {
+    const [selectedBook, setSelectedBook] = useState(null);
     const spineColors = ['#ff3b30', '#ff9500', '#ffcc00', '#4cd964', '#007aff', '#5856d6', '#ff2d55'];
 
     return (
@@ -39,6 +43,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [] }) => {
                                         className={`shelf-book ${size}`}
                                         style={{ '--spine-color': bgColor }}
                                         data-tooltip={`${book.title} - ${book.author}`}
+                                        onClick={() => setSelectedBook(book)}
                                     >
                                         <div className="book-spine">
                                             {book.coverUrl ? (
@@ -56,6 +61,13 @@ const Library = ({ onNavigate, onOpenAddModal, books = [] }) => {
                     </div>
                 </section>
             )}
+
+            <BookDetailsModal
+                book={selectedBook}
+                isOpen={!!selectedBook}
+                onClose={() => setSelectedBook(null)}
+                onDelete={onDeleteBook}
+            />
         </div>
     );
 };
