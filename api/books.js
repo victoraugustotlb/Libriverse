@@ -19,7 +19,14 @@ export default async function handler(req, res) {
                     author TEXT NOT NULL,
                     publisher TEXT,
                     cover_url TEXT,
-                    created_at TIMESTAMP DEFAULT NOW()
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    page_count INTEGER,
+                    language TEXT,
+                    is_read BOOLEAN DEFAULT FALSE,
+                    purchase_date DATE,
+                    purchase_price DECIMAL(10, 2),
+                    loaned_to TEXT,
+                    loan_date DATE
                 )
             `);
 
@@ -28,15 +35,21 @@ export default async function handler(req, res) {
                 [user.userId]
             );
 
-            // Map DB fields to frontend expected format if necessary
-            // Frontend expects: id, title, author, publisher, coverUrl (came from cover_url)
+            // Map DB fields to frontend expected format
             const books = result.rows.map(book => ({
                 id: book.id,
                 title: book.title,
                 author: book.author,
                 publisher: book.publisher,
                 coverUrl: book.cover_url,
-                createdAt: book.created_at
+                createdAt: book.created_at,
+                pageCount: book.page_count,
+                language: book.language,
+                isRead: book.is_read,
+                purchaseDate: book.purchase_date,
+                purchasePrice: book.purchase_price,
+                loanedTo: book.loaned_to,
+                loanDate: book.loan_date
             }));
 
             return res.status(200).json(books);
@@ -48,29 +61,46 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-        const { title, author, publisher, coverUrl } = req.body;
+        const {
+            title, author, publisher, coverUrl,
+            pageCount, language, isRead,
+            purchaseDate, purchasePrice,
+            loanedTo, loanDate
+        } = req.body;
 
         if (!title || !author) {
             return res.status(400).json({ error: 'Title and Author are required' });
         }
 
         try {
-            await pool.query(`
-                CREATE TABLE IF NOT EXISTS books (
-                    id SERIAL PRIMARY KEY,
-                    user_id INTEGER REFERENCES users(id),
-                    title TEXT NOT NULL,
-                    author TEXT NOT NULL,
-                    publisher TEXT,
-                    cover_url TEXT,
-                    created_at TIMESTAMP DEFAULT NOW()
-                )
-            `);
+            // Lazy migration: Add missing columns if they don't exist
+            // (In a real production app we would use a migration tool)
+            const columnsToAdd = [
+                'ADD COLUMN IF NOT EXISTS page_count INTEGER',
+                'ADD COLUMN IF NOT EXISTS language TEXT',
+                'ADD COLUMN IF NOT EXISTS is_read BOOLEAN DEFAULT FALSE',
+                'ADD COLUMN IF NOT EXISTS purchase_date DATE',
+                'ADD COLUMN IF NOT EXISTS purchase_price DECIMAL(10, 2)',
+                'ADD COLUMN IF NOT EXISTS loaned_to TEXT',
+                'ADD COLUMN IF NOT EXISTS loan_date DATE'
+            ];
+
+            for (const col of columnsToAdd) {
+                await pool.query(`ALTER TABLE books ${col}`).catch(() => { });
+            }
 
             console.log('Adding book:', title, author);
             const result = await pool.query(
-                'INSERT INTO books (user_id, title, author, publisher, cover_url) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-                [user.userId, title, author, publisher, coverUrl]
+                `INSERT INTO books (
+                    user_id, title, author, publisher, cover_url,
+                    page_count, language, is_read, 
+                    purchase_date, purchase_price, loaned_to, loan_date
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+                [
+                    user.userId, title, author, publisher, coverUrl,
+                    pageCount || null, language || 'Português', isRead || false,
+                    purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null
+                ]
             );
             console.log('Book added, ID:', result.rows[0].id);
 
@@ -81,7 +111,15 @@ export default async function handler(req, res) {
                 author: newBook.author,
                 publisher: newBook.publisher,
                 coverUrl: newBook.cover_url,
-                createdAt: newBook.created_at
+                createdAt: newBook.created_at,
+                // Return new fields
+                pageCount: newBook.page_count,
+                language: newBook.language,
+                isRead: newBook.is_read,
+                purchaseDate: newBook.purchase_date,
+                purchasePrice: newBook.purchase_price,
+                loanedTo: newBook.loaned_to,
+                loanDate: newBook.loan_date
             });
 
         } catch (error) {
