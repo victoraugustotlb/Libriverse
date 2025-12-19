@@ -17,12 +17,32 @@ const App = () => {
         return savedUser ? JSON.parse(savedUser) : null;
     });
 
-    const [userBooks, setUserBooks] = useState(() => {
-        const savedBooks = localStorage.getItem('libriverse_library');
-        return savedBooks ? JSON.parse(savedBooks) : [];
-    });
+    const [userBooks, setUserBooks] = useState([]);
 
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    // Fetch books when user is logged in
+    React.useEffect(() => {
+        if (user) {
+            const fetchBooks = async () => {
+                try {
+                    const token = localStorage.getItem('libriverse_token');
+                    const response = await fetch('/api/books', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        setUserBooks(data);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch books:', error);
+                }
+            };
+            fetchBooks();
+        } else {
+            setUserBooks([]);
+        }
+    }, [user]);
 
     const handleNavigate = (newView) => {
         if (newView === 'logout') {
@@ -43,21 +63,49 @@ const App = () => {
         window.scrollTo(0, 0);
     };
 
-    const handleAddBook = (bookData) => {
-        const newBook = {
-            id: Date.now(),
-            ...bookData,
-            createdAt: new Date().toISOString()
-        };
-        const updatedBooks = [...userBooks, newBook];
-        setUserBooks(updatedBooks);
-        localStorage.setItem('libriverse_library', JSON.stringify(updatedBooks));
+    const handleAddBook = async (bookData) => {
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            const response = await fetch('/api/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(bookData)
+            });
+
+            if (response.ok) {
+                const newBook = await response.json();
+                setUserBooks([newBook, ...userBooks]);
+            } else {
+                alert('Erro ao adicionar livro.');
+            }
+        } catch (error) {
+            console.error('Error adding book:', error);
+            alert('Erro de conexão.');
+        }
     };
 
-    const handleDeleteBook = (bookId) => {
-        const updatedBooks = userBooks.filter(book => book.id !== bookId);
-        setUserBooks(updatedBooks);
-        localStorage.setItem('libriverse_library', JSON.stringify(updatedBooks));
+    const handleDeleteBook = async (bookId) => {
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            const response = await fetch(`/api/books/${bookId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                setUserBooks(userBooks.filter(book => book.id !== bookId));
+            } else {
+                alert('Erro ao excluir livro.');
+            }
+        } catch (error) {
+            console.error('Error deleting book:', error);
+            alert('Erro de conexão.');
+        }
     };
 
     return (
