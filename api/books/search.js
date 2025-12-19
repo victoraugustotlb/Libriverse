@@ -1,5 +1,5 @@
-import pool from '../../lib/db.js';
-import { verifyToken } from '../../lib/auth-utils.js';
+import pool from '../lib/db.js';
+import { verifyToken } from '../lib/auth-utils.js';
 
 export default async function handler(req, res) {
     const user = verifyToken(req);
