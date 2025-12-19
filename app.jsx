@@ -24,6 +24,7 @@ const App = () => {
     });
 
     const [userBooks, setUserBooks] = useState([]);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     // Fetch books when user is logged in
     React.useEffect(() => {
