@@ -319,39 +319,36 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
                                 </label>
                             </div>
 
-                            {/* Collapsible/Section for Logs (Simplified visual) */}
-                            <div style={{ marginTop: '10px' }}>
-                                <details style={{ background: 'var(--color-bg-secondary)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                                    <summary style={{ padding: '15px', cursor: 'pointer', fontWeight: '500', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <span>Opções Avançadas (Logs)</span>
-                                        <span style={{ fontSize: '0.8rem' }}>▼</span>
-                                    </summary>
-                                    <div style={{ padding: '15px', borderTop: '1px solid var(--color-border)' }}>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                                <label>Data Compra</label>
-                                                <input type="date" className="auth-input" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
-                                            </div>
-                                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                                <label>Preço (R$)</label>
-                                                <input type="number" step="0.01" className="auth-input" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} />
-                                            </div>
-                                        </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                                <label>Emprestado para</label>
-                                                <input type="text" className="auth-input" value={loanedTo} onChange={(e) => setLoanedTo(e.target.value)} />
-                                            </div>
-                                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                                <label>Data Empréstimo</label>
-                                                <input type="date" className="auth-input" value={loanDate} onChange={(e) => setLoanDate(e.target.value)} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </details>
-                            </div>
-
                         </div>
+
+                        {/* Logs Column */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
+                                Logs e Histórico
+                            </h3>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Data Compra</label>
+                                    <input type="date" className="auth-input" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Preço (R$)</label>
+                                    <input type="number" step="0.01" className="auth-input" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} />
+                                </div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Emprestado para</label>
+                                    <input type="text" className="auth-input" value={loanedTo} onChange={(e) => setLoanedTo(e.target.value)} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Data Empréstimo</label>
+                                    <input type="date" className="auth-input" value={loanDate} onChange={(e) => setLoanDate(e.target.value)} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </form>
 

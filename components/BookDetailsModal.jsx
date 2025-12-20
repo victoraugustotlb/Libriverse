@@ -1,4 +1,3 @@
-```javascript
 import React from 'react';
 
 const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
@@ -69,16 +68,16 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                     borderRight: '1px solid var(--color-border)'
                 }}>
                     {book.coverUrl && !imgError ? (
-                        <img 
-                            src={book.coverUrl} 
-                            alt={book.title} 
+                        <img
+                            src={book.coverUrl}
+                            alt={book.title}
                             onError={() => setImgError(true)}
                             style={{
                                 maxWidth: '100%',
                                 maxHeight: '400px',
                                 boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
                                 borderRadius: '8px'
-                            }} 
+                            }}
                         />
                     ) : (
                         <div style={{
@@ -204,7 +203,7 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                 </button>
                             </div>
                             <div style={{ width: '100%', height: '10px', background: 'var(--color-bg-secondary)', borderRadius: '5px', overflow: 'hidden' }}>
-                                <div style={{ width: `${ progress }% `, height: '100%', background: 'linear-gradient(to right, var(--color-accent), #5ac8fa)', transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)', borderRadius: '5px' }}></div>
+                                <div style={{ width: `${progress}% `, height: '100%', background: 'linear-gradient(to right, var(--color-accent), #5ac8fa)', transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)', borderRadius: '5px' }}></div>
                             </div>
                         </div>
                     )}
