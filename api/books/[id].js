@@ -4,15 +4,17 @@ import { verifyToken } from '../lib/auth-utils.js';
 export default async function handler(req, res) {
     const user = verifyToken(req);
 
+    const method = req.method.toUpperCase();
+
     if (!user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    if (req.method === 'OPTIONS') {
+    if (method === 'OPTIONS') {
         return res.status(200).end();
     }
 
-    if (req.method === 'DELETE') {
+    if (method === 'DELETE') {
         const { id } = req.query;
 
         if (!id) {
@@ -37,7 +39,7 @@ export default async function handler(req, res) {
         }
     }
 
-    if (req.method === 'PUT') {
+    if (method === 'PUT') {
         const { id } = req.query;
         const { currentPage, isRead } = req.body;
 
