@@ -1,13 +1,17 @@
+```javascript
 import React from 'react';
 
 const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
     const [currentPage, setCurrentPage] = React.useState(0);
     const [isRead, setIsRead] = React.useState(false);
 
+    const [imgError, setImgError] = React.useState(false);
+
     React.useEffect(() => {
         if (book) {
             setCurrentPage(book.currentPage || 0);
             setIsRead(book.isRead || false);
+            setImgError(false); // Reset error state for new book
         }
     }, [book]);
 
@@ -64,13 +68,18 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                     padding: '30px',
                     borderRight: '1px solid var(--color-border)'
                 }}>
-                    {book.coverUrl ? (
-                        <img src={book.coverUrl} alt={book.title} style={{
-                            maxWidth: '100%',
-                            maxHeight: '400px',
-                            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                            borderRadius: '8px'
-                        }} />
+                    {book.coverUrl && !imgError ? (
+                        <img 
+                            src={book.coverUrl} 
+                            alt={book.title} 
+                            onError={() => setImgError(true)}
+                            style={{
+                                maxWidth: '100%',
+                                maxHeight: '400px',
+                                boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                                borderRadius: '8px'
+                            }} 
+                        />
                     ) : (
                         <div style={{
                             width: '160px',
@@ -195,7 +204,7 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                 </button>
                             </div>
                             <div style={{ width: '100%', height: '10px', background: 'var(--color-bg-secondary)', borderRadius: '5px', overflow: 'hidden' }}>
-                                <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(to right, var(--color-accent), #5ac8fa)', transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)', borderRadius: '5px' }}></div>
+                                <div style={{ width: `${ progress }% `, height: '100%', background: 'linear-gradient(to right, var(--color-accent), #5ac8fa)', transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)', borderRadius: '5px' }}></div>
                             </div>
                         </div>
                     )}

@@ -149,7 +149,13 @@ const App = () => {
             } else {
                 const errorData = await response.json().catch(() => ({}));
                 const errorMessage = errorData.error || `Erro ${response.status}: ${response.statusText}`;
-                alert(`Erro ao atualizar livro: ${errorMessage}`);
+
+                let debugInfo = '';
+                if (errorData.debug) {
+                    debugInfo = `\nDebug: Method=${errorData.debug.method}, URL=${errorData.debug.url}`;
+                }
+
+                alert(`Erro ao atualizar livro: ${errorMessage}${debugInfo}`);
             }
         } catch (error) {
             console.error('Error updating book:', error);

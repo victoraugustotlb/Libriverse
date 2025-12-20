@@ -16,6 +16,42 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
     const [loanedTo, setLoanedTo] = useState('');
     const [loanDate, setLoanDate] = useState('');
 
+    const [isDragging, setIsDragging] = useState(false);
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            processFile(file);
+        }
+    };
+
+    const handleFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            processFile(file);
+        }
+    };
+
+    const processFile = (file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setCoverUrl(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
     useEffect(() => {
         if (isOpen && initialData) {
             setTitle(initialData.title || '');
@@ -90,183 +126,232 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px' }}>
 
-                    {/* Left Column: Basic Info */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
-                            Informações Principais
-                        </h3>
+                    {/* Top Section: Cover & Basic Info */}
+                    <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '40px' }}>
 
-                        <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label htmlFor="title">Nome do Livro</label>
-                            <input
-                                type="text"
-                                id="title"
-                                className="auth-input"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                required
-                                placeholder="Ex: O Pequeno Príncipe"
-                            />
-                        </div>
+                        {/* Left: Drag & Drop Cover Zone */}
+                        <div
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                            style={{
+                                width: '200px',
+                                flexShrink: 0,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '10px'
+                            }}
+                        >
+                            <div style={{
+                                width: '100%',
+                                height: '300px', // Standard book ratio approx
+                                background: coverUrl ? `url(${coverUrl}) center/cover no-repeat` : (isDragging ? 'var(--color-bg-tertiary)' : 'var(--color-bg-secondary)'),
+                                border: `2px dashed ${isDragging ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }} onClick={() => document.getElementById('coverInput').click()}>
 
-                        <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label htmlFor="author">Autor</label>
-                            <input
-                                type="text"
-                                id="author"
-                                className="auth-input"
-                                value={author}
-                                onChange={(e) => setAuthor(e.target.value)}
-                                required
-                                placeholder="Ex: Antoine de Saint-Exupéry"
-                            />
-                        </div>
+                                {!coverUrl && (
+                                    <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)' }}>
+                                        <span style={{ fontSize: '2rem', display: 'block', marginBottom: '10px' }}>📷</span>
+                                        <p style={{ fontSize: '0.9rem' }}>Arraste uma imagem ou clique para enviar</p>
+                                    </div>
+                                )}
 
-                        <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label htmlFor="publisher">Editora</label>
-                            <input
-                                type="text"
-                                id="publisher"
-                                className="auth-input"
-                                value={publisher}
-                                onChange={(e) => setPublisher(e.target.value)}
-                                required
-                                placeholder="Ex: Agir"
-                            />
-                        </div>
+                                <input
+                                    type="file"
+                                    id="coverInput"
+                                    accept="image/*"
+                                    onChange={handleFileSelect}
+                                    style={{ display: 'none' }}
+                                />
+                            </div>
 
-                        <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label htmlFor="coverUrl">Foto da Capa (URL)</label>
+                            {/* URL Fallback */}
                             <input
                                 type="url"
-                                id="coverUrl"
                                 className="auth-input"
                                 value={coverUrl}
                                 onChange={(e) => setCoverUrl(e.target.value)}
-                                placeholder="https://..."
+                                placeholder="Ou cole a URL aqui..."
+                                style={{ fontSize: '0.8rem', padding: '8px' }}
                             />
+                        </div>
+
+                        {/* Right: Basic Fields */}
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
+                                Informações Principais
+                            </h3>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="title">Nome do Livro</label>
+                                <input
+                                    type="text"
+                                    id="title"
+                                    className="auth-input"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    required
+                                    placeholder="Ex: O Pequeno Príncipe"
+                                />
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="author">Autor</label>
+                                <input
+                                    type="text"
+                                    id="author"
+                                    className="auth-input"
+                                    value={author}
+                                    onChange={(e) => setAuthor(e.target.value)}
+                                    required
+                                    placeholder="Ex: Antoine de Saint-Exupéry"
+                                />
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="publisher">Editora</label>
+                                <input
+                                    type="text"
+                                    id="publisher"
+                                    className="auth-input"
+                                    value={publisher}
+                                    onChange={(e) => setPublisher(e.target.value)}
+                                    required
+                                    placeholder="Ex: Agir"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Right Column: Details & Logs */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
-                            Detalhes & Status
-                        </h3>
+                    {/* Bottom Section: Details & Logs */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                        {/* Details Column */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
+                                Detalhes & Status
+                            </h3>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="pageCount">Páginas</label>
-                                <input
-                                    type="number"
-                                    id="pageCount"
-                                    className="auth-input"
-                                    value={pageCount}
-                                    onChange={(e) => setPageCount(e.target.value)}
-                                    placeholder="0"
-                                />
-                            </div>
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="currentPage">Pág. Atual</label>
-                                <input
-                                    type="number"
-                                    id="currentPage"
-                                    className="auth-input"
-                                    value={currentPage}
-                                    onChange={(e) => setCurrentPage(e.target.value)}
-                                    placeholder="0"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label htmlFor="language">Idioma</label>
-                            <input
-                                type="text"
-                                id="language"
-                                className="auth-input"
-                                placeholder="Ex: Português"
-                                value={language}
-                                onChange={(e) => setLanguage(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Read Status Toggle */}
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            background: 'var(--color-bg-tertiary)',
-                            padding: '15px',
-                            borderRadius: 'var(--radius-md)',
-                            border: '1px solid var(--color-border)'
-                        }}>
-                            <span style={{ color: 'var(--color-text-primary)', fontWeight: '500' }}>Já li este livro</span>
-                            <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '46px', height: '24px' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={isRead}
-                                    onChange={(e) => setIsRead(e.target.checked)}
-                                    style={{ opacity: 0, width: 0, height: 0 }}
-                                />
-                                <span className="slider round" style={{
-                                    position: 'absolute',
-                                    cursor: 'pointer',
-                                    top: 0, left: 0, right: 0, bottom: 0,
-                                    backgroundColor: isRead ? 'var(--color-accent)' : '#d1d1d6', // Apple switch gray
-                                    transition: '.4s',
-                                    borderRadius: '34px'
-                                }}>
-                                    <span style={{
-                                        position: 'absolute',
-                                        content: '""',
-                                        height: '20px', width: '20px',
-                                        left: isRead ? '24px' : '2px',
-                                        bottom: '2px',
-                                        backgroundColor: 'white',
-                                        transition: '.4s',
-                                        borderRadius: '50%',
-                                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                    }}></span>
-                                </span>
-                            </label>
-                        </div>
-
-                        {/* Collapsible/Section for Logs (Simplified visual) */}
-                        <div style={{ marginTop: '10px' }}>
-                            <details style={{ background: 'var(--color-bg-secondary)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                                <summary style={{ padding: '15px', cursor: 'pointer', fontWeight: '500', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <span>Opções Avançadas (Logs)</span>
-                                    <span style={{ fontSize: '0.8rem' }}>▼</span>
-                                </summary>
-                                <div style={{ padding: '15px', borderTop: '1px solid var(--color-border)' }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                                        <div className="form-group" style={{ marginBottom: 0 }}>
-                                            <label>Data Compra</label>
-                                            <input type="date" className="auth-input" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
-                                        </div>
-                                        <div className="form-group" style={{ marginBottom: 0 }}>
-                                            <label>Preço (R$)</label>
-                                            <input type="number" step="0.01" className="auth-input" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} />
-                                        </div>
-                                    </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                        <div className="form-group" style={{ marginBottom: 0 }}>
-                                            <label>Emprestado para</label>
-                                            <input type="text" className="auth-input" value={loanedTo} onChange={(e) => setLoanedTo(e.target.value)} />
-                                        </div>
-                                        <div className="form-group" style={{ marginBottom: 0 }}>
-                                            <label>Data Empréstimo</label>
-                                            <input type="date" className="auth-input" value={loanDate} onChange={(e) => setLoanDate(e.target.value)} />
-                                        </div>
-                                    </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label htmlFor="pageCount">Páginas</label>
+                                    <input
+                                        type="number"
+                                        id="pageCount"
+                                        className="auth-input"
+                                        value={pageCount}
+                                        onChange={(e) => setPageCount(e.target.value)}
+                                        placeholder="0"
+                                    />
                                 </div>
-                            </details>
-                        </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label htmlFor="currentPage">Pág. Atual</label>
+                                    <input
+                                        type="number"
+                                        id="currentPage"
+                                        className="auth-input"
+                                        value={currentPage}
+                                        onChange={(e) => setCurrentPage(e.target.value)}
+                                        placeholder="0"
+                                    />
+                                </div>
+                            </div>
 
-                    </div>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="language">Idioma</label>
+                                <input
+                                    type="text"
+                                    id="language"
+                                    className="auth-input"
+                                    placeholder="Ex: Português"
+                                    value={language}
+                                    onChange={(e) => setLanguage(e.target.value)}
+                                />
+                            </div>
+
+                            {/* Read Status Toggle */}
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                background: 'var(--color-bg-tertiary)',
+                                padding: '15px',
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--color-border)'
+                            }}>
+                                <span style={{ color: 'var(--color-text-primary)', fontWeight: '500' }}>Já li este livro</span>
+                                <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '46px', height: '24px' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={isRead}
+                                        onChange={(e) => setIsRead(e.target.checked)}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                    />
+                                    <span className="slider round" style={{
+                                        position: 'absolute',
+                                        cursor: 'pointer',
+                                        top: 0, left: 0, right: 0, bottom: 0,
+                                        backgroundColor: isRead ? 'var(--color-accent)' : '#d1d1d6', // Apple switch gray
+                                        transition: '.4s',
+                                        borderRadius: '34px'
+                                    }}>
+                                        <span style={{
+                                            position: 'absolute',
+                                            content: '""',
+                                            height: '20px', width: '20px',
+                                            left: isRead ? '24px' : '2px',
+                                            bottom: '2px',
+                                            backgroundColor: 'white',
+                                            transition: '.4s',
+                                            borderRadius: '50%',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                        }}></span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            {/* Collapsible/Section for Logs (Simplified visual) */}
+                            <div style={{ marginTop: '10px' }}>
+                                <details style={{ background: 'var(--color-bg-secondary)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                                    <summary style={{ padding: '15px', cursor: 'pointer', fontWeight: '500', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <span>Opções Avançadas (Logs)</span>
+                                        <span style={{ fontSize: '0.8rem' }}>▼</span>
+                                    </summary>
+                                    <div style={{ padding: '15px', borderTop: '1px solid var(--color-border)' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                                <label>Data Compra</label>
+                                                <input type="date" className="auth-input" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+                                            </div>
+                                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                                <label>Preço (R$)</label>
+                                                <input type="number" step="0.01" className="auth-input" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} />
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                                <label>Emprestado para</label>
+                                                <input type="text" className="auth-input" value={loanedTo} onChange={(e) => setLoanedTo(e.target.value)} />
+                                            </div>
+                                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                                <label>Data Empréstimo</label>
+                                                <input type="date" className="auth-input" value={loanDate} onChange={(e) => setLoanDate(e.target.value)} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+
+                        </div>
 
                 </form>
 
