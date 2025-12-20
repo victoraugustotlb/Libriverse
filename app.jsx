@@ -107,7 +107,7 @@ const App = () => {
     const handleDeleteBook = async (bookId) => {
         try {
             const token = localStorage.getItem('libriverse_token');
-            const response = await fetch(`/api/books/${bookId}`, {
+            const response = await fetch(`/api/books?id=${bookId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -134,7 +134,7 @@ const App = () => {
 
         try {
             const token = localStorage.getItem('libriverse_token');
-            const response = await fetch(`/api/books/${bookId}`, {
+            const response = await fetch(`/api/books?id=${bookId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
