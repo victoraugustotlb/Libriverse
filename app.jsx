@@ -126,6 +126,12 @@ const App = () => {
     };
 
     const handleUpdateBook = async (bookId, updates) => {
+        if (!bookId) {
+            console.error("handleUpdateBook called without bookId");
+            alert("Erro interno: ID do livro não encontrado.");
+            return;
+        }
+
         try {
             const token = localStorage.getItem('libriverse_token');
             const response = await fetch(`/api/books/${bookId}`, {
