@@ -34,47 +34,109 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="login-card book-details-card" onClick={(e) => e.stopPropagation()} style={{ width: '800px', maxWidth: '95vw', padding: '0', display: 'flex', overflow: 'hidden' }}>
-                <button className="modal-close-btn" onClick={onClose} style={{ zIndex: 10 }}>&times;</button>
+            <div className="login-card book-details-card" onClick={(e) => e.stopPropagation()} style={{
+                width: '900px',
+                maxWidth: '95vw',
+                padding: '0',
+                display: 'flex',
+                overflow: 'hidden',
+                background: 'var(--color-bg-primary)',
+                boxShadow: 'var(--shadow-xl)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-xl)'
+            }}>
+                <button className="modal-close-btn" onClick={onClose} style={{ zIndex: 10, right: '15px', top: '15px' }}>&times;</button>
 
                 {/* Left Side: Cover */}
-                <div style={{ width: '35%', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                <div style={{
+                    width: '35%',
+                    background: 'var(--color-bg-secondary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '30px',
+                    borderRight: '1px solid var(--color-border)'
+                }}>
                     {book.coverUrl ? (
-                        <img src={book.coverUrl} alt={book.title} style={{ maxWidth: '100%', maxHeight: '400px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', borderRadius: '5px' }} />
+                        <img src={book.coverUrl} alt={book.title} style={{
+                            maxWidth: '100%',
+                            maxHeight: '400px',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                            borderRadius: '8px'
+                        }} />
                     ) : (
-                        <div style={{ width: '150px', height: '220px', background: 'var(--spine-color, #2c3e50)', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: 'white', padding: '10px', borderRadius: '5px' }}>
+                        <div style={{
+                            width: '160px',
+                            height: '240px',
+                            background: 'linear-gradient(135deg, #e0e0e0 0%, #d0d0d0 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            textAlign: 'center',
+                            color: '#666',
+                            padding: '20px',
+                            borderRadius: '8px',
+                            fontWeight: '600',
+                            boxShadow: '0 10px 20px rgba(0,0,0,0.05)'
+                        }}>
                             <span>{book.title}</span>
                         </div>
                     )}
                 </div>
 
                 {/* Right Side: Details */}
-                <div style={{ width: '65%', padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '80vh', overflowY: 'auto' }}>
+                <div style={{
+                    width: '65%',
+                    padding: '40px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '24px',
+                    maxHeight: '85vh',
+                    overflowY: 'auto'
+                }}>
                     <div>
-                        <h2 style={{ fontSize: '2rem', marginBottom: '10px', color: 'var(--text-primary)' }}>{book.title}</h2>
-                        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>por <span style={{ color: 'var(--primary-color)' }}>{book.author}</span></p>
+                        <h2 style={{
+                            fontSize: '2.5rem',
+                            marginBottom: '8px',
+                            color: 'var(--color-text-primary)',
+                            lineHeight: '1.1',
+                            letterSpacing: '-0.02em'
+                        }}>{book.title}</h2>
+                        <p style={{ fontSize: '1.25rem', color: 'var(--color-text-secondary)' }}>
+                            por <span style={{ color: 'var(--color-accent)', fontWeight: '500' }}>{book.author}</span>
+                        </p>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', background: 'rgba(255,255,255,0.03)', padding: '15px', borderRadius: '10px' }}>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2, 1fr)',
+                        gap: '20px',
+                        background: 'var(--color-bg-secondary)',
+                        padding: '20px',
+                        borderRadius: 'var(--radius-lg)'
+                    }}>
                         <div>
-                            <p style={{ fontSize: '0.9rem', color: '#888' }}>Editora</p>
-                            <p>{book.publisher || '-'}</p>
+                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Editora</p>
+                            <p style={{ fontWeight: '500' }}>{book.publisher || '-'}</p>
                         </div>
                         <div>
-                            <p style={{ fontSize: '0.9rem', color: '#888' }}>Idioma</p>
-                            <p>{book.language || '-'}</p>
+                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Idioma</p>
+                            <p style={{ fontWeight: '500' }}>{book.language || '-'}</p>
                         </div>
                         <div>
-                            <p style={{ fontSize: '0.9rem', color: '#888' }}>Páginas</p>
-                            <p>{book.pageCount || '-'}</p>
+                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Páginas</p>
+                            <p style={{ fontWeight: '500' }}>{book.pageCount || '-'}</p>
                         </div>
                         <div>
-                            <p style={{ fontSize: '0.9rem', color: '#888' }}>Status</p>
+                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Status</p>
                             <span style={{
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                background: isRead ? 'var(--primary-color)' : '#444',
-                                fontSize: '0.8rem'
+                                display: 'inline-block',
+                                padding: '4px 12px',
+                                borderRadius: '20px',
+                                background: isRead ? 'var(--color-accent)' : '#e0e0e0',
+                                color: isRead ? 'white' : '#555',
+                                fontSize: '0.85rem',
+                                fontWeight: '600'
                             }}>
                                 {isRead ? 'Lido' : 'Lendo'}
                             </span>
@@ -83,40 +145,72 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
 
                     {/* Reading Progress */}
                     {book.pageCount > 0 && (
-                        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '15px', borderRadius: '10px' }}>
-                            <p style={{ marginBottom: '10px', fontWeight: 'bold' }}>Progresso de Leitura</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                                <input
-                                    type="number"
-                                    value={currentPage}
-                                    onChange={(e) => setCurrentPage(e.target.value)}
-                                    style={{ width: '80px', padding: '5px', borderRadius: '4px', border: '1px solid #444', background: '#222', color: 'white' }}
-                                />
-                                <span>/ {book.pageCount} páginas</span>
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
+                                <p style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>Progresso de Leitura</p>
+                                <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{Math.round(progress)}%</span>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-bg-tertiary)', padding: '5px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                                    <input
+                                        type="number"
+                                        value={currentPage}
+                                        onChange={(e) => setCurrentPage(e.target.value)}
+                                        style={{
+                                            width: '60px',
+                                            padding: '5px',
+                                            border: 'none',
+                                            background: 'transparent',
+                                            textAlign: 'center',
+                                            fontWeight: '600',
+                                            fontSize: '1rem',
+                                            color: 'var(--color-text-primary)'
+                                        }}
+                                    />
+                                    <span style={{ color: 'var(--color-text-secondary)', marginRight: '8px', fontSize: '0.9rem' }}>/ {book.pageCount}</span>
+                                </div>
                                 <button
                                     onClick={handleUpdateProgress}
-                                    style={{ marginLeft: 'auto', padding: '5px 15px', background: 'var(--primary-color)', border: 'none', borderRadius: '4px', color: 'white', cursor: 'pointer' }}
+                                    style={{
+                                        padding: '8px 20px',
+                                        background: 'var(--color-accent)',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        color: 'white',
+                                        cursor: 'pointer',
+                                        fontWeight: '500',
+                                        fontSize: '0.9rem',
+                                        transition: 'background 0.2s'
+                                    }}
                                 >
-                                    Salvar
+                                    Atualizar
                                 </button>
                             </div>
-                            <div style={{ width: '100%', height: '8px', background: '#444', borderRadius: '4px', overflow: 'hidden' }}>
-                                <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(to right, var(--primary-color), #a855f7)', transition: 'width 0.3s' }}></div>
+                            <div style={{ width: '100%', height: '10px', background: 'var(--color-bg-secondary)', borderRadius: '5px', overflow: 'hidden' }}>
+                                <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(to right, var(--color-accent), #5ac8fa)', transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)', borderRadius: '5px' }}></div>
                             </div>
                         </div>
                     )}
 
                     {/* Logs Details */}
                     {(book.purchaseDate || book.loanedTo) && (
-                        <div style={{ fontSize: '0.9rem', color: '#ccc' }}>
-                            {book.purchaseDate && <p>Comprado em {new Date(book.purchaseDate).toLocaleDateString()} por R$ {book.purchasePrice}</p>}
-                            {book.loanedTo && <p>Emprestado para <strong>{book.loanedTo}</strong> em {new Date(book.loanDate).toLocaleDateString()}</p>}
+                        <div style={{
+                            fontSize: '0.9rem',
+                            color: 'var(--color-text-secondary)',
+                            background: 'var(--color-bg-tertiary)',
+                            padding: '15px',
+                            borderRadius: '8px',
+                            border: '1px solid var(--color-border)'
+                        }}>
+                            {book.purchaseDate && <p style={{ marginBottom: '4px' }}>🛒 Comprado em <strong>{new Date(book.purchaseDate).toLocaleDateString()}</strong> por <strong>R$ {book.purchasePrice}</strong></p>}
+                            {book.loanedTo && <p>🤝 Emprestado para <strong>{book.loanedTo}</strong> em {new Date(book.loanDate).toLocaleDateString()}</p>}
                         </div>
                     )}
 
-                    <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                        <button className="delete-button" onClick={handleDelete} style={{ width: '100%', padding: '10px' }}>
-                            <span className="icon">🗑️</span> Excluir da Biblioteca
+                    <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+                        <button className="delete-button" onClick={handleDelete} style={{ width: '100%' }}>
+                            Excluir da Biblioteca
                         </button>
                     </div>
                 </div>
