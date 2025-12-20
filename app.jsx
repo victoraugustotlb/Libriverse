@@ -141,7 +141,9 @@ const App = () => {
                 const updatedBook = await response.json();
                 setUserBooks(userBooks.map(b => b.id === bookId ? { ...b, ...updatedBook } : b));
             } else {
-                alert('Erro ao atualizar livro.');
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error || `Erro ${response.status}: ${response.statusText}`;
+                alert(`Erro ao atualizar livro: ${errorMessage}`);
             }
         } catch (error) {
             console.error('Error updating book:', error);
