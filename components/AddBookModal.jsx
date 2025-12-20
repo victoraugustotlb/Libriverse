@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
+const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [publisher, setPublisher] = useState('');
@@ -15,6 +15,37 @@ const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
     const [purchasePrice, setPurchasePrice] = useState('');
     const [loanedTo, setLoanedTo] = useState('');
     const [loanDate, setLoanDate] = useState('');
+
+    useEffect(() => {
+        if (isOpen && initialData) {
+            setTitle(initialData.title || '');
+            setAuthor(initialData.author || '');
+            setPublisher(initialData.publisher || '');
+            setCoverUrl(initialData.coverUrl || '');
+            setPageCount(initialData.pageCount || '');
+            setCurrentPage(initialData.currentPage || '');
+            setLanguage(initialData.language || '');
+            setIsRead(initialData.isRead || false);
+            setPurchaseDate(initialData.purchaseDate || '');
+            setPurchasePrice(initialData.purchasePrice || '');
+            setLoanedTo(initialData.loanedTo || '');
+            setLoanDate(initialData.loanDate || '');
+        } else if (isOpen && !initialData) {
+            // Reset form if opening fresh
+            setTitle('');
+            setAuthor('');
+            setPublisher('');
+            setCoverUrl('');
+            setPageCount('');
+            setCurrentPage('');
+            setLanguage('');
+            setIsRead(false);
+            setPurchaseDate('');
+            setPurchasePrice('');
+            setLoanedTo('');
+            setLoanDate('');
+        }
+    }, [isOpen, initialData]);
 
     if (!isOpen) return null;
 
@@ -32,20 +63,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
             loanDate: loanDate || null
         });
 
-        // Reset form
-        setTitle('');
-        setAuthor('');
-        setPublisher('');
-        setCoverUrl('');
-        setPageCount('');
-        setCurrentPage('');
-        setLanguage('');
-        setIsRead(false);
-        setPurchaseDate('');
-        setPurchasePrice('');
-        setLoanedTo('');
-        setLoanDate('');
-
+        // Close is handled by parent usually, but we can reset here or just rely on unmount/re-render
         onClose();
     };
 
@@ -64,8 +82,12 @@ const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
                 <button className="modal-close-btn" onClick={onClose} style={{ top: '20px', right: '20px', fontSize: '2rem' }}>&times;</button>
 
                 <div className="auth-header" style={{ marginBottom: '40px' }}>
-                    <h1 className="auth-title" style={{ fontSize: '2.5rem' }}>Adicionar Livro</h1>
-                    <p className="auth-subtitle" style={{ fontSize: '1.1rem' }}>Preencha os detalhes do novo livro</p>
+                    <h1 className="auth-title" style={{ fontSize: '2.5rem' }}>
+                        {initialData ? 'Editar/Confirmar Livro' : 'Adicionar Livro'}
+                    </h1>
+                    <p className="auth-subtitle" style={{ fontSize: '1.1rem' }}>
+                        {initialData ? 'Verifique as informações antes de salvar' : 'Preencha os detalhes do novo livro'}
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
@@ -261,7 +283,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook }) => {
                         Cancelar
                     </button>
                     <button onClick={handleSubmit} className="auth-button" style={{ width: 'auto', marginTop: 0, padding: '12px 32px' }}>
-                        Adicionar Livro
+                        {initialData ? 'Salvar Livro' : 'Adicionar Livro'}
                     </button>
                 </div>
             </div>

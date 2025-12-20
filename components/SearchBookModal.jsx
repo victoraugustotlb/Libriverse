@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const SearchBookModal = ({ isOpen, onClose, onAddBook }) => {
+const SearchBookModal = ({ isOpen, onClose, onSelectBook }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -44,14 +44,9 @@ const SearchBookModal = ({ isOpen, onClose, onAddBook }) => {
         }
     };
 
-    const handleAdd = (book) => {
-        // Strip ID to create a new entry for this user
-        const { id, user_id, created_at, ...bookData } = book;
-        // Map snake_case from DB if necessary to cameCase for consistency, 
-        // but here we already handled basic mapping in the search API or we will simply pass what we have.
-        // Let's ensure uniform structure before calling onAddBook
-
-        onAddBook({
+    const handleSelect = (book) => {
+        // Pass the book to parent to fill the Add form
+        onSelectBook({
             title: book.title,
             author: book.author,
             publisher: book.publisher || '',
@@ -62,8 +57,16 @@ const SearchBookModal = ({ isOpen, onClose, onAddBook }) => {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="login-card" onClick={(e) => e.stopPropagation()} style={{ position: 'relative', width: '600px', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-                <button className="modal-close-btn" onClick={onClose}>&times;</button>
+            <div className="login-card" onClick={(e) => e.stopPropagation()} style={{
+                position: 'relative',
+                width: '600px',
+                maxHeight: '80vh',
+                display: 'flex',
+                flexDirection: 'column',
+                background: 'var(--color-bg-primary)',
+                borderRadius: 'var(--radius-xl)'
+            }}>
+                <button className="modal-close-btn" onClick={onClose} style={{ top: '15px', right: '15px' }}>&times;</button>
 
                 <div className="auth-header">
                     <h1 className="auth-title">Pesquisar Livro</h1>
@@ -92,17 +95,25 @@ const SearchBookModal = ({ isOpen, onClose, onAddBook }) => {
                     )}
 
                     {results.map((book, index) => (
-                        <div key={index} className="pearl-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px' }}>
+                        <div key={index} className="pearl-card" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '15px',
+                            background: 'var(--color-bg-secondary)',
+                            borderRadius: 'var(--radius-md)',
+                            border: '1px solid var(--color-border)'
+                        }}>
                             <div>
-                                <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>{book.title}</h3>
-                                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{book.author}</p>
+                                <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-text-primary)' }}>{book.title}</h3>
+                                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>{book.author}</p>
                             </div>
                             <button
                                 className="auth-button"
-                                style={{ width: 'auto', padding: '5px 15px', fontSize: '0.9rem' }}
-                                onClick={() => handleAdd(book)}
+                                style={{ width: 'auto', padding: '8px 20px', fontSize: '0.9rem', marginTop: 0 }}
+                                onClick={() => handleSelect(book)}
                             >
-                                Adicionar
+                                Selecionar
                             </button>
                         </div>
                     ))}

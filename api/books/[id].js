@@ -50,7 +50,12 @@ export default async function handler(req, res) {
                      is_read = COALESCE($2, is_read)
                  WHERE id = $3 AND user_id = $4
                  RETURNING *`,
-                [currentPage, isRead, id, user.userId]
+                [
+                    currentPage !== undefined ? currentPage : null,
+                    isRead !== undefined ? isRead : null,
+                    id,
+                    user.userId
+                ]
             );
 
             if (result.rowCount === 0) {

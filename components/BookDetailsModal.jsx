@@ -17,10 +17,17 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
     const progress = Math.min((currentPage / totalPages) * 100, 100);
 
     const handleUpdateProgress = () => {
+        const newPage = parseInt(currentPage, 10);
+
+        if (isNaN(newPage)) {
+            alert("Por favor, digite um número de página válido.");
+            return;
+        }
+
         if (onUpdate) {
             onUpdate(book.id, {
-                currentPage: parseInt(currentPage),
-                isRead: currentPage >= (book.pageCount || 1) // Auto-mark read if complete
+                currentPage: newPage,
+                isRead: newPage >= (book.pageCount || 1) // Auto-mark read if complete
             });
         }
     };

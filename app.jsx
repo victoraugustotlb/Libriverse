@@ -29,6 +29,7 @@ const App = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isMethodModalOpen, setIsMethodModalOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const [bookToEdit, setBookToEdit] = useState(null);
 
     // Fetch books when user is logged in
     React.useEffect(() => {
@@ -172,20 +173,31 @@ const App = () => {
             <AddBookMethodModal
                 isOpen={isMethodModalOpen}
                 onClose={() => setIsMethodModalOpen(false)}
-                onSelectManual={() => setIsAddModalOpen(true)}
+                onSelectManual={() => {
+                    setBookToEdit(null); // Ensure fresh form
+                    setIsAddModalOpen(true);
+                }}
                 onSelectSearch={() => setIsSearchModalOpen(true)}
             />
 
             <AddBookModal
                 isOpen={isAddModalOpen}
-                onClose={() => setIsAddModalOpen(false)}
+                onClose={() => {
+                    setIsAddModalOpen(false);
+                    setBookToEdit(null); // Clear edit data on close
+                }}
                 onAddBook={handleAddBook}
+                initialData={bookToEdit}
             />
 
             <SearchBookModal
                 isOpen={isSearchModalOpen}
                 onClose={() => setIsSearchModalOpen(false)}
-                onAddBook={handleAddBook}
+                onSelectBook={(book) => {
+                    setBookToEdit(book);
+                    setIsSearchModalOpen(false);
+                    setIsAddModalOpen(true);
+                }}
             />
         </div>
     );
