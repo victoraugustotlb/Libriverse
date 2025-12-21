@@ -3,6 +3,7 @@ import Navbar from './components/Navbar.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
 import Library from './pages/Library.jsx';
 import UserHome from './pages/UserHome.jsx';
 import TermsOfUse from './pages/TermsOfUse.jsx';
@@ -191,6 +192,7 @@ const App = () => {
             {view === 'home' && <Home onNavigate={handleNavigate} />}
             {view === 'login' && <Login onNavigate={handleNavigate} />}
             {view === 'register' && <Register onNavigate={handleNavigate} />}
+            {view === 'forgot-password' && <ForgotPassword onNavigate={handleNavigate} />}
             {view === 'terms' && <TermsOfUse onNavigate={handleNavigate} />}
             {view === 'privacy' && <PrivacyPolicy onNavigate={handleNavigate} />}
             {view === 'user-home' && (

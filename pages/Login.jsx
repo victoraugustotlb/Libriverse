@@ -62,6 +62,16 @@ const Login = ({ onNavigate }) => {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
+                        <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
+                            <a
+                                href="#"
+                                onClick={(e) => { e.preventDefault(); onNavigate('forgot-password'); }}
+                                className="auth-link"
+                                style={{ fontSize: '0.9rem' }}
+                            >
+                                Esqueci minha senha
+                            </a>
+                        </div>
                     </div>
 
                     <button type="submit" className="auth-button">
