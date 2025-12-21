@@ -4,6 +4,7 @@ import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Library from './pages/Library.jsx';
+import UserHome from './pages/UserHome.jsx';
 import AddBookModal from './components/AddBookModal.jsx';
 import AddBookMethodModal from './components/AddBookMethodModal.jsx';
 import SearchBookModal from './components/SearchBookModal.jsx';
@@ -12,7 +13,7 @@ import Footer from './components/Footer.jsx';
 const App = () => {
     const [view, setView] = useState(() => {
         const savedUser = localStorage.getItem('libriverse_user');
-        return savedUser ? 'library' : 'home';
+        return savedUser ? 'user-home' : 'home';
     });
     const [user, setUser] = useState(() => {
         try {
@@ -173,6 +174,15 @@ const App = () => {
             {view === 'home' && <Home onNavigate={handleNavigate} />}
             {view === 'login' && <Login onNavigate={handleNavigate} />}
             {view === 'register' && <Register onNavigate={handleNavigate} />}
+            {view === 'user-home' && (
+                <UserHome
+                    user={user}
+                    books={userBooks}
+                    onNavigate={handleNavigate}
+                    onUpdateBook={handleUpdateBook}
+                    onDeleteBook={handleDeleteBook}
+                />
+            )}
             {view === 'library' && (
                 <Library
                     onNavigate={handleNavigate}

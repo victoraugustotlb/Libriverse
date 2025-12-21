@@ -7,7 +7,7 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
                 <a
                     href="#"
                     className="navbar-logo"
-                    onClick={(e) => { e.preventDefault(); onNavigate(user ? 'library' : 'home'); }}
+                    onClick={(e) => { e.preventDefault(); onNavigate(user ? 'user-home' : 'home'); }}
                 >
                     Libriverse
                 </a>
@@ -17,7 +17,7 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
                         <a
                             href="#"
                             className="navbar-link"
-                            onClick={(e) => { e.preventDefault(); onNavigate(user ? 'library' : 'home'); }}
+                            onClick={(e) => { e.preventDefault(); onNavigate(user ? 'user-home' : 'home'); }}
                         >
                             Início
                         </a>

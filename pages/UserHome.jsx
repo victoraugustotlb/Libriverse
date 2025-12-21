@@ -1,0 +1,157 @@
+import React, { useState } from 'react';
+import BookDetailsModal from '../components/BookDetailsModal';
+
+const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook }) => {
+    const [selectedBook, setSelectedBook] = useState(null);
+    const readingBooks = books.filter(b => !b.isRead);
+
+    return (
+        <div className="user-home-page">
+            <section className="hero">
+                <div className="container">
+                    <h1 className="hero-title">Olá, {user.name}</h1>
+                    <p className="hero-subtitle">
+                        {readingBooks.length > 0
+                            ? `Você está lendo ${readingBooks.length} ${readingBooks.length === 1 ? 'livro' : 'livros'} no momento.`
+                            : 'Você não está lendo nenhum livro no momento.'}
+                    </p>
+                    <button
+                        className="hero-cta"
+                        onClick={() => onNavigate('library')}
+                    >
+                        Acessar Biblioteca
+                    </button>
+                </div>
+            </section>
+
+            {readingBooks.length > 0 && (
+                <section className="container" style={{ paddingBottom: '60px' }}>
+                    <h2 style={{
+                        fontSize: '2rem',
+                        marginBottom: '30px',
+                        color: 'var(--color-text-primary)'
+                    }}>Lendo Atualmente</h2>
+
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                        gap: '30px'
+                    }}>
+                        {readingBooks.map((book) => {
+                            const progress = book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0;
+
+                            return (
+                                <div
+                                    key={book.id}
+                                    onClick={() => setSelectedBook(book)}
+                                    style={{
+                                        background: 'rgba(255, 255, 255, 0.03)',
+                                        backdropFilter: 'blur(10px)',
+                                        borderRadius: '16px',
+                                        padding: '20px',
+                                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                                        cursor: 'pointer',
+                                        transition: 'transform 0.2s, box-shadow 0.2s',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '15px'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-5px)';
+                                        e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = 'none';
+                                    }}
+                                >
+                                    <div style={{
+                                        width: '100%',
+                                        aspectRatio: '2/3',
+                                        borderRadius: '8px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+                                        position: 'relative'
+                                    }}>
+                                        {book.coverUrl ? (
+                                            <img
+                                                src={book.coverUrl}
+                                                alt={book.title}
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
+                                        ) : (
+                                            <div style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                background: 'linear-gradient(135deg, #444 0%, #222 100%)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                color: '#aaa',
+                                                padding: '10px',
+                                                textAlign: 'center'
+                                            }}>
+                                                {book.title}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <h3 style={{
+                                            fontSize: '1.1rem',
+                                            fontWeight: '600',
+                                            marginBottom: '4px',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            color: 'var(--color-text-primary)'
+                                        }} title={book.title}>{book.title}</h3>
+                                        <p style={{
+                                            fontSize: '0.9rem',
+                                            color: 'var(--color-text-secondary)',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>{book.author}</p>
+                                    </div>
+
+                                    <div style={{ marginTop: 'auto' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px', color: 'var(--color-text-secondary)' }}>
+                                            <span>Progresso</span>
+                                            <span>{Math.round(progress)}%</span>
+                                        </div>
+                                        <div style={{
+                                            width: '100%',
+                                            height: '6px',
+                                            background: 'rgba(255,255,255,0.1)',
+                                            borderRadius: '3px',
+                                            overflow: 'hidden'
+                                        }}>
+                                            <div style={{
+                                                width: `${progress}%`,
+                                                height: '100%',
+                                                background: 'var(--color-accent)',
+                                                borderRadius: '3px',
+                                                transition: 'width 0.5s ease'
+                                            }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
+            )}
+
+            <BookDetailsModal
+                book={selectedBook}
+                isOpen={!!selectedBook}
+                onClose={() => setSelectedBook(null)}
+                onDelete={onDeleteBook}
+                onUpdate={onUpdateBook}
+            />
+        </div>
+    );
+};
+
+export default UserHome;

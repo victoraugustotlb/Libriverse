@@ -19,7 +19,7 @@ const Login = ({ onNavigate }) => {
             if (response.ok) {
                 localStorage.setItem('libriverse_token', data.token);
                 localStorage.setItem('libriverse_user', JSON.stringify(data.user));
-                onNavigate('library');
+                onNavigate('user-home');
             } else {
                 alert(data.error || 'Credenciais inválidas');
             }

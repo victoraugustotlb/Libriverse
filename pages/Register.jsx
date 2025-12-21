@@ -34,7 +34,7 @@ const Register = ({ onNavigate }) => {
                     const loginData = await loginResponse.json();
                     localStorage.setItem('libriverse_token', loginData.token);
                     localStorage.setItem('libriverse_user', JSON.stringify(loginData.user));
-                    onNavigate('library');
+                    onNavigate('user-home');
                 } else {
                     alert('Conta criada! Por favor, faça login.');
                     onNavigate('login');
