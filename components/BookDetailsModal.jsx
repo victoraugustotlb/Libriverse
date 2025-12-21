@@ -144,17 +144,59 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                         </div>
                         <div>
                             <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Status</p>
-                            <span style={{
-                                display: 'inline-block',
-                                padding: '4px 12px',
-                                borderRadius: '20px',
-                                background: isRead ? 'var(--color-accent)' : '#e0e0e0',
-                                color: isRead ? 'white' : '#555',
-                                fontSize: '0.85rem',
-                                fontWeight: '600'
-                            }}>
-                                {isRead ? 'Lido' : 'Lendo'}
-                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <span style={{
+                                    display: 'inline-block',
+                                    padding: '4px 12px',
+                                    borderRadius: '20px',
+                                    background: isRead ? 'var(--color-accent)' : '#e0e0e0',
+                                    color: isRead ? 'white' : '#555',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '600'
+                                }}>
+                                    {isRead ? 'Lido' : 'Lendo'}
+                                </span>
+                                {!isRead && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            const totalPages = book.pageCount || 1;
+                                            setCurrentPage(totalPages);
+                                            setIsRead(true);
+                                            if (onUpdate) {
+                                                onUpdate(book.id, {
+                                                    currentPage: totalPages,
+                                                    isRead: true
+                                                });
+                                            }
+                                        }}
+                                        title="Marcar como Lido"
+                                        style={{
+                                            background: 'none',
+                                            border: '1px solid var(--color-accent)',
+                                            borderRadius: '50%',
+                                            width: '24px',
+                                            height: '24px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer',
+                                            color: 'var(--color-accent)',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'var(--color-accent)';
+                                            e.currentTarget.style.color = 'white';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = 'none';
+                                            e.currentTarget.style.color = 'var(--color-accent)';
+                                        }}
+                                    >
+                                        <span style={{ fontSize: '14px', lineHeight: 1 }}>✓</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
