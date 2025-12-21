@@ -117,31 +117,31 @@ const Register = ({ onNavigate }) => {
                         />
                     </div>
 
-                    <div className="form-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '10px' }}>
+                    <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '12px', marginTop: '10px' }}>
                         <input
                             type="checkbox"
                             id="acceptTerms"
                             checked={acceptTerms}
                             onChange={(e) => setAcceptTerms(e.target.checked)}
                             required
-                            style={{ marginTop: '4px' }}
+                            style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--color-accent)' }}
                         />
-                        <label htmlFor="acceptTerms" style={{ fontSize: '14px', fontWeight: 'normal', cursor: 'pointer', color: 'var(--color-text-secondary)' }}>
-                            Li e aceito os <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('terms'); }} style={{ textDecoration: 'underline', color: 'var(--color-primary)' }}>Termos de Uso</a> da Libriverse.
+                        <label htmlFor="acceptTerms" style={{ fontSize: '14px', lineHeight: '1.4', cursor: 'pointer', color: 'var(--color-text-secondary)' }}>
+                            Li e aceito os <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('terms'); }} style={{ fontWeight: '600', color: '#0071e3', textDecoration: 'none' }}>Termos de Uso</a> da Libriverse.
                         </label>
                     </div>
 
-                    <div className="form-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '10px' }}>
+                    <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '12px' }}>
                         <input
                             type="checkbox"
                             id="acceptPrivacy"
                             checked={acceptPrivacy}
                             onChange={(e) => setAcceptPrivacy(e.target.checked)}
                             required
-                            style={{ marginTop: '4px' }}
+                            style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--color-accent)' }}
                         />
-                        <label htmlFor="acceptPrivacy" style={{ fontSize: '14px', fontWeight: 'normal', cursor: 'pointer', color: 'var(--color-text-secondary)' }}>
-                            Concordo com a <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('privacy'); }} style={{ textDecoration: 'underline', color: 'var(--color-primary)' }}>Política de Privacidade</a> e o processamento dos meus dados.
+                        <label htmlFor="acceptPrivacy" style={{ fontSize: '14px', lineHeight: '1.4', cursor: 'pointer', color: 'var(--color-text-secondary)' }}>
+                            Concordo com a <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('privacy'); }} style={{ fontWeight: '600', color: '#0071e3', textDecoration: 'none' }}>Política de Privacidade</a> e o processamento dos meus dados.
                         </label>
                     </div>
 
