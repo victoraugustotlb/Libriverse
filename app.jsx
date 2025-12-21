@@ -8,6 +8,7 @@ import UserHome from './pages/UserHome.jsx';
 import AddBookModal from './components/AddBookModal.jsx';
 import AddBookMethodModal from './components/AddBookMethodModal.jsx';
 import SearchBookModal from './components/SearchBookModal.jsx';
+import Loading from './components/Loading.jsx';
 import Footer from './components/Footer.jsx';
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
     });
 
     const [userBooks, setUserBooks] = useState([]);
+    const [isLoading, setIsLoading] = useState(true); // Start true for initial check/fetch
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isMethodModalOpen, setIsMethodModalOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -34,6 +36,7 @@ const App = () => {
 
     // Fetch books when user is logged in
     React.useEffect(() => {
+        setIsLoading(true);
         if (user) {
             const fetchBooks = async () => {
                 try {
@@ -54,11 +57,15 @@ const App = () => {
                     }
                 } catch (error) {
                     console.error('Failed to fetch books:', error);
+                } finally {
+                    // Small artificial delay for a smoother feeling if it's too fast
+                    setTimeout(() => setIsLoading(false), 800);
                 }
             };
             fetchBooks();
         } else {
             setUserBooks([]);
+            setIsLoading(false);
         }
     }, [user]);
 
@@ -165,6 +172,7 @@ const App = () => {
 
     return (
         <div className="app">
+            {isLoading && <Loading />}
             <Navbar
                 onNavigate={handleNavigate}
                 user={user}
