@@ -113,6 +113,8 @@ body {
     display: flex;
     gap: var(--spacing-lg);
     list-style: none;
+    align-items: center;
+    /* Ensures all navbar items including avatar are vertically centered */
 }
 
 .navbar-link {
@@ -770,9 +772,12 @@ body {
     }
 }
 
+/* ===== USER DROPDOWN ===== */
 .user-dropdown-container {
     position: relative;
     z-index: 1100;
+    display: flex;
+    align-items: center;
 }
 
 .user-dropdown-trigger {
@@ -780,19 +785,25 @@ body {
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: background-color 0.2s;
+    padding: 4px;
+    border-radius: 50px;
+    /* Pillow shape for better hover effect */
+    background-color: transparent;
+    transition: all 0.2s;
     user-select: none;
+    border: 1px solid transparent;
 }
 
-.user-dropdown-trigger:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+.user-dropdown-trigger:hover,
+.user-dropdown-trigger:active {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-border);
 }
 
 .user-avatar {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    /* Slightly larger */
+    height: 36px;
     border-radius: 50%;
     background: linear-gradient(135deg, #0071e3, #00c6ff);
     display: flex;
@@ -801,26 +812,26 @@ body {
     color: white;
     font-weight: 600;
     font-size: 14px;
+    box-shadow: var(--shadow-sm);
 }
 
 .dropdown-menu {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 12px);
     right: 0;
-    width: 280px;
+    width: 260px;
     background-color: var(--color-bg-primary);
-    /* Changed to white */
     border: 1px solid var(--color-border);
-    /* Changed to light border */
-    border-radius: 12px;
-    box-shadow: var(--shadow-xl);
-    /* Standardized shadow */
-    padding: 8px;
+    border-radius: 16px;
+    /* More rounded modern look */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    padding: 6px;
     display: none;
     flex-direction: column;
     color: var(--color-text-primary);
-    /* Changed to dark text */
-    animation: slideDownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: var(--font-family);
+    /* Ensure consistent font */
+    animation: slideDownFade 0.2s ease-out;
 }
 
 .dropdown-menu.active {
@@ -914,45 +925,54 @@ body {
 .theme-options {
     display: flex;
     background: var(--color-bg-secondary);
-    border-radius: 20px;
-    padding: 2px;
+    border-radius: 8px;
+    /* Slightly squarer for segmented control feel */
+    padding: 3px;
+    gap: 2px;
 }
 
-/* End of replacement */
-
 .theme-option-btn {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 6px;
     cursor: pointer;
-    color: #666;
-    transition: all 0.2s;
+    color: var(--color-text-secondary);
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.theme-option-btn:hover {
+    color: var(--color-text-primary);
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .theme-option-btn.active {
-    background: white;
-    box-shadow: var(--shadow-sm);
-    color: var(--color-icon-active, #000);
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow for lift */
+    color: #000;
 }
 
 .upgrade-btn {
-    margin-top: 6px;
-    background: var(--color-text-primary);
-    /* Dark button */
+    margin-top: 4px;
+    background: #111;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 10px;
     font-weight: 600;
     font-size: 13px;
     cursor: pointer;
     text-align: center;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    font-family: var(--font-family);
 }
 
 .upgrade-btn:hover {
-    background: #333;
+    background: #000;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

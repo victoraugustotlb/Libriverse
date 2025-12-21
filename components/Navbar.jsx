@@ -83,13 +83,6 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
 
                                 <div className="dropdown-divider"></div>
 
-                                <div className="dropdown-item">
-                                    <div className="dropdown-item-content">Command Menu</div>
-                                    <div style={{ display: 'flex', gap: '4px' }}>
-                                        <span className="kbd-shortcut">Ctrl</span>
-                                        <span className="kbd-shortcut">K</span>
-                                    </div>
-                                </div>
 
                                 <div className="dropdown-item theme-toggle-row">
                                     <div className="dropdown-item-content">Theme</div>
