@@ -10,30 +10,49 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
         try {
-            // Ensure table exists (lazy creation for simplicity)
+            // Ensure tables exist (lazy creation)
             await pool.query(`
-                CREATE TABLE IF NOT EXISTS books (
+                CREATE TABLE IF NOT EXISTS global_books (
                     id SERIAL PRIMARY KEY,
-                    user_id INTEGER REFERENCES users(id),
+                    isbn TEXT UNIQUE,
                     title TEXT NOT NULL,
                     author TEXT NOT NULL,
                     publisher TEXT,
                     cover_url TEXT,
-                    created_at TIMESTAMP DEFAULT NOW(),
                     page_count INTEGER,
                     language TEXT,
+                    created_at TIMESTAMP DEFAULT NOW()
+                );
+            `);
+
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS user_books (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER REFERENCES users(id),
+                    global_book_id INTEGER REFERENCES global_books(id),
+                    custom_cover_url TEXT,
                     is_read BOOLEAN DEFAULT FALSE,
+                    current_page INTEGER DEFAULT 0,
                     purchase_date DATE,
                     purchase_price DECIMAL(10, 2),
                     loaned_to TEXT,
                     loan_date DATE,
-                    current_page INTEGER DEFAULT 0,
-                    isbn TEXT
-                )
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    CONSTRAINT unique_user_book UNIQUE (user_id, global_book_id)
+                );
             `);
 
             const result = await pool.query(
-                'SELECT * FROM books WHERE user_id = $1 ORDER BY created_at DESC',
+                `SELECT 
+                    ub.id, ub.user_id, ub.is_read, ub.current_page, 
+                    ub.purchase_date, ub.purchase_price, ub.loaned_to, ub.loan_date,
+                    ub.created_at, ub.custom_cover_url,
+                    gb.title, gb.author, gb.publisher, gb.cover_url as global_cover_url,
+                    gb.page_count, gb.language, gb.isbn
+                 FROM user_books ub
+                 JOIN global_books gb ON ub.global_book_id = gb.id
+                 WHERE ub.user_id = $1 
+                 ORDER BY ub.created_at DESC`,
                 [user.userId]
             );
 
@@ -43,7 +62,7 @@ export default async function handler(req, res) {
                 title: book.title,
                 author: book.author,
                 publisher: book.publisher,
-                coverUrl: book.cover_url,
+                coverUrl: book.custom_cover_url || book.global_cover_url, // Prefer custom cover
                 createdAt: book.created_at,
                 pageCount: book.page_count,
                 language: book.language,
@@ -77,71 +96,76 @@ export default async function handler(req, res) {
         }
 
         try {
-            // Lazy migration: Add missing columns if they don't exist
-            // (In a real production app we would use a migration tool)
-            const columnsToAdd = [
-                'ADD COLUMN IF NOT EXISTS page_count INTEGER',
-                'ADD COLUMN IF NOT EXISTS language TEXT',
-                'ADD COLUMN IF NOT EXISTS is_read BOOLEAN DEFAULT FALSE',
-                'ADD COLUMN IF NOT EXISTS purchase_date DATE',
-                'ADD COLUMN IF NOT EXISTS purchase_price DECIMAL(10, 2)',
-                'ADD COLUMN IF NOT EXISTS loaned_to TEXT',
-                'ADD COLUMN IF NOT EXISTS loan_date DATE',
-                'ADD COLUMN IF NOT EXISTS loan_date DATE',
-                'ADD COLUMN IF NOT EXISTS current_page INTEGER DEFAULT 0',
-                'ADD COLUMN IF NOT EXISTS isbn TEXT'
-            ];
+            // Check if exists in global_books
+            let globalBookId;
+            let existingGlobalBook;
 
-            for (const col of columnsToAdd) {
-                await pool.query(`ALTER TABLE books ${col}`).catch(() => { });
+            if (isbn) {
+                const resIsbn = await pool.query('SELECT id FROM global_books WHERE isbn = $1', [isbn]);
+                if (resIsbn.rows.length > 0) existingGlobalBook = resIsbn.rows[0];
             }
 
-            console.log('Adding book:', title, author);
+            if (!existingGlobalBook) {
+                // Fallback check by title + author if no ISBN match (fuzzy constraint)
+                const resTitleAuthor = await pool.query(
+                    'SELECT id FROM global_books WHERE title ILIKE $1 AND author ILIKE $2',
+                    [title, author]
+                );
+                if (resTitleAuthor.rows.length > 0) existingGlobalBook = resTitleAuthor.rows[0];
+            }
+
+            if (existingGlobalBook) {
+                globalBookId = existingGlobalBook.id;
+            } else {
+                // Create in global_books
+                const resNewGlobal = await pool.query(
+                    `INSERT INTO global_books (title, author, publisher, cover_url, page_count, language, isbn)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+                    [title, author, publisher, coverUrl, pageCount || null, language || 'Português', isbn || null]
+                );
+                globalBookId = resNewGlobal.rows[0].id;
+            }
+
+            // Create relation in user_books
+            // We save the coverUrl passed by the user as custom_cover_url if provided.
             const result = await pool.query(
-                `INSERT INTO books (
-                    user_id, title, author, publisher, cover_url,
-                    page_count, language, is_read,
-                    purchase_date, purchase_price, loaned_to, loan_date,
-                    current_page, isbn
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`,
+                `INSERT INTO user_books (
+                    user_id, global_book_id, custom_cover_url,
+                    is_read, current_page,
+                    purchase_date, purchase_price, loaned_to, loan_date
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
                 [
-                    user.userId, title, author, publisher, coverUrl,
-                    pageCount || null, language || 'Português', isRead || false,
-                    purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null,
-                    currentPage || 0, isbn || null
+                    user.userId, globalBookId, coverUrl || null,
+                    isRead || false, currentPage || 0,
+                    purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null
                 ]
             );
-            console.log('Book added, ID:', result.rows[0].id);
 
+            // Construct full response object
             const newBook = result.rows[0];
             return res.status(201).json({
-                id: newBook.id,
-                title: newBook.title,
-                author: newBook.author,
-                publisher: newBook.publisher,
-                coverUrl: newBook.cover_url,
-                createdAt: newBook.created_at,
-                // Return new fields
-                pageCount: newBook.page_count,
-                language: newBook.language,
+                id: newBook.id, // user_book id
+                title, author, publisher,
+                coverUrl: newBook.custom_cover_url || coverUrl,
+                pageCount, language, isbn,
                 isRead: newBook.is_read,
+                currentPage: newBook.current_page,
+                createdAt: newBook.created_at,
+                // Return new fields if needed
                 purchaseDate: newBook.purchase_date,
                 purchasePrice: newBook.purchase_price,
                 loanedTo: newBook.loaned_to,
-                loanDate: newBook.loan_date,
-                loanedTo: newBook.loaned_to,
-                loanDate: newBook.loan_date,
-                currentPage: newBook.current_page,
-                isbn: newBook.isbn
+                loanDate: newBook.loan_date
             });
 
         } catch (error) {
+            if (error.code === '23505') { // Unique violation
+                return res.status(409).json({ error: 'Book already in library' });
+            }
             console.error('Add book error:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
     }
-
-
 
     if (req.method === 'DELETE') {
         const { id } = req.query;
@@ -152,7 +176,7 @@ export default async function handler(req, res) {
 
         try {
             const result = await pool.query(
-                'DELETE FROM books WHERE id = $1 AND user_id = $2 RETURNING *',
+                'DELETE FROM user_books WHERE id = $1 AND user_id = $2 RETURNING *',
                 [id, user.userId]
             );
 
@@ -178,7 +202,7 @@ export default async function handler(req, res) {
 
         try {
             const result = await pool.query(
-                `UPDATE books 
+                `UPDATE user_books 
                  SET current_page = COALESCE($1, current_page),
                      is_read = COALESCE($2, is_read)
                  WHERE id = $3 AND user_id = $4
