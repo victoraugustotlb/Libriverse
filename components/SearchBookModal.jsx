@@ -1,47 +1,49 @@
 import React, { useState } from 'react';
 
-const SearchBookModal = ({ isOpen, onClose, onSelectBook }) => {
+const SearchBookModal = ({ isOpen, onClose, onSelectBook, initialQuery }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    React.useEffect(() => {
+        if (isOpen && initialQuery) {
+            setQuery(initialQuery);
+            // Auto search after a brief timeout to ensure state update or immediate
+            // We can reuse logic if we extract it, or just call fetch here.
+            // For simplicity, let's just set it and let user click or we can extract `performSearch`.
+            // Better UX: Auto search.
+            performSearch(initialQuery);
+        } else if (isOpen) {
+            // Reset if opening empty
+            if (!initialQuery) setQuery('');
+            setResults([]);
+        }
+    }, [isOpen, initialQuery]);
+
+    const performSearch = async (searchTerm) => {
+        if (!searchTerm.trim()) return;
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            const response = await fetch(`/api/books/search?q=${encodeURIComponent(searchTerm)}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Search failed');
+            const data = await response.json();
+            setResults(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error(error);
+            setResults([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (!isOpen) return null;
 
     const handleSearch = async (e) => {
         e.preventDefault();
-        if (!query.trim()) return;
-
-        setLoading(true);
-        try {
-            const token = localStorage.getItem('libriverse_token');
-            console.log('Sending search request for:', query);
-
-            const response = await fetch(`/api/books/search?q=${encodeURIComponent(query)}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            console.log('Search response status:', response.status);
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                const errorMessage = errorData.error || await response.text();
-                console.error('Search failed:', errorMessage);
-                alert(`Erro na pesquisa: ${errorMessage}`);
-                setResults([]);
-                return;
-            }
-
-            const data = await response.json();
-            console.log('Search results:', data);
-            setResults(Array.isArray(data) ? data : []);
-        } catch (error) {
-            console.error('Search error:', error);
-            setResults([]);
-        } finally {
-            setLoading(false);
-        }
+        performSearch(query);
     };
 
     const handleSelect = (book) => {

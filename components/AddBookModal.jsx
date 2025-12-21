@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
+const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearch }) => {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [publisher, setPublisher] = useState('');
@@ -88,8 +88,38 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
 
     if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // 1. Check for duplicate ISBN if provided and not editing
+        if (isbn && !initialData) {
+            try {
+                const token = localStorage.getItem('libriverse_token');
+                const response = await fetch(`/api/books/search?q=${encodeURIComponent(isbn)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const results = await response.json();
+                    // Check if any result has this ISBN
+                    const duplicate = results.find(b => b.isbn === isbn);
+
+                    if (duplicate) {
+                        const confirmSearch = window.confirm(
+                            `Encontramos um livro com o ISBN ${isbn} na base de dados: "${duplicate.title}".\n\nDeseja usar os dados existentes em vez de cadastrar manualmente?`
+                        );
+
+                        if (confirmSearch) {
+                            onSwitchToSearch(isbn);
+                            return;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error checking ISBN:", err);
+                // Continue with save on error to not block user
+            }
+        }
+
         onAddBook({
             title, author, publisher, coverUrl, isbn,
             pageCount: pageCount ? parseInt(pageCount) : null,

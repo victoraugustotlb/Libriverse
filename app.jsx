@@ -33,6 +33,7 @@ const App = () => {
     const [isMethodModalOpen, setIsMethodModalOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [bookToEdit, setBookToEdit] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Fetch books when user is logged in
     React.useEffect(() => {
@@ -170,6 +171,12 @@ const App = () => {
         }
     };
 
+    const handleSwitchToSearch = (query) => {
+        setIsAddModalOpen(false);
+        setSearchQuery(query);
+        setIsSearchModalOpen(true);
+    };
+
     return (
         <div className="app">
             {isLoading && <Loading />}
@@ -220,11 +227,16 @@ const App = () => {
                 }}
                 onAddBook={handleAddBook}
                 initialData={bookToEdit}
+                onSwitchToSearch={handleSwitchToSearch}
             />
 
             <SearchBookModal
                 isOpen={isSearchModalOpen}
-                onClose={() => setIsSearchModalOpen(false)}
+                onClose={() => {
+                    setIsSearchModalOpen(false);
+                    setSearchQuery(''); // Clear query on close
+                }}
+                initialQuery={searchQuery}
                 onSelectBook={(book) => {
                     setBookToEdit(book);
                     setIsSearchModalOpen(false);
