@@ -46,7 +46,8 @@ export default async function handler(req, res) {
                     title: book.title,
                     author: book.author,
                     publisher: book.publisher,
-                    coverUrl: book.cover_url
+                    coverUrl: book.cover_url,
+                    isbn: book.isbn
                 }));
 
                 books.unshift({
@@ -63,9 +64,9 @@ export default async function handler(req, res) {
             // Use DISTINCT ON to return only one instance of each book (title/author pair)
             // preventing duplicates in search results when multiple users own the same book
             const result = await pool.query(
-                `SELECT DISTINCT ON (title, author) id, title, author, publisher, cover_url 
+                `SELECT DISTINCT ON (title, author) id, title, author, publisher, cover_url, isbn
                  FROM books 
-                 WHERE title ILIKE $1 OR author ILIKE $1 
+                 WHERE title ILIKE $1 OR author ILIKE $1 OR isbn ILIKE $1
                  ORDER BY title, author, created_at DESC
                  LIMIT 20`,
                 [`%${q}%`]
@@ -77,7 +78,8 @@ export default async function handler(req, res) {
                 title: book.title,
                 author: book.author,
                 publisher: book.publisher,
-                coverUrl: book.cover_url
+                coverUrl: book.cover_url,
+                isbn: book.isbn
             }));
 
             return res.status(200).json(books);

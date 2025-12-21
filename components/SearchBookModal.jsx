@@ -50,7 +50,8 @@ const SearchBookModal = ({ isOpen, onClose, onSelectBook }) => {
             title: book.title,
             author: book.author,
             publisher: book.publisher || '',
-            coverUrl: book.coverUrl || book.cover_url || ''
+            coverUrl: book.coverUrl || book.cover_url || '',
+            isbn: book.isbn || ''
         });
         onClose();
     };
@@ -78,7 +79,7 @@ const SearchBookModal = ({ isOpen, onClose, onSelectBook }) => {
                         <input
                             type="text"
                             className="auth-input"
-                            placeholder="Digite o título ou autor..."
+                            placeholder="Digite o título, autor ou ISBN..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             autoFocus

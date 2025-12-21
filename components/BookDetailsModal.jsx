@@ -139,6 +139,10 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                             <p style={{ fontWeight: '500' }}>{book.language || '-'}</p>
                         </div>
                         <div>
+                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>ISBN</p>
+                            <p style={{ fontWeight: '500', fontSize: '0.9rem' }}>{book.isbn || 'N/A'}</p>
+                        </div>
+                        <div>
                             <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Páginas</p>
                             <p style={{ fontWeight: '500' }}>{book.pageCount || '-'}</p>
                         </div>

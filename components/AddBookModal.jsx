@@ -4,6 +4,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [publisher, setPublisher] = useState('');
+    const [isbn, setIsbn] = useState('');
     const [coverUrl, setCoverUrl] = useState('');
     const [pageCount, setPageCount] = useState('');
     const [currentPage, setCurrentPage] = useState('');
@@ -57,6 +58,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
             setTitle(initialData.title || '');
             setAuthor(initialData.author || '');
             setPublisher(initialData.publisher || '');
+            setIsbn(initialData.isbn || '');
             setCoverUrl(initialData.coverUrl || '');
             setPageCount(initialData.pageCount || '');
             setCurrentPage(initialData.currentPage || '');
@@ -71,6 +73,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
             setTitle('');
             setAuthor('');
             setPublisher('');
+            setIsbn('');
             setCoverUrl('');
             setPageCount('');
             setCurrentPage('');
@@ -88,7 +91,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onAddBook({
-            title, author, publisher, coverUrl,
+            title, author, publisher, coverUrl, isbn,
             pageCount: pageCount ? parseInt(pageCount) : null,
             currentPage: currentPage ? parseInt(currentPage) : 0,
             language,
@@ -228,6 +231,18 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData }) => {
                                     onChange={(e) => setPublisher(e.target.value)}
                                     required
                                     placeholder="Ex: Agir"
+                                />
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="isbn">ISBN</label>
+                                <input
+                                    type="text"
+                                    id="isbn"
+                                    className="auth-input"
+                                    value={isbn}
+                                    onChange={(e) => setIsbn(e.target.value)}
+                                    placeholder="Ex: 978-85-220-3136-1"
                                 />
                             </div>
                         </div>
