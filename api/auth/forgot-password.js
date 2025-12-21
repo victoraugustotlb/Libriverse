@@ -40,7 +40,7 @@ export default async function handler(req, res) {
 
         // 4. Send Email
         const { data, error } = await resend.emails.send({
-            from: 'Libriverse <Do-Not-Reply@libriverse.com>', // Update this if you have a verified domain!
+            from: 'Libriverse <Do-Not-Reply@mylibriverse.com>', // Update this if you have a verified domain!
             to: [email],
             subject: 'Seu código de recuperação de senha - Libriverse',
             html: `
