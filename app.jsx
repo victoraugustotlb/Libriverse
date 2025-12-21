@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import Navbar from './components/Navbar.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
@@ -231,6 +232,7 @@ const App = () => {
                     setIsAddModalOpen(true);
                 }}
             />
+            <Analytics />
         </div>
     );
 };
