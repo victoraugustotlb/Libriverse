@@ -5,6 +5,8 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Library from './pages/Library.jsx';
 import UserHome from './pages/UserHome.jsx';
+import TermsOfUse from './pages/TermsOfUse.jsx';
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
 import AddBookModal from './components/AddBookModal.jsx';
 import AddBookMethodModal from './components/AddBookMethodModal.jsx';
 import SearchBookModal from './components/SearchBookModal.jsx';
@@ -189,6 +191,8 @@ const App = () => {
             {view === 'home' && <Home onNavigate={handleNavigate} />}
             {view === 'login' && <Login onNavigate={handleNavigate} />}
             {view === 'register' && <Register onNavigate={handleNavigate} />}
+            {view === 'terms' && <TermsOfUse onNavigate={handleNavigate} />}
+            {view === 'privacy' && <PrivacyPolicy onNavigate={handleNavigate} />}
             {view === 'user-home' && (
                 <UserHome
                     user={user}

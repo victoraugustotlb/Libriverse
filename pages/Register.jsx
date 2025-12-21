@@ -5,11 +5,19 @@ const Register = ({ onNavigate }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [acceptTerms, setAcceptTerms] = useState(false);
+    const [acceptPrivacy, setAcceptPrivacy] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         if (password !== confirmPassword) {
             alert('As senhas não coincidem!');
+            return;
+        }
+
+        if (!acceptTerms || !acceptPrivacy) {
+            alert('Você deve aceitar os Termos de Uso e a Política de Privacidade para criar uma conta.');
             return;
         }
 
@@ -107,6 +115,34 @@ const Register = ({ onNavigate }) => {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                         />
+                    </div>
+
+                    <div className="form-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '10px' }}>
+                        <input
+                            type="checkbox"
+                            id="acceptTerms"
+                            checked={acceptTerms}
+                            onChange={(e) => setAcceptTerms(e.target.checked)}
+                            required
+                            style={{ marginTop: '4px' }}
+                        />
+                        <label htmlFor="acceptTerms" style={{ fontSize: '14px', fontWeight: 'normal', cursor: 'pointer', color: 'var(--color-text-secondary)' }}>
+                            Li e aceito os <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('terms'); }} style={{ textDecoration: 'underline', color: 'var(--color-primary)' }}>Termos de Uso</a> da Libriverse.
+                        </label>
+                    </div>
+
+                    <div className="form-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '10px' }}>
+                        <input
+                            type="checkbox"
+                            id="acceptPrivacy"
+                            checked={acceptPrivacy}
+                            onChange={(e) => setAcceptPrivacy(e.target.checked)}
+                            required
+                            style={{ marginTop: '4px' }}
+                        />
+                        <label htmlFor="acceptPrivacy" style={{ fontSize: '14px', fontWeight: 'normal', cursor: 'pointer', color: 'var(--color-text-secondary)' }}>
+                            Concordo com a <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('privacy'); }} style={{ textDecoration: 'underline', color: 'var(--color-primary)' }}>Política de Privacidade</a> e o processamento dos meus dados.
+                        </label>
                     </div>
 
                     <button type="submit" className="auth-button">
