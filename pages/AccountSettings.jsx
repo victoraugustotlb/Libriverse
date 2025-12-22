@@ -68,6 +68,37 @@ const AccountSettings = ({ user, onUpdateUser, onNavigate }) => {
         }
     };
 
+    const handleDeleteAccount = async (password) => {
+        if (!confirm("Tem certeza absoluta? Essa ação não pode ser desfeita.")) return;
+
+        setIsLoading(true);
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            const response = await fetch('/api/auth/delete-account', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Conta excluída com sucesso.');
+                onNavigate('logout');
+            } else {
+                alert(data.error || 'Erro ao excluir conta.');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Erro de conexão.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="auth-page">
             <div className="login-card" style={{ maxWidth: '500px' }}>
@@ -132,7 +163,25 @@ const AccountSettings = ({ user, onUpdateUser, onNavigate }) => {
                         />
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '1.5rem' }}>
+                    <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 82, 82, 0.3)' }}>
+                        <h3 style={{ color: '#ff5252', fontSize: '1rem', marginBottom: '0.5rem' }}>Zona de Perigo</h3>
+                        <p style={{ color: '#ccc', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                            A exclusão da conta é permanente e não pode ser desfeita. Todos os seus livros serão apagados.
+                        </p>
+                        <button
+                            type="button"
+                            className="auth-button"
+                            style={{ background: 'rgba(255, 82, 82, 0.1)', border: '1px solid #ff5252', color: '#ff5252' }}
+                            onClick={() => {
+                                const pwd = prompt("Para confirmar a exclusão, digite sua senha atual:");
+                                if (pwd) handleDeleteAccount(pwd);
+                            }}
+                        >
+                            Excluir Minha Conta
+                        </button>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
                         <button type="button" className="auth-button" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)' }} onClick={() => onNavigate('user-home')}>
                             Voltar
                         </button>
