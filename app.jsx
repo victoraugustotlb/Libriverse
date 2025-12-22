@@ -4,6 +4,7 @@ import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
+import AccountSettings from './pages/AccountSettings.jsx';
 import Library from './pages/Library.jsx';
 import UserHome from './pages/UserHome.jsx';
 import TermsOfUse from './pages/TermsOfUse.jsx';
@@ -174,6 +175,10 @@ const App = () => {
         }
     };
 
+    const handleUpdateUser = (updatedUser) => {
+        setUser(updatedUser);
+    };
+
     const handleSwitchToSearch = (query) => {
         setIsAddModalOpen(false);
         setSearchQuery(query);
@@ -193,6 +198,13 @@ const App = () => {
             {view === 'login' && <Login onNavigate={handleNavigate} />}
             {view === 'register' && <Register onNavigate={handleNavigate} />}
             {view === 'forgot-password' && <ForgotPassword onNavigate={handleNavigate} />}
+            {view === 'account-settings' && (
+                <AccountSettings
+                    user={user}
+                    onUpdateUser={handleUpdateUser}
+                    onNavigate={handleNavigate}
+                />
+            )}
             {view === 'terms' && <TermsOfUse onNavigate={handleNavigate} />}
             {view === 'privacy' && <PrivacyPolicy onNavigate={handleNavigate} />}
             {view === 'user-home' && (

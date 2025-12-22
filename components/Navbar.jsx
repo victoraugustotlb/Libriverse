@@ -76,7 +76,7 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
                                     <div className="dropdown-item-content">Dashboard</div>
                                 </a>
 
-                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); setIsDropdownOpen(false); }}>
+                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); onNavigate('account-settings'); setIsDropdownOpen(false); }}>
                                     <div className="dropdown-item-content">Account Settings</div>
                                 </a>
 
