@@ -24,13 +24,113 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook }) 
                 </div>
             </section>
 
+            {/* Carousel Section */}
+            <section className="container" style={{ marginBottom: '40px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                    <h2 style={{ fontSize: '1.5rem', color: 'var(--color-text-primary)', margin: 0 }}>Destaques</h2>
+                </div>
+
+                <div className="carousel-container" style={{
+                    display: 'flex',
+                    gap: '20px',
+                    overflowX: 'auto',
+                    paddingBottom: '20px',
+                    scrollSnapType: 'x mandatory'
+                }}>
+                    {readingBooks.slice(0, 5).map((book) => (
+                        <div key={`carousel-${book.id}`} style={{ flex: '0 0 160px', scrollSnapAlign: 'start' }}>
+                            <div
+                                onClick={() => setSelectedBook(book)}
+                                style={{
+                                    width: '100%',
+                                    aspectRatio: '2/3',
+                                    borderRadius: '12px',
+                                    overflow: 'hidden',
+                                    cursor: 'pointer',
+                                    position: 'relative',
+                                    boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
+                                    transition: 'transform 0.2s',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                                <img
+                                    src={book.coverUrl}
+                                    alt={book.title}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
+                                    padding: '10px',
+                                    paddingTop: '30px'
+                                }}>
+                                    <div style={{
+                                        height: '4px',
+                                        background: 'rgba(255,255,255,0.3)',
+                                        borderRadius: '2px',
+                                        marginTop: '5px'
+                                    }}>
+                                        <div style={{
+                                            width: `${book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0}%`,
+                                            height: '100%',
+                                            background: 'var(--color-accent)',
+                                            borderRadius: '2px'
+                                        }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p style={{ marginTop: '10px', fontSize: '0.9rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{book.title}</p>
+                        </div>
+                    ))}
+
+                    {/* Modern Add Card */}
+                    <div style={{ flex: '0 0 160px', scrollSnapAlign: 'start' }}>
+                        <div
+                            onClick={() => onNavigate('library')} // Or open add modal directly if prop passed
+                            style={{
+                                width: '100%',
+                                aspectRatio: '2/3',
+                                borderRadius: '12px',
+                                border: '2px dashed rgba(255, 255, 255, 0.2)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                background: 'rgba(255, 255, 255, 0.02)',
+                                color: 'rgba(255, 255, 255, 0.5)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--color-accent)';
+                                e.currentTarget.style.color = 'var(--color-accent)';
+                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
+                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+                            }}
+                        >
+                            <div style={{ fontSize: '3rem', fontWeight: '200' }}>+</div>
+                        </div>
+                        <p style={{ marginTop: '10px', fontSize: '0.9rem', color: '#888', textAlign: 'center' }}>Adicionar Novo</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Existing Grid Section (Pushed Down) */}
             {readingBooks.length > 0 && (
                 <section className="container" style={{ paddingBottom: '60px' }}>
                     <h2 style={{
                         fontSize: '2rem',
                         marginBottom: '30px',
                         color: 'var(--color-text-primary)'
-                    }}>Lendo Atualmente</h2>
+                    }}>Todos os Livros ({readingBooks.length})</h2>
 
                     <div style={{
                         display: 'grid',

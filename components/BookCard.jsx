@@ -21,6 +21,11 @@ const BookCard = ({ book }) => {
                     <span className="stars">{renderStars(book.rating)}</span>
                     <span>{book.rating}</span>
                 </div>
+                {book.createdAt && (
+                    <p className="book-date" style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.5rem' }}>
+                        Adicionado em: {new Date(book.createdAt).toLocaleDateString('pt-BR')}
+                    </p>
+                )}
             </div>
         </div>
     );
