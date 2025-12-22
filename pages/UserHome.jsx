@@ -35,69 +35,124 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook }) 
                     gap: '20px',
                     overflowX: 'auto',
                     paddingBottom: '20px',
-                    scrollSnapType: 'x mandatory'
+                    scrollSnapType: 'x mandatory',
+                    paddingRight: '20px' // Padding for scrolling end
                 }}>
-                    {readingBooks.slice(0, 5).map((book) => (
-                        <div key={`carousel-${book.id}`} style={{ flex: '0 0 160px', scrollSnapAlign: 'start' }}>
-                            <div
-                                onClick={() => setSelectedBook(book)}
-                                style={{
-                                    width: '100%',
-                                    aspectRatio: '2/3',
-                                    borderRadius: '12px',
-                                    overflow: 'hidden',
-                                    cursor: 'pointer',
-                                    position: 'relative',
-                                    boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
-                                    transition: 'transform 0.2s',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)'
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            >
-                                <img
-                                    src={book.coverUrl}
-                                    alt={book.title}
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                />
-                                <div style={{
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
-                                    padding: '10px',
-                                    paddingTop: '30px'
-                                }}>
+                    {readingBooks.slice(0, 5).map((book) => {
+                        const progress = book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0;
+                        return (
+                            <div key={`carousel-${book.id}`} style={{ flex: '0 0 320px', scrollSnapAlign: 'start' }}>
+                                <div
+                                    onClick={() => setSelectedBook(book)}
+                                    style={{
+                                        width: '100%',
+                                        height: '180px', // Fixed height for consistency
+                                        background: 'rgba(255, 255, 255, 0.05)',
+                                        backdropFilter: 'blur(10px)',
+                                        borderRadius: '16px',
+                                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        overflow: 'hidden',
+                                        transition: 'transform 0.2s, background 0.2s, border-color 0.2s',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                                    }}
+                                >
+                                    {/* Cover Image (Left) */}
                                     <div style={{
-                                        height: '4px',
-                                        background: 'rgba(255,255,255,0.3)',
-                                        borderRadius: '2px',
-                                        marginTop: '5px'
+                                        width: '120px',
+                                        height: '100%',
+                                        flexShrink: 0
                                     }}>
-                                        <div style={{
-                                            width: `${book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0}%`,
-                                            height: '100%',
-                                            background: 'var(--color-accent)',
-                                            borderRadius: '2px'
-                                        }}></div>
+                                        <img
+                                            src={book.coverUrl}
+                                            alt={book.title}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    </div>
+
+                                    {/* Info (Right) */}
+                                    <div style={{
+                                        flex: 1,
+                                        padding: '16px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'space-between'
+                                    }}>
+                                        <div>
+                                            <h3 style={{
+                                                fontSize: '1rem',
+                                                marginTop: 0,
+                                                marginBottom: '4px',
+                                                color: '#fff',
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden',
+                                                lineHeight: '1.3'
+                                            }} title={book.title}>
+                                                {book.title}
+                                            </h3>
+                                            <p style={{
+                                                fontSize: '0.8rem',
+                                                color: 'rgba(255,255,255,0.6)',
+                                                margin: 0,
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis'
+                                            }}>
+                                                {book.author}
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '6px', color: 'rgba(255,255,255,0.8)' }}>
+                                                <span>Progresso</span>
+                                                <span>{Math.round(progress)}%</span>
+                                            </div>
+                                            <div style={{
+                                                width: '100%',
+                                                height: '4px',
+                                                background: 'rgba(255,255,255,0.1)',
+                                                borderRadius: '2px'
+                                            }}>
+                                                <div style={{
+                                                    width: `${progress}%`,
+                                                    height: '100%',
+                                                    background: 'var(--color-accent)',
+                                                    borderRadius: '2px'
+                                                }}></div>
+                                            </div>
+                                            <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>
+                                                {book.currentPage} de {book.pageCount} pág.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <p style={{ marginTop: '10px', fontSize: '0.9rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{book.title}</p>
-                        </div>
-                    ))}
+                        );
+                    })}
 
-                    {/* Modern Add Card */}
-                    <div style={{ flex: '0 0 160px', scrollSnapAlign: 'start' }}>
+                    {/* Modern Add Card (Horizontal) */}
+                    <div style={{ flex: '0 0 320px', scrollSnapAlign: 'start' }}>
                         <div
-                            onClick={() => onNavigate('library')} // Or open add modal directly if prop passed
+                            onClick={() => onNavigate('library')}
                             style={{
                                 width: '100%',
-                                aspectRatio: '2/3',
-                                borderRadius: '12px',
+                                height: '180px',
+                                borderRadius: '16px',
                                 border: '2px dashed rgba(255, 255, 255, 0.2)',
                                 display: 'flex',
+                                flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 cursor: 'pointer',
@@ -116,9 +171,9 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook }) 
                                 e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
                             }}
                         >
-                            <div style={{ fontSize: '3rem', fontWeight: '200' }}>+</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: '200', marginBottom: '10px' }}>+</div>
+                            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: '500' }}>Adicionar Leitura</p>
                         </div>
-                        <p style={{ marginTop: '10px', fontSize: '0.9rem', color: '#888', textAlign: 'center' }}>Adicionar Novo</p>
                     </div>
                 </div>
             </section>
