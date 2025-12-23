@@ -37,24 +37,25 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
         <div className="book-carousel-container" style={{
             position: 'relative',
             width: '100%',
-            height: '500px', // Fixed height
+            height: '600px', // Taller to accommodate scaling
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             overflow: 'hidden',
-            margin: '20px 0'
+            margin: '20px 0',
+            perspective: '1000px' // Restore perspective for depth feel
         }}>
             {/* Prev Button */}
             <button onClick={handlePrev} style={{
                 position: 'absolute',
                 left: '20px',
                 zIndex: 200,
-                background: 'var(--color-bg-tertiary)',
-                border: '1px solid var(--color-border)',
+                background: 'rgba(255,255,255,0.8)',
+                border: 'none',
                 borderRadius: '50%',
                 width: '50px',
                 height: '50px',
-                color: 'var(--color-text-primary)',
+                color: '#333',
                 fontSize: '1.5rem',
                 cursor: 'pointer',
                 display: 'flex',
@@ -62,22 +63,19 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                 justifyContent: 'center',
                 transition: 'all 0.2s',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-            }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-            >&#8249;</button>
+            }}>&#8249;</button>
 
             {/* Next Button */}
             <button onClick={handleNext} style={{
                 position: 'absolute',
                 right: '20px',
                 zIndex: 200,
-                background: 'var(--color-bg-tertiary)',
-                border: '1px solid var(--color-border)',
+                background: 'rgba(255,255,255,0.8)',
+                border: 'none',
                 borderRadius: '50%',
                 width: '50px',
                 height: '50px',
-                color: 'var(--color-text-primary)',
+                color: '#333',
                 fontSize: '1.5rem',
                 cursor: 'pointer',
                 display: 'flex',
@@ -85,10 +83,7 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                 justifyContent: 'center',
                 transition: 'all 0.2s',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-            }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-            >&#8250;</button>
+            }}>&#8250;</button>
 
             <div style={{
                 position: 'relative',
@@ -97,36 +92,48 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                transformStyle: 'preserve-3d'
             }}>
                 {items.map((item, index) => {
                     const offset = index - activeIndex;
                     const isActive = index === activeIndex;
 
-                    // Logic: "Flower" Style scaling and spacing.
-                    // Active: Center (0)
-                    // Neighbors: Spaced out significantly
+                    // Logic: "Bloom" / "Flower" Style
+                    // Active: Center, Large.
+                    // Neighbors: Visible as FULL CARDS, scaled down, spaced out.
 
-                    if (Math.abs(offset) > 2) return null; // Hide far items
+                    if (Math.abs(offset) > 2) return null;
 
-                    // Card Dimensions
-                    const CARD_WIDTH = 750; // Wide card for "Book Layout"
-                    const GAP = 50;
+                    const CARD_WIDTH = 700;
 
                     let translateX = 0;
+                    const GAP = 100; // Visible gap between cards
+
                     if (offset === 0) {
                         translateX = 0;
                     } else if (offset > 0) {
-                        // Move right: (Half Active + Half Neighbor)? 
-                        // Actually, neighbors should just shift right by slightly more than width to create gap.
-                        translateX = (CARD_WIDTH * 0.95) + ((offset - 1) * 200);
+                        translateX = (CARD_WIDTH * 0.85) + GAP + ((offset - 1) * 200);
                     } else {
-                        translateX = -(CARD_WIDTH * 0.95) + ((offset + 1) * 200);
+                        translateX = -((CARD_WIDTH * 0.85) + GAP) + ((offset + 1) * 200);
                     }
 
                     const scale = isActive ? 1 : 0.85;
                     const opacity = isActive ? 1 : 0.5;
                     const zIndex = 100 - Math.abs(offset);
                     const blur = isActive ? '0' : '2px';
+
+                    // Consistent Card Style for ALL items (Book or Placeholder)
+                    const cardStyle = {
+                        display: 'flex',
+                        width: '100%',
+                        height: '100%',
+                        background: 'var(--color-bg-secondary)',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        boxShadow: isActive ? '0 30px 60px rgba(0,0,0,0.5)' : '0 10px 30px rgba(0,0,0,0.3)',
+                        border: '1px solid var(--color-border)',
+                        transition: 'box-shadow 0.3s'
+                    };
 
                     return (
                         <div
@@ -135,9 +142,9 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                             style={{
                                 position: 'absolute',
                                 width: `${CARD_WIDTH}px`,
-                                height: '400px',
+                                height: '420px',
                                 transition: 'all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                                transform: `translateX(${translateX}px) scale(${scale})`,
+                                transform: `translateX(${translateX}px) scale(${scale}) translateZ(${isActive ? 0 : -100}px)`, // Use translateZ for depth
                                 zIndex: zIndex,
                                 opacity: opacity,
                                 filter: `blur(${blur})`,
@@ -147,21 +154,15 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                 justifyContent: 'center'
                             }}
                         >
-                            {/* --- CONTENT --- */}
                             {item.type === 'placeholder' ? (
                                 <div style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    borderRadius: '16px',
-                                    border: '2px dashed #666',
-                                    display: 'flex',
+                                    ...cardStyle,
+                                    background: '#2a2a2a', // Distinct gray for add
                                     flexDirection: 'column',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    background: '#2a2a2a', // Solid dark gray
-                                    color: '#ccc',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+                                    color: '#eee',
+                                    border: '2px dashed #555'
                                 }}
                                     onClick={() => isActive && onNavigate('library')}
                                 >
@@ -169,21 +170,10 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                     <p style={{ fontSize: '1.2rem', fontWeight: '500', marginTop: '10px' }}>Adicionar Novo Livro</p>
                                 </div>
                             ) : (
-                                // DETAILED CARD (Matches User Image)
-                                <div style={{
-                                    display: 'flex',
-                                    width: '100%',
-                                    height: '100%',
-                                    background: 'var(--color-bg-secondary)', // Should be solid
-                                    borderRadius: '12px',
-                                    border: '1px solid var(--color-border)',
-                                    overflow: 'hidden',
-                                    // Heavy shadow to stand out from any background
-                                    boxShadow: '0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)'
-                                }}>
+                                <div style={cardStyle}>
                                     {/* Left: Full Cover */}
                                     <div style={{
-                                        width: '40%', // Slightly wider cover area
+                                        width: '40%',
                                         background: '#000',
                                         position: 'relative',
                                         overflow: 'hidden',
@@ -207,10 +197,10 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                         display: 'flex',
                                         flexDirection: 'column',
                                         textAlign: 'left',
-                                        background: 'var(--color-bg-secondary)' // Ensure solid fill
+                                        background: 'var(--color-bg-secondary)'
                                     }}>
                                         <h2 style={{
-                                            fontSize: '2rem', // Large title like image
+                                            fontSize: '2rem',
                                             fontWeight: '700',
                                             margin: '0 0 10px 0',
                                             color: 'var(--color-text-primary)',
@@ -224,7 +214,7 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                             fontWeight: '500'
                                         }}>por {item.author}</p>
 
-                                        {/* Grid Stats */}
+                                        {/* Stats */}
                                         <div style={{
                                             display: 'grid',
                                             gridTemplateColumns: '1fr 1fr',
@@ -249,7 +239,7 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                             </div>
                                         </div>
 
-                                        {/* Progress Section */}
+                                        {/* Progress */}
                                         <div>
                                             <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px' }}>Progresso de Leitura</p>
 
@@ -283,7 +273,7 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                                 <button
                                                     onClick={(e) => handlePageUpdate(e, item)}
                                                     style={{
-                                                        background: '#0070f3', // Bright Blue Button like reference
+                                                        background: '#0070f3',
                                                         color: 'white',
                                                         border: 'none',
                                                         borderRadius: '6px',
@@ -297,7 +287,6 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                                 </button>
                                             </div>
 
-                                            {/* Progress Bar Line */}
                                             <div style={{ width: '100%', height: '4px', background: 'var(--color-bg-tertiary)', marginTop: '12px', borderRadius: '2px' }}>
                                                 <div style={{
                                                     width: `${Math.min(((item.currentPage || 0) / (item.pageCount || 1)) * 100, 100)}%`,
@@ -307,7 +296,6 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                                 }}></div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             )}
