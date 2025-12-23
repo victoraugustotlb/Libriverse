@@ -35,6 +35,7 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook }) 
                     books={readingBooks.slice(0, 10)}
                     onSelectBook={setSelectedBook}
                     onNavigate={onNavigate}
+                    onUpdateBook={onUpdateBook}
                 />
             </section>
 
