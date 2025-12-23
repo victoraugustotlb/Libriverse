@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import BookDetailsModal from '../components/BookDetailsModal';
+import BookCarousel from '../components/BookCarousel';
 
 const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook }) => {
     const [selectedBook, setSelectedBook] = useState(null);
@@ -26,156 +27,15 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook }) 
 
             {/* Carousel Section */}
             <section className="container" style={{ marginBottom: '40px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                     <h2 style={{ fontSize: '1.5rem', color: 'var(--color-text-primary)', margin: 0 }}>Destaques</h2>
                 </div>
 
-                <div className="carousel-container" style={{
-                    display: 'flex',
-                    gap: '20px',
-                    overflowX: 'auto',
-                    paddingBottom: '20px',
-                    scrollSnapType: 'x mandatory',
-                    paddingRight: '20px' // Padding for scrolling end
-                }}>
-                    {readingBooks.slice(0, 5).map((book) => {
-                        const progress = book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0;
-                        return (
-                            <div key={`carousel-${book.id}`} style={{ flex: '0 0 320px', scrollSnapAlign: 'start' }}>
-                                <div
-                                    onClick={() => setSelectedBook(book)}
-                                    style={{
-                                        width: '100%',
-                                        height: '180px', // Fixed height for consistency
-                                        background: 'rgba(255, 255, 255, 0.05)',
-                                        backdropFilter: 'blur(10px)',
-                                        borderRadius: '16px',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        overflow: 'hidden',
-                                        transition: 'transform 0.2s, background 0.2s, border-color 0.2s',
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                                    }}
-                                >
-                                    {/* Cover Image (Left) */}
-                                    <div style={{
-                                        width: '120px',
-                                        height: '100%',
-                                        flexShrink: 0
-                                    }}>
-                                        <img
-                                            src={book.coverUrl}
-                                            alt={book.title}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                    </div>
-
-                                    {/* Info (Right) */}
-                                    <div style={{
-                                        flex: 1,
-                                        padding: '16px',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        justifyContent: 'space-between'
-                                    }}>
-                                        <div>
-                                            <h3 style={{
-                                                fontSize: '1rem',
-                                                marginTop: 0,
-                                                marginBottom: '4px',
-                                                color: '#fff',
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: 2,
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden',
-                                                lineHeight: '1.3'
-                                            }} title={book.title}>
-                                                {book.title}
-                                            </h3>
-                                            <p style={{
-                                                fontSize: '0.8rem',
-                                                color: 'rgba(255,255,255,0.6)',
-                                                margin: 0,
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis'
-                                            }}>
-                                                {book.author}
-                                            </p>
-                                        </div>
-
-                                        <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '6px', color: 'rgba(255,255,255,0.8)' }}>
-                                                <span>Progresso</span>
-                                                <span>{Math.round(progress)}%</span>
-                                            </div>
-                                            <div style={{
-                                                width: '100%',
-                                                height: '4px',
-                                                background: 'rgba(255,255,255,0.1)',
-                                                borderRadius: '2px'
-                                            }}>
-                                                <div style={{
-                                                    width: `${progress}%`,
-                                                    height: '100%',
-                                                    background: 'var(--color-accent)',
-                                                    borderRadius: '2px'
-                                                }}></div>
-                                            </div>
-                                            <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>
-                                                {book.currentPage} de {book.pageCount} pág.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-
-                    {/* Modern Add Card (Horizontal) */}
-                    <div style={{ flex: '0 0 320px', scrollSnapAlign: 'start' }}>
-                        <div
-                            onClick={() => onNavigate('library')}
-                            style={{
-                                width: '100%',
-                                height: '180px',
-                                borderRadius: '16px',
-                                border: '2px dashed rgba(255, 255, 255, 0.2)',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                background: 'rgba(255, 255, 255, 0.02)',
-                                color: 'rgba(255, 255, 255, 0.5)'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.borderColor = 'var(--color-accent)';
-                                e.currentTarget.style.color = 'var(--color-accent)';
-                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
-                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
-                            }}
-                        >
-                            <div style={{ fontSize: '2.5rem', fontWeight: '200', marginBottom: '10px' }}>+</div>
-                            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: '500' }}>Adicionar Leitura</p>
-                        </div>
-                    </div>
-                </div>
+                <BookCarousel
+                    books={readingBooks.slice(0, 10)}
+                    onSelectBook={setSelectedBook}
+                    onNavigate={onNavigate}
+                />
             </section>
 
             {/* Existing Grid Section (Pushed Down) */}
