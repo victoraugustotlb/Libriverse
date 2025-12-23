@@ -98,29 +98,32 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                     const offset = index - activeIndex;
                     const isActive = index === activeIndex;
 
-                    // Logic: "Bloom" / "Flower" Style
-                    // Active: Center, Large.
-                    // Neighbors: Visible as FULL CARDS, scaled down, spaced out.
-
-                    if (Math.abs(offset) > 2) return null;
+                    // Logic: "Bloom" / "Flower" Style - Continuous Flow
+                    // We allow more items to be visible to prevent "abrupt ending"
+                    if (Math.abs(offset) > 5) return null;
 
                     const CARD_WIDTH = 700;
+                    const GAP = 50; // Gap between the active card and neighbors
+                    const NEIGHBOR_OFFSET = 180; // How much neighbors overlap/space out
 
                     let translateX = 0;
-                    const GAP = 100; // Visible gap between cards
 
                     if (offset === 0) {
                         translateX = 0;
                     } else if (offset > 0) {
-                        translateX = (CARD_WIDTH * 0.85) + GAP + ((offset - 1) * 200);
+                        // Distribute neighbor cards to the right
+                        // First neighbor is at (CARD_WIDTH*0.6) + GAP
+                        // Subsequent ones add NEIGHBOR_OFFSET
+                        translateX = ((CARD_WIDTH * 0.55) + GAP) + ((offset - 1) * NEIGHBOR_OFFSET);
                     } else {
-                        translateX = -((CARD_WIDTH * 0.85) + GAP) + ((offset + 1) * 200);
+                        // Distribute to left
+                        translateX = -((CARD_WIDTH * 0.55) + GAP) + ((offset + 1) * NEIGHBOR_OFFSET);
                     }
 
                     const scale = isActive ? 1 : 0.85;
-                    const opacity = isActive ? 1 : 0.5;
+                    const opacity = isActive ? 1 : 0.8; // Higher opacity for visibility
                     const zIndex = 100 - Math.abs(offset);
-                    const blur = isActive ? '0' : '2px';
+                    const blur = isActive ? '0' : '1px';
 
                     // Consistent Card Style for ALL items (Book or Placeholder)
                     const cardStyle = {
@@ -144,7 +147,7 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                 width: `${CARD_WIDTH}px`,
                                 height: '420px',
                                 transition: 'all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                                transform: `translateX(${translateX}px) scale(${scale}) translateZ(${isActive ? 0 : -100}px)`, // Use translateZ for depth
+                                transform: `translateX(${translateX}px) scale(${scale}) translateZ(${isActive ? 0 : -50 * Math.abs(offset)}px)`, // Use translateZ for depth
                                 zIndex: zIndex,
                                 opacity: opacity,
                                 filter: `blur(${blur})`,
