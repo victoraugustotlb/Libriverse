@@ -25,13 +25,15 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                     {/* View Toggle */}
                     <div style={{
                         position: 'absolute',
-                        right: 0,
+                        right: '20px',
                         top: '50%',
                         transform: 'translateY(-50%)',
                         display: 'flex',
-                        background: 'rgba(255,255,255,0.1)',
+                        background: 'rgba(0,0,0,0.6)', // Darker background for visibility
                         borderRadius: '8px',
-                        padding: '4px'
+                        padding: '4px',
+                        zIndex: 100, // Ensure it's on top
+                        border: '1px solid rgba(255,255,255,0.1)'
                     }}>
                         <button
                             onClick={() => setViewMode('shelves')}
