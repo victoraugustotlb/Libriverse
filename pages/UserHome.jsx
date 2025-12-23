@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import BookDetailsModal from '../components/BookDetailsModal';
 import BookCarousel from '../components/BookCarousel';
 
-const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook }) => {
+const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook, onOpenAddModal }) => {
     const [selectedBook, setSelectedBook] = useState(null);
     const readingBooks = books.filter(b => !b.isRead);
 
@@ -36,6 +36,7 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook }) 
                     onSelectBook={setSelectedBook}
                     onNavigate={onNavigate}
                     onUpdateBook={onUpdateBook}
+                    onOpenAddModal={onOpenAddModal}
                 />
             </section>
 

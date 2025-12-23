@@ -214,6 +214,7 @@ const App = () => {
                     onNavigate={handleNavigate}
                     onUpdateBook={handleUpdateBook}
                     onDeleteBook={handleDeleteBook}
+                    onOpenAddModal={() => setIsMethodModalOpen(true)}
                 />
             )}
             {view === 'library' && (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
+const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook, onOpenAddModal }) => {
     // Merge books with a placeholder for "Add Book"
     const items = [...books, { id: 'add-placeholder', type: 'placeholder' }];
     const [activeIndex, setActiveIndex] = useState(0);
@@ -119,7 +119,7 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                     }
 
                     const scale = isActive ? 1 : 0.7;
-                    const opacity = isActive ? 1 : 0.8; // Higher opacity for visibility
+                    const opacity = isActive ? 1 : 0.7; // Increased opacity as requested
                     const zIndex = 100 - Math.abs(offset);
                     const blur = isActive ? '0' : '1px';
 
@@ -165,7 +165,7 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                     color: '#eee',
                                     border: '2px dashed #555'
                                 }}
-                                    onClick={() => isActive && onNavigate('library')}
+                                    onClick={() => isActive && onOpenAddModal && onOpenAddModal()}
                                 >
                                     <div style={{ fontSize: '4rem', fontWeight: '200' }}>+</div>
                                     <p style={{ fontSize: '1.2rem', fontWeight: '500', marginTop: '10px' }}>Adicionar Novo Livro</p>
