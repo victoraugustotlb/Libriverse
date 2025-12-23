@@ -37,58 +37,58 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
         <div className="book-carousel-container" style={{
             position: 'relative',
             width: '100%',
-            height: '550px',
+            height: '500px', // Fixed height
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            overflow: 'visible', // Allow overlap logic to work visually
+            overflow: 'hidden',
             margin: '20px 0'
         }}>
             {/* Prev Button */}
             <button onClick={handlePrev} style={{
                 position: 'absolute',
-                left: '0',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 200, // Above everything
-                background: 'rgba(0,0,0,0.5)',
-                border: 'none',
+                left: '20px',
+                zIndex: 200,
+                background: 'var(--color-bg-tertiary)',
+                border: '1px solid var(--color-border)',
                 borderRadius: '50%',
                 width: '50px',
                 height: '50px',
-                color: 'white',
+                color: 'var(--color-text-primary)',
                 fontSize: '1.5rem',
                 cursor: 'pointer',
-                backdropFilter: 'blur(5px)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.2s',
-                boxShadow: '0 5px 15px rgba(0,0,0,0.3)'
-            }}>&#8249;</button>
+                boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+            }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+            >&#8249;</button>
 
             {/* Next Button */}
             <button onClick={handleNext} style={{
                 position: 'absolute',
-                right: '0',
-                top: '50%',
-                transform: 'translateY(-50%)',
+                right: '20px',
                 zIndex: 200,
-                background: 'rgba(0,0,0,0.5)',
-                border: 'none',
+                background: 'var(--color-bg-tertiary)',
+                border: '1px solid var(--color-border)',
                 borderRadius: '50%',
                 width: '50px',
                 height: '50px',
-                color: 'white',
+                color: 'var(--color-text-primary)',
                 fontSize: '1.5rem',
                 cursor: 'pointer',
-                backdropFilter: 'blur(5px)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.2s',
-                boxShadow: '0 5px 15px rgba(0,0,0,0.3)'
-            }}>&#8250;</button>
+                boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+            }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+            >&#8250;</button>
 
             <div style={{
                 position: 'relative',
@@ -102,38 +102,29 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                     const offset = index - activeIndex;
                     const isActive = index === activeIndex;
 
-                    // Optimization: Hide items far away
-                    if (Math.abs(offset) > 2) return null;
+                    // Logic: "Flower" Style scaling and spacing.
+                    // Active: Center (0)
+                    // Neighbors: Spaced out significantly
 
-                    // --- STACKED LOGIC ---
-                    const ACTIVE_WIDTH = 800; // Width of the main card
-                    // Use a smaller translation step so they overlap
-                    // If offsets are -1, 0, 1
-                    // 0 is at center 0px.
-                    // -1 should be left.
-                    // 1 should be right.
+                    if (Math.abs(offset) > 2) return null; // Hide far items
+
+                    // Card Dimensions
+                    const CARD_WIDTH = 750; // Wide card for "Book Layout"
+                    const GAP = 50;
 
                     let translateX = 0;
-                    let rotateY = 0;
-
-                    // We want neighbors to peek out from behind.
-                    // Active card half width is 400.
-                    // If we move neighbors by 300px, they will overlap by 100px (assuming neighbor width ~220).
-                    // Actually neighbor is much smaller.
-
                     if (offset === 0) {
                         translateX = 0;
-                        rotateY = 0;
                     } else if (offset > 0) {
-                        translateX = 360 + (offset * 40); // 360px right, then stack closely
-                        rotateY = -5; // Slight angle inward
+                        // Move right: (Half Active + Half Neighbor)? 
+                        // Actually, neighbors should just shift right by slightly more than width to create gap.
+                        translateX = (CARD_WIDTH * 0.95) + ((offset - 1) * 200);
                     } else {
-                        translateX = -360 + (offset * 40);
-                        rotateY = 5;
+                        translateX = -(CARD_WIDTH * 0.95) + ((offset + 1) * 200);
                     }
 
                     const scale = isActive ? 1 : 0.85;
-                    const opacity = isActive ? 1 : 0.4;
+                    const opacity = isActive ? 1 : 0.5;
                     const zIndex = 100 - Math.abs(offset);
                     const blur = isActive ? '0' : '2px';
 
@@ -143,10 +134,10 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                             onClick={() => !isActive && setActiveIndex(index)}
                             style={{
                                 position: 'absolute',
-                                width: isActive ? `${ACTIVE_WIDTH}px` : '240px',
-                                height: '380px',
-                                transition: 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)',
-                                transform: `translateX(${translateX}px) scale(${scale}) perspective(1000px) rotateY(${rotateY}deg)`,
+                                width: `${CARD_WIDTH}px`,
+                                height: '400px',
+                                transition: 'all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                                transform: `translateX(${translateX}px) scale(${scale})`,
                                 zIndex: zIndex,
                                 opacity: opacity,
                                 filter: `blur(${blur})`,
@@ -158,44 +149,45 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                         >
                             {/* --- CONTENT --- */}
                             {item.type === 'placeholder' ? (
-                                // Placeholder (Active or Inactive)
                                 <div style={{
                                     width: '100%',
                                     height: '100%',
                                     borderRadius: '16px',
-                                    border: '2px dashed rgba(255,255,255,0.3)',
+                                    border: '2px dashed #666',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    background: 'rgba(255,255,255,0.02)',
-                                    color: 'rgba(255,255,255,0.5)',
-                                    cursor: 'pointer'
+                                    background: '#2a2a2a', // Solid dark gray
+                                    color: '#ccc',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
                                 }}
                                     onClick={() => isActive && onNavigate('library')}
                                 >
-                                    <div style={{ fontSize: '3rem', fontWeight: '200' }}>+</div>
-                                    <p>Adicionar</p>
+                                    <div style={{ fontSize: '4rem', fontWeight: '200' }}>+</div>
+                                    <p style={{ fontSize: '1.2rem', fontWeight: '500', marginTop: '10px' }}>Adicionar Novo Livro</p>
                                 </div>
-                            ) : isActive ? (
-                                // ACTIVE DETAILED CARD
+                            ) : (
+                                // DETAILED CARD (Matches User Image)
                                 <div style={{
                                     display: 'flex',
                                     width: '100%',
                                     height: '100%',
-                                    background: 'var(--color-bg-secondary)',
-                                    borderRadius: '16px',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.6)',
+                                    background: 'var(--color-bg-secondary)', // Should be solid
+                                    borderRadius: '12px',
                                     border: '1px solid var(--color-border)',
+                                    overflow: 'hidden',
+                                    // Heavy shadow to stand out from any background
+                                    boxShadow: '0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)'
                                 }}>
-                                    {/* Left: Cover */}
+                                    {/* Left: Full Cover */}
                                     <div style={{
-                                        width: '35%',
-                                        background: '#111',
+                                        width: '40%', // Slightly wider cover area
+                                        background: '#000',
                                         position: 'relative',
                                         overflow: 'hidden',
-                                        borderRight: '1px solid rgba(255,255,255,0.05)'
+                                        borderRight: '1px solid var(--color-border)'
                                     }}>
                                         <img
                                             src={item.coverUrl}
@@ -208,116 +200,115 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                                         />
                                     </div>
 
-                                    {/* Right: Info */}
+                                    {/* Right: Info Column */}
                                     <div style={{
-                                        width: '65%',
-                                        padding: '30px 40px',
+                                        width: '60%',
+                                        padding: '40px',
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        justifyContent: 'center',
-                                        textAlign: 'left'
+                                        textAlign: 'left',
+                                        background: 'var(--color-bg-secondary)' // Ensure solid fill
                                     }}>
                                         <h2 style={{
-                                            fontSize: '2.2rem',
+                                            fontSize: '2rem', // Large title like image
+                                            fontWeight: '700',
                                             margin: '0 0 10px 0',
-                                            color: 'var(--color-text-primary)'
+                                            color: 'var(--color-text-primary)',
+                                            lineHeight: '1.2'
                                         }}>{item.title}</h2>
 
                                         <p style={{
-                                            fontSize: '1.2rem',
+                                            fontSize: '1.1rem',
                                             color: 'var(--color-accent)',
-                                            marginBottom: '25px'
-                                        }}>por <span style={{ fontWeight: 600 }}>{item.author}</span></p>
+                                            marginBottom: '30px',
+                                            fontWeight: '500'
+                                        }}>por {item.author}</p>
 
-                                        {/* Metadata Mini-Grid */}
+                                        {/* Grid Stats */}
                                         <div style={{
                                             display: 'grid',
-                                            gridTemplateColumns: 'repeat(4, 1fr)',
-                                            gap: '15px',
-                                            marginBottom: '30px',
-                                            borderTop: '1px solid rgba(255,255,255,0.1)',
-                                            paddingTop: '20px'
+                                            gridTemplateColumns: '1fr 1fr',
+                                            gap: '20px',
+                                            marginBottom: 'auto'
                                         }}>
                                             <div>
-                                                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', opacity: 0.6 }}>Editora</p>
-                                                <p style={{ fontWeight: 500, fontSize: '0.9rem' }}>{item.publisher || '-'}</p>
+                                                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Editora</p>
+                                                <p style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.publisher || 'N/A'}</p>
                                             </div>
                                             <div>
-                                                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', opacity: 0.6 }}>Paginas</p>
-                                                <p style={{ fontWeight: 500, fontSize: '0.9rem' }}>{item.pageCount || '-'}</p>
+                                                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Idioma</p>
+                                                <p style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.language || 'Português'}</p>
                                             </div>
-                                            {/* Add more interactive buttons or mini stats here? */}
+                                            <div>
+                                                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>ISBN</p>
+                                                <p style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.isbn || '---'}</p>
+                                            </div>
+                                            <div>
+                                                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Páginas</p>
+                                                <p style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.pageCount || '---'}</p>
+                                            </div>
                                         </div>
 
-                                        {/* Progress Control */}
-                                        <div style={{
-                                            background: 'var(--color-bg-tertiary)',
-                                            padding: '15px',
-                                            borderRadius: '8px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            border: '1px solid rgba(255,255,255,0.05)'
-                                        }}>
-                                            <div>
-                                                <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>Atualizar Progresso</p>
-                                                <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>Atualmente na pág. {item.currentPage}</p>
-                                            </div>
+                                        {/* Progress Section */}
+                                        <div>
+                                            <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px' }}>Progresso de Leitura</p>
+
                                             <div style={{ display: 'flex', gap: '10px' }}>
-                                                <input
-                                                    type="number"
-                                                    value={pageInput}
-                                                    onChange={(e) => setPageInput(e.target.value)}
-                                                    style={{
-                                                        width: '70px',
-                                                        padding: '8px',
-                                                        borderRadius: '6px',
-                                                        border: '1px solid rgba(255,255,255,0.1)',
-                                                        background: 'var(--color-bg-primary)',
-                                                        color: 'white',
-                                                        textAlign: 'center'
-                                                    }}
-                                                />
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    border: '1px solid var(--color-border)',
+                                                    borderRadius: '6px',
+                                                    padding: '0 10px',
+                                                    background: 'var(--color-bg-tertiary)',
+                                                    flex: 1
+                                                }}>
+                                                    <input
+                                                        type="number"
+                                                        value={pageInput}
+                                                        onChange={(e) => setPageInput(e.target.value)}
+                                                        style={{
+                                                            width: '100%',
+                                                            border: 'none',
+                                                            background: 'transparent',
+                                                            color: 'var(--color-text-primary)',
+                                                            fontWeight: '600',
+                                                            textAlign: 'center',
+                                                            fontSize: '1rem',
+                                                            padding: '10px 0'
+                                                        }}
+                                                    />
+                                                    <span style={{ color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', fontSize: '0.9rem' }}>/ {item.pageCount}</span>
+                                                </div>
                                                 <button
                                                     onClick={(e) => handlePageUpdate(e, item)}
                                                     style={{
-                                                        background: 'var(--color-accent)',
+                                                        background: '#0070f3', // Bright Blue Button like reference
                                                         color: 'white',
                                                         border: 'none',
-                                                        padding: '0 20px',
                                                         borderRadius: '6px',
+                                                        padding: '0 25px',
                                                         fontWeight: '600',
                                                         cursor: 'pointer',
-                                                        transition: 'background 0.2s'
+                                                        fontSize: '0.9rem'
                                                     }}
                                                 >
-                                                    Salvar
+                                                    Atualizar
                                                 </button>
                                             </div>
+
+                                            {/* Progress Bar Line */}
+                                            <div style={{ width: '100%', height: '4px', background: 'var(--color-bg-tertiary)', marginTop: '12px', borderRadius: '2px' }}>
+                                                <div style={{
+                                                    width: `${Math.min(((item.currentPage || 0) / (item.pageCount || 1)) * 100, 100)}%`,
+                                                    height: '100%',
+                                                    background: '#0070f3',
+                                                    borderRadius: '2px'
+                                                }}></div>
+                                            </div>
                                         </div>
+
                                     </div>
-                                </div>
-                            ) : (
-                                // INACTIVE NEIGHBOR (Cover Only)
-                                <div style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    borderRadius: '12px',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                                    background: '#222'
-                                }}>
-                                    <img
-                                        src={item.coverUrl}
-                                        alt={item.title}
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover'
-                                        }}
-                                    />
-                                    {/* Overlay */}
-                                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }}></div>
                                 </div>
                             )}
                         </div>
