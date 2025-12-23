@@ -102,9 +102,9 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                     // We allow more items to be visible to prevent "abrupt ending"
                     if (Math.abs(offset) > 5) return null;
 
-                    const CARD_WIDTH = 700;
-                    const GAP = 50; // Gap between the active card and neighbors
-                    const NEIGHBOR_OFFSET = 180; // How much neighbors overlap/space out
+                    const CARD_WIDTH = 600; // Reduced from 700 to fit better
+                    const GAP = 30; // Reduced gap
+                    const NEIGHBOR_OFFSET = 120; // Reduced offset for tighter stacking
 
                     let translateX = 0;
 
@@ -112,15 +112,13 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook }) => {
                         translateX = 0;
                     } else if (offset > 0) {
                         // Distribute neighbor cards to the right
-                        // First neighbor is at (CARD_WIDTH*0.6) + GAP
-                        // Subsequent ones add NEIGHBOR_OFFSET
-                        translateX = ((CARD_WIDTH * 0.55) + GAP) + ((offset - 1) * NEIGHBOR_OFFSET);
+                        translateX = ((CARD_WIDTH * 0.5) + GAP) + ((offset - 1) * NEIGHBOR_OFFSET);
                     } else {
                         // Distribute to left
-                        translateX = -((CARD_WIDTH * 0.55) + GAP) + ((offset + 1) * NEIGHBOR_OFFSET);
+                        translateX = -((CARD_WIDTH * 0.5) + GAP) + ((offset + 1) * NEIGHBOR_OFFSET);
                     }
 
-                    const scale = isActive ? 1 : 0.85;
+                    const scale = isActive ? 1 : 0.7;
                     const opacity = isActive ? 1 : 0.8; // Higher opacity for visibility
                     const zIndex = 100 - Math.abs(offset);
                     const blur = isActive ? '0' : '1px';
