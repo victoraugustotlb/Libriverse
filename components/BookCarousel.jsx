@@ -119,7 +119,7 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook, onOpenAdd
                     }
 
                     const scale = isActive ? 1 : 0.7;
-                    const opacity = isActive ? 1 : 0.7; // Increased opacity as requested
+                    const opacity = isActive ? 1 : 0.95; // Almost fully opaque
                     const zIndex = 100 - Math.abs(offset);
                     const blur = isActive ? '0' : '1px';
 
