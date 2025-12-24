@@ -14,10 +14,40 @@ const CreateNote = ({ onNavigate, books = [] }) => {
         setLineNumbers(Array.from({ length: Math.max(lines, 1) }, (_, i) => i + 1));
     }, [content]);
 
-    const handleSave = () => {
-        // Placeholder save logic
-        alert('Anotação salva com sucesso (Simulação)!');
-        onNavigate('notes');
+    const handleSave = async () => {
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            if (!token) {
+                alert('Você precisa estar logado para salvar uma nota.');
+                return;
+            }
+
+            const response = await fetch('/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    bookId: selectedBookId,
+                    chapter,
+                    page,
+                    content,
+                    isGeneral: isGeneralNote
+                })
+            });
+
+            if (response.ok) {
+                alert('Anotação salva com sucesso!');
+                onNavigate('notes');
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Erro ao salvar anotação');
+            }
+        } catch (error) {
+            console.error('Error saving note:', error);
+            alert('Erro de conexão ao salvar nota');
+        }
     };
 
     // Helper to convert to Roman numerals
@@ -176,6 +206,7 @@ const CreateNote = ({ onNavigate, books = [] }) => {
                 {/* Editor Area */}
                 <div style={{
                     display: 'flex',
+                    flexDirection: 'column',
                     background: '#f8f9fa',
                     borderRadius: '12px',
                     border: '1px solid #e1e4e8',
@@ -183,43 +214,44 @@ const CreateNote = ({ onNavigate, books = [] }) => {
                     boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
                     overflow: 'hidden'
                 }}>
-                    {/* Line Numbers */}
-                    <div style={{
-                        width: '50px',
-                        background: '#f0f2f5',
-                        borderRight: '1px solid #e1e4e8',
-                        padding: chapter ? '60px 0 24px 0' : '24px 0', // Adjust padding if title exists
-                        textAlign: 'center',
-                        color: '#999',
-                        fontFamily: 'monospace',
-                        fontSize: '1rem',
-                        lineHeight: '1.6',
-                        userSelect: 'none',
-                        transition: 'padding 0.3s ease'
-                    }}>
-                        {lineNumbers.map(num => (
-                            <div key={num}>{num}</div>
-                        ))}
-                    </div>
+                    {/* Chapter Title */}
+                    {chapter && (
+                        <div style={{
+                            padding: '24px 24px 0 24px',
+                            textAlign: 'center',
+                            fontFamily: 'serif',
+                            fontSize: '2rem',
+                            color: '#1d1d1f',
+                            fontWeight: '700',
+                            letterSpacing: '2px',
+                            opacity: 0.9,
+                            transition: 'all 0.3s ease'
+                        }}>
+                            {toRoman(chapter)}
+                        </div>
+                    )}
 
-                    {/* Content Column */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        {chapter && (
-                            <div style={{
-                                padding: '24px 24px 0 24px',
-                                textAlign: 'center',
-                                fontFamily: 'serif',
-                                fontSize: '2rem',
-                                color: '#1d1d1f',
-                                fontWeight: '700',
-                                letterSpacing: '2px',
-                                opacity: 0.9,
-                                transition: 'all 0.3s ease'
-                            }}>
-                                {toRoman(chapter)}
-                            </div>
-                        )}
+                    {/* Editor Content Wrapper */}
+                    <div style={{ display: 'flex', flex: 1 }}>
+                        {/* Line Numbers */}
+                        <div style={{
+                            width: '50px',
+                            background: '#f0f2f5',
+                            borderRight: '1px solid #e1e4e8',
+                            padding: '24px 0',
+                            textAlign: 'center',
+                            color: '#999',
+                            fontFamily: 'monospace',
+                            fontSize: '1rem',
+                            lineHeight: '1.6',
+                            userSelect: 'none',
+                        }}>
+                            {lineNumbers.map(num => (
+                                <div key={num}>{num}</div>
+                            ))}
+                        </div>
 
+                        {/* Content Area */}
                         <textarea
                             value={content}
                             onChange={(e) => setContent(e.target.value)}

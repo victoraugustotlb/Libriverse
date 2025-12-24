@@ -1,12 +1,53 @@
 import React, { useState } from 'react';
 
 const Notes = ({ onNavigate }) => {
-    // Placeholder data for notes
-    const [notes, setNotes] = useState([
-        { id: 1, title: 'Ideias para o próximo capítulo', content: 'Pensar em como desenvolver o personagem principal...', date: '23/12/2025' },
-        { id: 2, title: 'Livros para comprar', content: '1. O Hobbit\n2. Duna\n3. Neuromancer', date: '22/12/2025' },
-        { id: 3, title: 'Citações favoritas', content: '"Não entre em pânico."', date: '20/12/2025' }
-    ]);
+    const [notes, setNotes] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchNotes = async () => {
+            try {
+                const token = localStorage.getItem('libriverse_token');
+                if (!token) {
+                    setLoading(false);
+                    return;
+                }
+
+                const response = await fetch('/api/notes', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setNotes(data);
+                }
+            } catch (error) {
+                console.error('Error fetching notes:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchNotes();
+    }, []);
+
+    const toRoman = (num) => {
+        if (!num || isNaN(num)) return num;
+        const n = parseInt(num);
+        if (n <= 0) return num;
+        const lookup = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+        let roman = '';
+        let i = n;
+        for (let key in lookup) {
+            while (i >= lookup[key]) {
+                roman += key;
+                i -= lookup[key];
+            }
+        }
+        return roman;
+    };
 
     return (
         <div className="notes-page">
@@ -92,7 +133,14 @@ const Notes = ({ onNavigate }) => {
                                         fontWeight: '600',
                                         margin: 0,
                                         color: '#fff'
-                                    }}>{note.title}</h3>
+                                    }}>
+                                        {note.isGeneral ? 'Nota Geral' : `Capítulo ${toRoman(note.chapter)}${note.page ? ` - Pág. ${note.page}` : ''}`}
+                                    </h3>
+                                    {note.bookTitle && (
+                                        <div style={{ fontSize: '0.8rem', color: '#aaa', marginTop: '4px' }}>
+                                            {note.bookTitle}
+                                        </div>
+                                    )}
                                     <span style={{
                                         fontSize: '0.8rem',
                                         color: 'rgba(255,255,255,0.6)'
