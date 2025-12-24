@@ -250,7 +250,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 style={{
                                     background: 'transparent',
                                     border: 'none',
-                                    color: '#ff6b6b',
+                                    color: '#ff4444',
                                     fontSize: '0.85rem',
                                     cursor: 'pointer',
                                     textDecoration: 'underline',
@@ -261,13 +261,12 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                             </button>
                         )}
                         <span style={{
-                            color: 'rgba(255,255,255,0.9)', // High contrast off-white
+                            color: '#666',
                             fontSize: '0.95rem',
                             letterSpacing: '0.5px',
-                            fontWeight: '500',
-                            textShadow: '0 2px 4px rgba(0,0,0,0.5)' // Shadow for better legibility against any bg
+                            fontWeight: '500'
                         }}>
-                            Exibindo <span style={{ color: '#fff', fontWeight: 'bold' }}>{filteredBooks.length}</span> de <span style={{ color: '#fff' }}>{safeBooks.length}</span> livros
+                            Exibindo <span style={{ color: '#000', fontWeight: 'bold' }}>{filteredBooks.length}</span> de <span style={{ color: '#000' }}>{safeBooks.length}</span> livros
                         </span>
                     </div>
 

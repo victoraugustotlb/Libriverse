@@ -57,8 +57,9 @@ const Notes = ({ onNavigate }) => {
                     }}>
                         {notes.map(note => (
                             <div key={note.id} style={{
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                backdropFilter: 'blur(10px)',
+                                background: 'rgba(20, 20, 20, 0.8)', // Dark background like toolbar
+                                backdropFilter: 'blur(20px)',
+                                WebkitBackdropFilter: 'blur(20px)',
                                 borderRadius: '16px',
                                 padding: '24px',
                                 border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -67,17 +68,18 @@ const Notes = ({ onNavigate }) => {
                                 gap: '12px',
                                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                                 cursor: 'pointer',
-                                color: '#fff'
+                                color: '#fff',
+                                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)'
                             }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = 'translateY(-5px)';
                                     e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
-                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.1)';
+                                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                                 }}
                             >
                                 <div style={{
@@ -93,12 +95,12 @@ const Notes = ({ onNavigate }) => {
                                     }}>{note.title}</h3>
                                     <span style={{
                                         fontSize: '0.8rem',
-                                        color: 'rgba(255,255,255,0.4)'
+                                        color: 'rgba(255,255,255,0.6)'
                                     }}>{note.date}</span>
                                 </div>
                                 <p style={{
                                     fontSize: '0.95rem',
-                                    color: 'rgba(255,255,255,0.7)',
+                                    color: 'rgba(255,255,255,0.8)',
                                     lineHeight: '1.5',
                                     whiteSpace: 'pre-line',
                                     flex: 1
