@@ -43,7 +43,7 @@ const Notes = ({ onNavigate }) => {
                                 padding: '10px 20px',
                                 fontSize: '0.9rem'
                             }}
-                            onClick={() => alert('Funcionalidade de criar nota em breve!')}
+                            onClick={() => onNavigate('create-note')}
                         >
                             <span style={{ fontSize: '1.2em' }}>+</span> Nova Anotação
                         </button>
