@@ -62,17 +62,35 @@ export default async function handler(req, res) {
         const { bookId, chapter, page, content, isGeneral } = req.body;
 
         if (!content) {
-            return res.status(400).json({ error: 'Content is required' });
+            return res.status(400).json({ error: 'O conteúdo da anotação é obrigatório.' });
         }
 
         try {
+            let realBookId = null;
+
+            // If a book is selected (bookId corresponds to user_books.id from frontend)
+            // We need to resolve it to global_book_id because the notes table references global_books
+            if (bookId) {
+                const bookCheck = await pool.query(
+                    'SELECT global_book_id FROM user_books WHERE id = $1 AND user_id = $2',
+                    [bookId, user.userId]
+                );
+
+                if (bookCheck.rows.length > 0) {
+                    realBookId = bookCheck.rows[0].global_book_id;
+                } else {
+                    // If user sends a bookId they don't own or doesn't exist
+                    return res.status(400).json({ error: 'Livro selecionado inválido ou não encontrado na sua biblioteca.' });
+                }
+            }
+
             const result = await pool.query(
                 `INSERT INTO notes (user_id, book_id, chapter, page, content, is_general)
                  VALUES ($1, $2, $3, $4, $5, $6)
                  RETURNING *`,
                 [
                     user.userId,
-                    bookId || null,
+                    realBookId, // Use the resolved global_book_id
                     chapter || null,
                     page || null,
                     content,
@@ -94,7 +112,8 @@ export default async function handler(req, res) {
 
         } catch (error) {
             console.error('Create note error:', error);
-            return res.status(500).json({ error: 'Internal server error' });
+            // Provide more specific error if possible, but keep internal details hidden
+            return res.status(500).json({ error: 'Erro interno ao salvar anotação.' });
         }
     }
 
