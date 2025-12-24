@@ -15,6 +15,7 @@ import SearchBookModal from './components/SearchBookModal.jsx';
 import Loading from './components/Loading.jsx';
 import Footer from './components/Footer.jsx';
 import Notes from './pages/Notes.jsx';
+import CreateNote from './pages/CreateNote.jsx';
 
 const App = () => {
     const [view, setView] = useState(() => {
@@ -230,6 +231,10 @@ const App = () => {
 
             {view === 'notes' && (
                 <Notes onNavigate={handleNavigate} />
+            )}
+
+            {view === 'create-note' && (
+                <CreateNote onNavigate={handleNavigate} books={userBooks} />
             )}
 
             <Footer />
