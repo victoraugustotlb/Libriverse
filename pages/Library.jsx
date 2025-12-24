@@ -50,7 +50,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
         <div className="library-page">
             <section className="hero">
                 <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                    <h1 className="hero-title" style={{ marginBottom: '40px' }}>Sua Biblioteca</h1>
+                    <h1 className="hero-title" style={{ marginBottom: '40px', color: '#333' }}>Sua Biblioteca</h1>
 
                     {/* Unified Control Bar */}
                     <div style={{
@@ -59,13 +59,13 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: '20px',
-                        background: 'rgba(20, 20, 20, 0.6)',
-                        backdropFilter: 'blur(16px)',
-                        WebkitBackdropFilter: 'blur(16px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        background: 'rgba(255, 255, 255, 0.7)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.8)',
                         padding: '16px 24px',
                         borderRadius: '20px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.05)'
                     }}>
 
                         {/* Left Side: Search */}
@@ -76,25 +76,30 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                     placeholder="Buscar por título ou autor..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholderColor="#666"
                                     style={{
                                         width: '100%',
                                         padding: '12px 16px',
                                         paddingLeft: '40px',
                                         borderRadius: '12px',
-                                        border: '1px solid rgba(255,255,255,0.15)',
-                                        background: 'rgba(255,255,255,0.05)',
-                                        color: 'white',
+                                        border: '1px solid rgba(0,0,0,0.1)',
+                                        background: 'rgba(255,255,255,0.8)',
+                                        color: '#333',
                                         outline: 'none',
                                         fontSize: '0.95rem',
-                                        transition: 'all 0.2s'
+                                        fontWeight: '500',
+                                        transition: 'all 0.2s',
+                                        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
                                     }}
                                     onFocus={(e) => {
-                                        e.target.style.background = 'rgba(255,255,255,0.1)';
-                                        e.target.style.borderColor = 'rgba(255,255,255,0.3)';
+                                        e.target.style.background = '#fff';
+                                        e.target.style.borderColor = 'rgba(0,0,0,0.2)';
+                                        e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
                                     }}
                                     onBlur={(e) => {
-                                        e.target.style.background = 'rgba(255,255,255,0.05)';
-                                        e.target.style.borderColor = 'rgba(255,255,255,0.15)';
+                                        e.target.style.background = 'rgba(255,255,255,0.8)';
+                                        e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+                                        e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.02)';
                                     }}
                                 />
                                 <svg
@@ -106,7 +111,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                         left: '14px',
                                         top: '50%',
                                         transform: 'translateY(-50%)',
-                                        color: 'rgba(255,255,255,0.5)',
+                                        color: '#666',
                                         pointerEvents: 'none'
                                     }}
                                 >
@@ -125,18 +130,19 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 style={{
                                     padding: '12px 16px',
                                     borderRadius: '12px',
-                                    border: '1px solid rgba(255,255,255,0.15)',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    color: 'white',
+                                    border: '1px solid rgba(0,0,0,0.1)',
+                                    background: 'rgba(255,255,255,0.8)',
+                                    color: '#333',
                                     cursor: 'pointer',
                                     outline: 'none',
                                     fontSize: '0.9rem',
+                                    fontWeight: '500',
                                     minWidth: '150px'
                                 }}
                             >
-                                <option value="" style={{ background: '#222' }}>Todos os Autores</option>
+                                <option value="" style={{ background: '#fff', color: '#333' }}>Todos os Autores</option>
                                 {uniqueAuthors.map(author => (
-                                    <option key={author} value={author} style={{ background: '#222' }}>{author}</option>
+                                    <option key={author} value={author} style={{ background: '#fff', color: '#333' }}>{author}</option>
                                 ))}
                             </select>
 
@@ -145,16 +151,17 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 style={{
                                     padding: '12px 16px',
                                     borderRadius: '12px',
-                                    border: '1px solid rgba(255,255,255,0.15)',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    color: 'rgba(255,255,255,0.5)',
+                                    border: '1px solid rgba(0,0,0,0.1)',
+                                    background: 'rgba(255,255,255,0.8)',
+                                    color: '#999',
                                     cursor: 'not-allowed',
                                     outline: 'none',
-                                    fontSize: '0.9rem'
+                                    fontSize: '0.9rem',
+                                    fontWeight: '500'
                                 }}
                                 disabled
                             >
-                                <option value="" style={{ background: '#222' }}>Tags</option>
+                                <option value="" style={{ background: '#fff' }}>Tags</option>
                             </select>
 
                             {/* Sort */}
@@ -164,41 +171,43 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 style={{
                                     padding: '12px 16px',
                                     borderRadius: '12px',
-                                    border: '1px solid rgba(255,255,255,0.15)',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    color: 'white',
+                                    border: '1px solid rgba(0,0,0,0.1)',
+                                    background: 'rgba(255,255,255,0.8)',
+                                    color: '#333',
                                     cursor: 'pointer',
                                     outline: 'none',
-                                    fontSize: '0.9rem'
+                                    fontSize: '0.9rem',
+                                    fontWeight: '500'
                                 }}
                             >
-                                <option value="recent" style={{ background: '#222' }}>Mais Recentes</option>
-                                <option value="oldest" style={{ background: '#222' }}>Mais Antigos</option>
-                                <option value="az" style={{ background: '#222' }}>A-Z</option>
-                                <option value="za" style={{ background: '#222' }}>Z-A</option>
+                                <option value="recent" style={{ background: '#fff', color: '#333' }}>Mais Recentes</option>
+                                <option value="oldest" style={{ background: '#fff', color: '#333' }}>Mais Antigos</option>
+                                <option value="az" style={{ background: '#fff', color: '#333' }}>A-Z</option>
+                                <option value="za" style={{ background: '#fff', color: '#333' }}>Z-A</option>
                             </select>
                         </div>
 
                         {/* Right: View Toggle */}
                         <div style={{
                             display: 'flex',
-                            background: 'rgba(255,255,255,0.05)',
+                            background: 'rgba(0,0,0,0.05)',
                             padding: '4px',
                             borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.1)'
+                            border: '1px solid rgba(0,0,0,0.05)'
                         }}>
                             <button
                                 onClick={() => setViewMode('shelves')}
                                 style={{
-                                    background: viewMode === 'shelves' ? 'rgba(255,255,255,0.15)' : 'transparent',
+                                    background: viewMode === 'shelves' ? '#fff' : 'transparent',
                                     border: 'none',
-                                    color: viewMode === 'shelves' ? 'white' : 'rgba(255,255,255,0.5)',
+                                    color: viewMode === 'shelves' ? '#000' : '#666',
                                     padding: '8px 16px',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
                                     fontSize: '0.9rem',
                                     fontWeight: viewMode === 'shelves' ? '600' : '500',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s',
+                                    boxShadow: viewMode === 'shelves' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
                                 }}
                                 title="Visualizar Estante"
                             >
@@ -207,15 +216,16 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                             <button
                                 onClick={() => setViewMode('grid')}
                                 style={{
-                                    background: viewMode === 'grid' ? 'rgba(255,255,255,0.15)' : 'transparent',
+                                    background: viewMode === 'grid' ? '#fff' : 'transparent',
                                     border: 'none',
-                                    color: viewMode === 'grid' ? 'white' : 'rgba(255,255,255,0.5)',
+                                    color: viewMode === 'grid' ? '#000' : '#666',
                                     padding: '8px 16px',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
                                     fontSize: '0.9rem',
                                     fontWeight: viewMode === 'grid' ? '600' : '500',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s',
+                                    boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
                                 }}
                                 title="Visualizar Grade"
                             >
@@ -242,21 +252,23 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 style={{
                                     background: 'transparent',
                                     border: 'none',
-                                    color: '#ff6b6b',
+                                    color: '#ff4444',
                                     fontSize: '0.85rem',
                                     cursor: 'pointer',
-                                    textDecoration: 'underline'
+                                    textDecoration: 'underline',
+                                    fontWeight: '500'
                                 }}
                             >
                                 Limpar filtros
                             </button>
                         )}
                         <span style={{
-                            color: 'rgba(255,255,255,0.5)',
+                            color: '#666',
                             fontSize: '0.9rem',
-                            letterSpacing: '0.5px'
+                            letterSpacing: '0.5px',
+                            fontWeight: '500'
                         }}>
-                            Exibindo <span style={{ color: 'white', fontWeight: 'bold' }}>{filteredBooks.length}</span> de <span style={{ color: 'white' }}>{safeBooks.length}</span> livros
+                            Exibindo <span style={{ color: '#000', fontWeight: 'bold' }}>{filteredBooks.length}</span> de <span style={{ color: '#000' }}>{safeBooks.length}</span> livros
                         </span>
                     </div>
 
@@ -267,15 +279,15 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="48" height="48" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"
-                                style={{ color: 'rgba(255,255,255,0.3)', marginBottom: '15px' }}
+                                style={{ color: '#ccc', marginBottom: '15px' }}
                             >
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
-                            <p className="hero-subtitle" style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.8)' }}>
+                            <p className="hero-subtitle" style={{ fontSize: '1.2rem', color: '#666' }}>
                                 Nenhum livro encontrado.
                             </p>
-                            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.95rem' }}>
+                            <p style={{ color: '#999', fontSize: '0.95rem' }}>
                                 Tente ajustar seus filtros de busca ou autor.
                             </p>
                         </div>
@@ -284,7 +296,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                     {/* Global Empty State (No books at all) */}
                     {safeBooks.length === 0 && (
                         <div style={{ textAlign: 'center', marginTop: '40px' }}>
-                            <p className="hero-subtitle">Não há nenhum livro em sua biblioteca</p>
+                            <p className="hero-subtitle" style={{ color: '#333' }}>Não há nenhum livro em sua biblioteca</p>
                             <button
                                 className="hero-cta"
                                 onClick={() => onOpenAddModal()}
