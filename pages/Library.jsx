@@ -49,141 +49,189 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
     return (
         <div className="library-page">
             <section className="hero">
-                <div className="container" style={{ position: 'relative' }}>
-                    <h1 className="hero-title">Sua Biblioteca</h1>
+                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                    <h1 className="hero-title" style={{ marginBottom: '40px' }}>Sua Biblioteca</h1>
 
-                    {/* View Toggle - Repositioned slightly to avoid overlap if needed, or kept absolute */}
+                    {/* Unified Control Bar */}
                     <div style={{
-                        position: 'absolute',
-                        right: '0',
-                        top: '0',
                         display: 'flex',
-                        background: 'rgba(0,0,0,0.6)',
-                        borderRadius: '8px',
-                        padding: '4px',
-                        zIndex: 100,
-                        border: '1px solid rgba(255,255,255,0.1)'
-                    }}>
-                        <button
-                            onClick={() => setViewMode('shelves')}
-                            style={{
-                                background: viewMode === 'shelves' ? 'rgba(255,255,255,0.2)' : 'transparent',
-                                border: 'none',
-                                color: 'white',
-                                padding: '8px 12px',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontWeight: viewMode === 'shelves' ? 'bold' : 'normal'
-                            }}
-                            title="Visualizar Estante"
-                        >
-                            Estante
-                        </button>
-                        <button
-                            onClick={() => setViewMode('grid')}
-                            style={{
-                                background: viewMode === 'grid' ? 'rgba(255,255,255,0.2)' : 'transparent',
-                                border: 'none',
-                                color: 'white',
-                                padding: '8px 12px',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontWeight: viewMode === 'grid' ? 'bold' : 'normal'
-                            }}
-                            title="Visualizar Grade"
-                        >
-                            Lista
-                        </button>
-                    </div>
-
-                    {/* Filters Toolbar */}
-                    <div style={{
-                        marginTop: '30px',
-                        marginBottom: '20px',
-                        display: 'flex',
-                        gap: '15px',
                         flexWrap: 'wrap',
                         alignItems: 'center',
-                        background: 'rgba(255,255,255,0.1)',
-                        padding: '15px',
-                        borderRadius: '12px',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255,255,255,0.1)'
+                        justifyContent: 'space-between',
+                        gap: '20px',
+                        background: 'rgba(20, 20, 20, 0.6)',
+                        backdropFilter: 'blur(16px)',
+                        WebkitBackdropFilter: 'blur(16px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        padding: '16px 24px',
+                        borderRadius: '20px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
                     }}>
-                        {/* Search */}
-                        <input
-                            type="text"
-                            placeholder="Buscar por título ou autor..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{
-                                flex: '1 1 200px',
-                                padding: '10px 15px',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                background: 'rgba(0,0,0,0.3)',
-                                color: 'white',
-                                outline: 'none'
-                            }}
-                        />
 
-                        {/* Author Filter */}
-                        <select
-                            value={selectedAuthor}
-                            onChange={(e) => setSelectedAuthor(e.target.value)}
-                            style={{
-                                padding: '10px 15px',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                background: 'rgba(0,0,0,0.5)',
-                                color: 'white',
-                                cursor: 'pointer',
-                                outline: 'none'
-                            }}
-                        >
-                            <option value="">Todos os Autores</option>
-                            {uniqueAuthors.map(author => (
-                                <option key={author} value={author}>{author}</option>
-                            ))}
-                        </select>
+                        {/* Left Side: Search */}
+                        <div style={{ flex: '1 1 300px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ position: 'relative', width: '100%' }}>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar por título ou autor..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 16px',
+                                        paddingLeft: '40px',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(255,255,255,0.15)',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        color: 'white',
+                                        outline: 'none',
+                                        fontSize: '0.95rem',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onFocus={(e) => {
+                                        e.target.style.background = 'rgba(255,255,255,0.1)';
+                                        e.target.style.borderColor = 'rgba(255,255,255,0.3)';
+                                    }}
+                                    onBlur={(e) => {
+                                        e.target.style.background = 'rgba(255,255,255,0.05)';
+                                        e.target.style.borderColor = 'rgba(255,255,255,0.15)';
+                                    }}
+                                />
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                    style={{
+                                        position: 'absolute',
+                                        left: '14px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        color: 'rgba(255,255,255,0.5)',
+                                        pointerEvents: 'none'
+                                    }}
+                                >
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </div>
+                        </div>
 
-                        {/* Tags Filter (Placeholder) */}
-                        <select
-                            style={{
-                                padding: '10px 15px',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                background: 'rgba(0,0,0,0.5)',
-                                color: 'white',
-                                cursor: 'pointer',
-                                outline: 'none'
-                            }}
-                            disabled
-                        >
-                            <option value="">Tags (Em breve)</option>
-                        </select>
+                        {/* Middle: Filters & Sort */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                            {/* Author Filter */}
+                            <select
+                                value={selectedAuthor}
+                                onChange={(e) => setSelectedAuthor(e.target.value)}
+                                style={{
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    outline: 'none',
+                                    fontSize: '0.9rem',
+                                    minWidth: '150px'
+                                }}
+                            >
+                                <option value="" style={{ background: '#222' }}>Todos os Autores</option>
+                                {uniqueAuthors.map(author => (
+                                    <option key={author} value={author} style={{ background: '#222' }}>{author}</option>
+                                ))}
+                            </select>
 
-                        {/* Sort */}
-                        <select
-                            value={sortOption}
-                            onChange={(e) => setSortOption(e.target.value)}
-                            style={{
-                                padding: '10px 15px',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                background: 'rgba(0,0,0,0.5)',
-                                color: 'white',
-                                cursor: 'pointer',
-                                outline: 'none'
-                            }}
-                        >
-                            <option value="recent">Mais Recentes</option>
-                            <option value="oldest">Mais Antigos</option>
-                            <option value="az">A-Z</option>
-                            <option value="za">Z-A</option>
-                        </select>
+                            {/* Tags Filter (Placeholder) */}
+                            <select
+                                style={{
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: 'rgba(255,255,255,0.5)',
+                                    cursor: 'not-allowed',
+                                    outline: 'none',
+                                    fontSize: '0.9rem'
+                                }}
+                                disabled
+                            >
+                                <option value="" style={{ background: '#222' }}>Tags</option>
+                            </select>
 
-                        {/* Reset Button (only shows if filters active) */}
+                            {/* Sort */}
+                            <select
+                                value={sortOption}
+                                onChange={(e) => setSortOption(e.target.value)}
+                                style={{
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    outline: 'none',
+                                    fontSize: '0.9rem'
+                                }}
+                            >
+                                <option value="recent" style={{ background: '#222' }}>Mais Recentes</option>
+                                <option value="oldest" style={{ background: '#222' }}>Mais Antigos</option>
+                                <option value="az" style={{ background: '#222' }}>A-Z</option>
+                                <option value="za" style={{ background: '#222' }}>Z-A</option>
+                            </select>
+                        </div>
+
+                        {/* Right: View Toggle */}
+                        <div style={{
+                            display: 'flex',
+                            background: 'rgba(255,255,255,0.05)',
+                            padding: '4px',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(255,255,255,0.1)'
+                        }}>
+                            <button
+                                onClick={() => setViewMode('shelves')}
+                                style={{
+                                    background: viewMode === 'shelves' ? 'rgba(255,255,255,0.15)' : 'transparent',
+                                    border: 'none',
+                                    color: viewMode === 'shelves' ? 'white' : 'rgba(255,255,255,0.5)',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.9rem',
+                                    fontWeight: viewMode === 'shelves' ? '600' : '500',
+                                    transition: 'all 0.2s'
+                                }}
+                                title="Visualizar Estante"
+                            >
+                                Estante
+                            </button>
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                style={{
+                                    background: viewMode === 'grid' ? 'rgba(255,255,255,0.15)' : 'transparent',
+                                    border: 'none',
+                                    color: viewMode === 'grid' ? 'white' : 'rgba(255,255,255,0.5)',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.9rem',
+                                    fontWeight: viewMode === 'grid' ? '600' : '500',
+                                    transition: 'all 0.2s'
+                                }}
+                                title="Visualizar Grade"
+                            >
+                                Lista
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Status/Info Text */}
+                    <div style={{
+                        marginTop: '20px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '10px'
+                    }}>
                         {(searchTerm || selectedAuthor || sortOption !== 'recent') && (
                             <button
                                 onClick={() => {
@@ -193,65 +241,64 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 }}
                                 style={{
                                     background: 'transparent',
-                                    border: '1px solid rgba(255,255,255,0.3)',
-                                    color: 'white',
-                                    padding: '10px 15px',
-                                    borderRadius: '8px',
+                                    border: 'none',
+                                    color: '#ff6b6b',
+                                    fontSize: '0.85rem',
                                     cursor: 'pointer',
-                                    fontSize: '0.9rem'
+                                    textDecoration: 'underline'
                                 }}
                             >
-                                Limpar
+                                Limpar filtros
                             </button>
                         )}
+                        <span style={{
+                            color: 'rgba(255,255,255,0.5)',
+                            fontSize: '0.9rem',
+                            letterSpacing: '0.5px'
+                        }}>
+                            Exibindo <span style={{ color: 'white', fontWeight: 'bold' }}>{filteredBooks.length}</span> de <span style={{ color: 'white' }}>{safeBooks.length}</span> livros
+                        </span>
                     </div>
 
-                    {filteredBooks.length === 0 ? (
-                        safeBooks.length === 0 ? (
-                            <>
-                                <p className="hero-subtitle">Não há nenhum livro em sua biblioteca</p>
-                                <button
-                                    className="hero-cta"
-                                    onClick={() => onOpenAddModal()}
-                                >
-                                    Adicionar agora
-                                </button>
-                            </>
-                        ) : (
-                            <div style={{ textAlign: 'center', marginTop: '40px' }}>
-                                <p className="hero-subtitle" style={{ fontSize: '1.2rem' }}>
-                                    Nenhum livro encontrado para sua busca.
-                                </p>
-                                <button
-                                    onClick={() => {
-                                        setSearchTerm('');
-                                        setSelectedAuthor('');
-                                    }}
-                                    style={{
-                                        marginTop: '15px',
-                                        background: '#0070f3',
-                                        color: 'white',
-                                        border: 'none',
-                                        padding: '10px 20px',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        fontSize: '1rem'
-                                    }}
-                                >
-                                    Limpar filtros
-                                </button>
-                            </div>
-                        )
-                    ) : (
-                        <p className="hero-subtitle">
-                            Exibindo {filteredBooks.length} de {safeBooks.length} livros
-                        </p>
+                    {/* Empty State within Filters */}
+                    {filteredBooks.length === 0 && safeBooks.length > 0 && (
+                        <div style={{ textAlign: 'center', marginTop: '60px', paddingBottom: '40px' }}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="48" height="48" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"
+                                style={{ color: 'rgba(255,255,255,0.3)', marginBottom: '15px' }}
+                            >
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <p className="hero-subtitle" style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.8)' }}>
+                                Nenhum livro encontrado.
+                            </p>
+                            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.95rem' }}>
+                                Tente ajustar seus filtros de busca ou autor.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Global Empty State (No books at all) */}
+                    {safeBooks.length === 0 && (
+                        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+                            <p className="hero-subtitle">Não há nenhum livro em sua biblioteca</p>
+                            <button
+                                className="hero-cta"
+                                onClick={() => onOpenAddModal()}
+                                style={{ marginTop: '20px' }}
+                            >
+                                Adicionar agora
+                            </button>
+                        </div>
                     )}
                 </div>
             </section>
 
             {filteredBooks.length > 0 && (
-                <section className="bookshelf-section">
+                <section className="bookshelf-section" style={{ paddingTop: '20px' }}>
                     {viewMode === 'shelves' ? (
                         <div className="container bookshelf-container">
                             {shelves.map((shelfBooks, shelfIndex) => (
