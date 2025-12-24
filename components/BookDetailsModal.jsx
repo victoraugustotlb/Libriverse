@@ -3,6 +3,9 @@ import React from 'react';
 const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
     const [currentPage, setCurrentPage] = React.useState(0);
     const [isRead, setIsRead] = React.useState(false);
+    const [activeTab, setActiveTab] = React.useState('details');
+    const [notes, setNotes] = React.useState([]);
+    const [notesLoading, setNotesLoading] = React.useState(false);
 
     const [imgError, setImgError] = React.useState(false);
 
@@ -11,8 +14,34 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
             setCurrentPage(book.currentPage || 0);
             setIsRead(book.isRead || false);
             setImgError(false); // Reset error state for new book
+            setActiveTab('details'); // Reset tab
+            setNotes([]); // Clear notes
         }
     }, [book]);
+
+    // Fetch notes when tab is switched
+    React.useEffect(() => {
+        if (activeTab === 'notes' && book?.globalId) {
+            const fetchBookNotes = async () => {
+                setNotesLoading(true);
+                try {
+                    const token = localStorage.getItem('libriverse_token');
+                    const response = await fetch(`/api/notes?bookId=${book.globalId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        setNotes(data);
+                    }
+                } catch (error) {
+                    console.error("Error fetching notes:", error);
+                } finally {
+                    setNotesLoading(false);
+                }
+            };
+            fetchBookNotes();
+        }
+    }, [activeTab, book]);
 
     if (!isOpen || !book) return null;
 
@@ -109,171 +138,237 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                     maxHeight: '85vh',
                     overflowY: 'auto'
                 }}>
-                    <div>
-                        <h2 style={{
-                            fontSize: '2.5rem',
-                            marginBottom: '8px',
-                            color: 'var(--color-text-primary)',
-                            lineHeight: '1.1',
-                            letterSpacing: '-0.02em'
-                        }}>{book.title}</h2>
-                        <p style={{ fontSize: '1.25rem', color: 'var(--color-text-secondary)' }}>
-                            por <span style={{ color: 'var(--color-accent)', fontWeight: '500' }}>{book.author}</span>
-                        </p>
-                    </div>
-
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(2, 1fr)',
-                        gap: '20px',
-                        background: 'var(--color-bg-secondary)',
-                        padding: '20px',
-                        borderRadius: 'var(--radius-lg)'
-                    }}>
-                        <div>
-                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Editora</p>
-                            <p style={{ fontWeight: '500' }}>{book.publisher || '-'}</p>
-                        </div>
-                        <div>
-                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Idioma</p>
-                            <p style={{ fontWeight: '500' }}>{book.language || '-'}</p>
-                        </div>
-                        <div>
-                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>ISBN</p>
-                            <p style={{ fontWeight: '500', fontSize: '0.9rem' }}>{book.isbn || 'N/A'}</p>
-                        </div>
-                        <div>
-                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Páginas</p>
-                            <p style={{ fontWeight: '500' }}>{book.pageCount || '-'}</p>
-                        </div>
-                        <div>
-                            <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Status</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <span style={{
-                                    display: 'inline-block',
-                                    padding: '4px 12px',
-                                    borderRadius: '20px',
-                                    background: isRead ? 'var(--color-accent)' : '#e0e0e0',
-                                    color: isRead ? 'white' : '#555',
-                                    fontSize: '0.85rem',
-                                    fontWeight: '600'
-                                }}>
-                                    {isRead ? 'Lido' : 'Lendo'}
-                                </span>
-                                {!isRead && (
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            const totalPages = book.pageCount || 1;
-                                            setCurrentPage(totalPages);
-                                            setIsRead(true);
-                                            if (onUpdate) {
-                                                onUpdate(book.id, {
-                                                    currentPage: totalPages,
-                                                    isRead: true
-                                                });
-                                            }
-                                        }}
-                                        title="Marcar como Lido"
-                                        style={{
-                                            background: 'none',
-                                            border: '1px solid var(--color-accent)',
-                                            borderRadius: '50%',
-                                            width: '24px',
-                                            height: '24px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            cursor: 'pointer',
-                                            color: 'var(--color-accent)',
-                                            transition: 'all 0.2s'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.background = 'var(--color-accent)';
-                                            e.currentTarget.style.color = 'white';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.background = 'none';
-                                            e.currentTarget.style.color = 'var(--color-accent)';
-                                        }}
-                                    >
-                                        <span style={{ fontSize: '14px', lineHeight: 1 }}>✓</span>
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Reading Progress */}
-                    {book.pageCount > 0 && (
-                        <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
-                                <p style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>Progresso de Leitura</p>
-                                <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{Math.round(progress)}%</span>
-                            </div>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-bg-tertiary)', padding: '5px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-                                    <input
-                                        type="number"
-                                        value={currentPage}
-                                        onChange={(e) => setCurrentPage(e.target.value)}
-                                        style={{
-                                            width: '60px',
-                                            padding: '5px',
-                                            border: 'none',
-                                            background: 'transparent',
-                                            textAlign: 'center',
-                                            fontWeight: '600',
-                                            fontSize: '1rem',
-                                            color: 'var(--color-text-primary)'
-                                        }}
-                                    />
-                                    <span style={{ color: 'var(--color-text-secondary)', marginRight: '8px', fontSize: '0.9rem' }}>/ {book.pageCount}</span>
-                                </div>
-                                <button
-                                    onClick={handleUpdateProgress}
-                                    style={{
-                                        padding: '8px 20px',
-                                        background: 'var(--color-accent)',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        color: 'white',
-                                        cursor: 'pointer',
-                                        fontWeight: '500',
-                                        fontSize: '0.9rem',
-                                        transition: 'background 0.2s'
-                                    }}
-                                >
-                                    Atualizar
-                                </button>
-                            </div>
-                            <div style={{ width: '100%', height: '10px', background: 'var(--color-bg-secondary)', borderRadius: '5px', overflow: 'hidden' }}>
-                                <div style={{ width: `${progress}% `, height: '100%', background: 'linear-gradient(to right, var(--color-accent), #5ac8fa)', transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)', borderRadius: '5px' }}></div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Logs Details */}
-                    {(book.purchaseDate || book.loanedTo) && (
-                        <div style={{
-                            fontSize: '0.9rem',
-                            color: 'var(--color-text-secondary)',
-                            background: 'var(--color-bg-tertiary)',
-                            padding: '15px',
-                            borderRadius: '8px',
-                            border: '1px solid var(--color-border)'
-                        }}>
-                            {book.purchaseDate && <p style={{ marginBottom: '4px' }}>🛒 Comprado em <strong>{new Date(book.purchaseDate).toLocaleDateString()}</strong> por <strong>R$ {book.purchasePrice}</strong></p>}
-                            {book.loanedTo && <p>🤝 Emprestado para <strong>{book.loanedTo}</strong> em {new Date(book.loanDate).toLocaleDateString()}</p>}
-                        </div>
-                    )}
-
-                    <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-                        <button className="delete-button" onClick={handleDelete} style={{ width: '100%' }}>
-                            Excluir da Biblioteca
+                    {/* Tab Navigation */}
+                    <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '10px' }}>
+                        <button
+                            onClick={() => setActiveTab('details')}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: activeTab === 'details' ? '2px solid var(--color-accent)' : '2px solid transparent',
+                                color: activeTab === 'details' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                                fontWeight: '600',
+                                fontSize: '1.1rem',
+                                cursor: 'pointer',
+                                paddingBottom: '5px'
+                            }}
+                        >
+                            Detalhes
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('notes')}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: activeTab === 'notes' ? '2px solid var(--color-accent)' : '2px solid transparent',
+                                color: activeTab === 'notes' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                                fontWeight: '600',
+                                fontSize: '1.1rem',
+                                cursor: 'pointer',
+                                paddingBottom: '5px'
+                            }}
+                        >
+                            Anotações
                         </button>
                     </div>
+
+                    {activeTab === 'details' ? (
+                        <>
+                            <div>
+                                <h2 style={{
+                                    fontSize: '2.5rem',
+                                    marginBottom: '8px',
+                                    color: 'var(--color-text-primary)',
+                                    lineHeight: '1.1',
+                                    letterSpacing: '-0.02em'
+                                }}>{book.title}</h2>
+                                <p style={{ fontSize: '1.25rem', color: 'var(--color-text-secondary)' }}>
+                                    por <span style={{ color: 'var(--color-accent)', fontWeight: '500' }}>{book.author}</span>
+                                </p>
+                            </div>
+
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(2, 1fr)',
+                                gap: '20px',
+                                background: 'var(--color-bg-secondary)',
+                                padding: '20px',
+                                borderRadius: 'var(--radius-lg)'
+                            }}>
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Editora</p>
+                                    <p style={{ fontWeight: '500' }}>{book.publisher || '-'}</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Idioma</p>
+                                    <p style={{ fontWeight: '500' }}>{book.language || '-'}</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>ISBN</p>
+                                    <p style={{ fontWeight: '500', fontSize: '0.9rem' }}>{book.isbn || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Páginas</p>
+                                    <p style={{ fontWeight: '500' }}>{book.pageCount || '-'}</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Status</p>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <span style={{
+                                            display: 'inline-block',
+                                            padding: '4px 12px',
+                                            borderRadius: '20px',
+                                            background: isRead ? 'var(--color-accent)' : '#e0e0e0',
+                                            color: isRead ? 'white' : '#555',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '600'
+                                        }}>
+                                            {isRead ? 'Lido' : 'Lendo'}
+                                        </span>
+                                        {!isRead && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    const totalPages = book.pageCount || 1;
+                                                    setCurrentPage(totalPages);
+                                                    setIsRead(true);
+                                                    if (onUpdate) {
+                                                        onUpdate(book.id, {
+                                                            currentPage: totalPages,
+                                                            isRead: true
+                                                        });
+                                                    }
+                                                }}
+                                                title="Marcar como Lido"
+                                                style={{
+                                                    background: 'none',
+                                                    border: '1px solid var(--color-accent)',
+                                                    borderRadius: '50%',
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    cursor: 'pointer',
+                                                    color: 'var(--color-accent)',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.background = 'var(--color-accent)';
+                                                    e.currentTarget.style.color = 'white';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.background = 'none';
+                                                    e.currentTarget.style.color = 'var(--color-accent)';
+                                                }}
+                                            >
+                                                <span style={{ fontSize: '14px', lineHeight: 1 }}>✓</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Reading Progress */}
+                            {book.pageCount > 0 && (
+                                <div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
+                                        <p style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>Progresso de Leitura</p>
+                                        <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{Math.round(progress)}%</span>
+                                    </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-bg-tertiary)', padding: '5px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                                            <input
+                                                type="number"
+                                                value={currentPage}
+                                                onChange={(e) => setCurrentPage(e.target.value)}
+                                                style={{
+                                                    width: '60px',
+                                                    padding: '5px',
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    textAlign: 'center',
+                                                    fontWeight: '600',
+                                                    fontSize: '1rem',
+                                                    color: 'var(--color-text-primary)'
+                                                }}
+                                            />
+                                            <span style={{ color: 'var(--color-text-secondary)', marginRight: '8px', fontSize: '0.9rem' }}>/ {book.pageCount}</span>
+                                        </div>
+                                        <button
+                                            onClick={handleUpdateProgress}
+                                            style={{
+                                                padding: '8px 20px',
+                                                background: 'var(--color-accent)',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                color: 'white',
+                                                cursor: 'pointer',
+                                                fontWeight: '500',
+                                                fontSize: '0.9rem',
+                                                transition: 'background 0.2s'
+                                            }}
+                                        >
+                                            Atualizar
+                                        </button>
+                                    </div>
+                                    <div style={{ width: '100%', height: '10px', background: 'var(--color-bg-secondary)', borderRadius: '5px', overflow: 'hidden' }}>
+                                        <div style={{ width: `${progress}% `, height: '100%', background: 'linear-gradient(to right, var(--color-accent), #5ac8fa)', transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)', borderRadius: '5px' }}></div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Logs Details */}
+                            {(book.purchaseDate || book.loanedTo) && (
+                                <div style={{
+                                    fontSize: '0.9rem',
+                                    color: 'var(--color-text-secondary)',
+                                    background: 'var(--color-bg-tertiary)',
+                                    padding: '15px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--color-border)'
+                                }}>
+                                    {book.purchaseDate && <p style={{ marginBottom: '4px' }}>🛒 Comprado em <strong>{new Date(book.purchaseDate).toLocaleDateString()}</strong> por <strong>R$ {book.purchasePrice}</strong></p>}
+                                    {book.loanedTo && <p>🤝 Emprestado para <strong>{book.loanedTo}</strong> em {new Date(book.loanDate).toLocaleDateString()}</p>}
+                                </div>
+                            )}
+
+                            <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+                                <button className="delete-button" onClick={handleDelete} style={{ width: '100%' }}>
+                                    Excluir da Biblioteca
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        // Notes Tab Content
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            {notesLoading ? (
+                                <div style={{ color: 'var(--color-text-secondary)', padding: '20px', textAlign: 'center' }}>Carregando anotações...</div>
+                            ) : notes.length > 0 ? (
+                                notes.map(note => (
+                                    <div key={note.id} style={{
+                                        background: 'var(--color-bg-tertiary)',
+                                        padding: '15px',
+                                        borderRadius: '8px',
+                                        border: '1px solid var(--color-border)'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                            <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
+                                                {note.isGeneral ? 'Nota Geral' : `Capítulo ${note.chapter || '?'} - Pág. ${note.page || '?'}`}
+                                            </span>
+                                            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{note.date}</span>
+                                        </div>
+                                        <p style={{ color: 'var(--color-text-secondary)', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>{note.content}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <div style={{ color: 'var(--color-text-secondary)', padding: '40px', textAlign: 'center', background: 'var(--color-bg-secondary)', borderRadius: '8px' }}>
+                                    Nenhuma anotação encontrada para este livro.
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

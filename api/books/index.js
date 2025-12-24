@@ -46,7 +46,7 @@ export default async function handler(req, res) {
                 `SELECT 
                     ub.id, ub.user_id, ub.is_read, ub.current_page, 
                     ub.purchase_date, ub.purchase_price, ub.loaned_to, ub.loan_date,
-                    ub.created_at, ub.custom_cover_url,
+                    ub.created_at, ub.custom_cover_url, ub.global_book_id,
                     gb.title, gb.author, gb.publisher, gb.cover_url as global_cover_url,
                     gb.page_count, gb.language, gb.isbn
                  FROM user_books ub
@@ -59,6 +59,7 @@ export default async function handler(req, res) {
             // Map DB fields to frontend expected format
             const books = result.rows.map(book => ({
                 id: book.id,
+                globalId: book.global_book_id,
                 title: book.title,
                 author: book.author,
                 publisher: book.publisher,

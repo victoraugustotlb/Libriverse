@@ -29,14 +29,23 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
         try {
-            const result = await pool.query(
-                `SELECT n.*, gb.title as book_title
-                 FROM notes n
-                 LEFT JOIN global_books gb ON n.book_id = gb.id
-                 WHERE n.user_id = $1
-                 ORDER BY n.created_at DESC`,
-                [user.userId]
-            );
+            const { bookId } = req.query;
+            let query = `
+                SELECT n.*, gb.title as book_title
+                FROM notes n
+                LEFT JOIN global_books gb ON n.book_id = gb.id
+                WHERE n.user_id = $1
+            `;
+            const params = [user.userId];
+
+            if (bookId) {
+                query += ` AND n.book_id = $2`;
+                params.push(bookId);
+            }
+
+            query += ` ORDER BY n.created_at DESC`;
+
+            const result = await pool.query(query, params);
 
             const notes = result.rows.map(note => ({
                 id: note.id,
