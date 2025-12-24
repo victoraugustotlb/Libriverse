@@ -55,6 +55,17 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
                             </a>
                         </li>
                     )}
+                    {user && (
+                        <li>
+                            <a
+                                href="#"
+                                className="navbar-link"
+                                onClick={(e) => { e.preventDefault(); onNavigate('notes'); }}
+                            >
+                                Anotações
+                            </a>
+                        </li>
+                    )}
                     {user ? (
                         <li className="user-dropdown-container" ref={dropdownRef}>
                             <div

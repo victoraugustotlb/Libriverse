@@ -50,7 +50,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
         <div className="library-page">
             <section className="hero">
                 <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                    <h1 className="hero-title" style={{ marginBottom: '40px', color: '#333' }}>Sua Biblioteca</h1>
+                    <h1 className="hero-title" style={{ marginBottom: '40px' }}>Sua Biblioteca</h1>
 
                     {/* Unified Control Bar */}
                     <div style={{
@@ -59,13 +59,13 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: '20px',
-                        background: 'rgba(255, 255, 255, 0.7)',
+                        background: 'rgba(20, 20, 20, 0.8)', // Darker, more solid background for contrast
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.8)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
                         padding: '16px 24px',
                         borderRadius: '20px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.05)'
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
                     }}>
 
                         {/* Left Side: Search */}
@@ -76,30 +76,28 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                     placeholder="Buscar por título ou autor..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholderColor="#666"
                                     style={{
                                         width: '100%',
                                         padding: '12px 16px',
                                         paddingLeft: '40px',
                                         borderRadius: '12px',
-                                        border: '1px solid rgba(0,0,0,0.1)',
-                                        background: 'rgba(255,255,255,0.8)',
-                                        color: '#333',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        background: 'rgba(255,255,255,0.08)',
+                                        color: '#fff', // High contrast white
                                         outline: 'none',
                                         fontSize: '0.95rem',
                                         fontWeight: '500',
-                                        transition: 'all 0.2s',
-                                        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+                                        transition: 'all 0.2s'
                                     }}
                                     onFocus={(e) => {
-                                        e.target.style.background = '#fff';
-                                        e.target.style.borderColor = 'rgba(0,0,0,0.2)';
-                                        e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+                                        e.target.style.background = 'rgba(255,255,255,0.15)';
+                                        e.target.style.borderColor = 'rgba(255,255,255,0.5)';
+                                        e.target.style.boxShadow = '0 0 15px rgba(255,255,255,0.1)';
                                     }}
                                     onBlur={(e) => {
-                                        e.target.style.background = 'rgba(255,255,255,0.8)';
-                                        e.target.style.borderColor = 'rgba(0,0,0,0.1)';
-                                        e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.02)';
+                                        e.target.style.background = 'rgba(255,255,255,0.08)';
+                                        e.target.style.borderColor = 'rgba(255,255,255,0.2)';
+                                        e.target.style.boxShadow = 'none';
                                     }}
                                 />
                                 <svg
@@ -111,7 +109,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                         left: '14px',
                                         top: '50%',
                                         transform: 'translateY(-50%)',
-                                        color: '#666',
+                                        color: 'rgba(255,255,255,0.8)', // Brighter icon
                                         pointerEvents: 'none'
                                     }}
                                 >
@@ -130,9 +128,9 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 style={{
                                     padding: '12px 16px',
                                     borderRadius: '12px',
-                                    border: '1px solid rgba(0,0,0,0.1)',
-                                    background: 'rgba(255,255,255,0.8)',
-                                    color: '#333',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.08)',
+                                    color: '#fff',
                                     cursor: 'pointer',
                                     outline: 'none',
                                     fontSize: '0.9rem',
@@ -140,9 +138,9 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                     minWidth: '150px'
                                 }}
                             >
-                                <option value="" style={{ background: '#fff', color: '#333' }}>Todos os Autores</option>
+                                <option value="" style={{ background: '#222', color: '#fff' }}>Todos os Autores</option>
                                 {uniqueAuthors.map(author => (
-                                    <option key={author} value={author} style={{ background: '#fff', color: '#333' }}>{author}</option>
+                                    <option key={author} value={author} style={{ background: '#222', color: '#fff' }}>{author}</option>
                                 ))}
                             </select>
 
@@ -151,9 +149,9 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 style={{
                                     padding: '12px 16px',
                                     borderRadius: '12px',
-                                    border: '1px solid rgba(0,0,0,0.1)',
-                                    background: 'rgba(255,255,255,0.8)',
-                                    color: '#999',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: 'rgba(255,255,255,0.5)',
                                     cursor: 'not-allowed',
                                     outline: 'none',
                                     fontSize: '0.9rem',
@@ -161,7 +159,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 }}
                                 disabled
                             >
-                                <option value="" style={{ background: '#fff' }}>Tags</option>
+                                <option value="" style={{ background: '#222' }}>Tags</option>
                             </select>
 
                             {/* Sort */}
@@ -171,43 +169,43 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 style={{
                                     padding: '12px 16px',
                                     borderRadius: '12px',
-                                    border: '1px solid rgba(0,0,0,0.1)',
-                                    background: 'rgba(255,255,255,0.8)',
-                                    color: '#333',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.08)',
+                                    color: '#fff',
                                     cursor: 'pointer',
                                     outline: 'none',
                                     fontSize: '0.9rem',
                                     fontWeight: '500'
                                 }}
                             >
-                                <option value="recent" style={{ background: '#fff', color: '#333' }}>Mais Recentes</option>
-                                <option value="oldest" style={{ background: '#fff', color: '#333' }}>Mais Antigos</option>
-                                <option value="az" style={{ background: '#fff', color: '#333' }}>A-Z</option>
-                                <option value="za" style={{ background: '#fff', color: '#333' }}>Z-A</option>
+                                <option value="recent" style={{ background: '#222', color: '#fff' }}>Mais Recentes</option>
+                                <option value="oldest" style={{ background: '#222', color: '#fff' }}>Mais Antigos</option>
+                                <option value="az" style={{ background: '#222', color: '#fff' }}>A-Z</option>
+                                <option value="za" style={{ background: '#222', color: '#fff' }}>Z-A</option>
                             </select>
                         </div>
 
                         {/* Right: View Toggle */}
                         <div style={{
                             display: 'flex',
-                            background: 'rgba(0,0,0,0.05)',
+                            background: 'rgba(255,255,255,0.1)',
                             padding: '4px',
                             borderRadius: '12px',
-                            border: '1px solid rgba(0,0,0,0.05)'
+                            border: '1px solid rgba(255,255,255,0.1)'
                         }}>
                             <button
                                 onClick={() => setViewMode('shelves')}
                                 style={{
-                                    background: viewMode === 'shelves' ? '#fff' : 'transparent',
+                                    background: viewMode === 'shelves' ? 'rgba(255,255,255,0.2)' : 'transparent',
                                     border: 'none',
-                                    color: viewMode === 'shelves' ? '#000' : '#666',
+                                    color: viewMode === 'shelves' ? '#fff' : 'rgba(255,255,255,0.6)',
                                     padding: '8px 16px',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
                                     fontSize: '0.9rem',
                                     fontWeight: viewMode === 'shelves' ? '600' : '500',
                                     transition: 'all 0.2s',
-                                    boxShadow: viewMode === 'shelves' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                                    boxShadow: viewMode === 'shelves' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
                                 }}
                                 title="Visualizar Estante"
                             >
@@ -216,16 +214,16 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                             <button
                                 onClick={() => setViewMode('grid')}
                                 style={{
-                                    background: viewMode === 'grid' ? '#fff' : 'transparent',
+                                    background: viewMode === 'grid' ? 'rgba(255,255,255,0.2)' : 'transparent',
                                     border: 'none',
-                                    color: viewMode === 'grid' ? '#000' : '#666',
+                                    color: viewMode === 'grid' ? '#fff' : 'rgba(255,255,255,0.6)',
                                     padding: '8px 16px',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
                                     fontSize: '0.9rem',
                                     fontWeight: viewMode === 'grid' ? '600' : '500',
                                     transition: 'all 0.2s',
-                                    boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                                    boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
                                 }}
                                 title="Visualizar Grade"
                             >
@@ -252,7 +250,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 style={{
                                     background: 'transparent',
                                     border: 'none',
-                                    color: '#ff4444',
+                                    color: '#ff6b6b',
                                     fontSize: '0.85rem',
                                     cursor: 'pointer',
                                     textDecoration: 'underline',
@@ -263,12 +261,13 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                             </button>
                         )}
                         <span style={{
-                            color: '#666',
-                            fontSize: '0.9rem',
+                            color: 'rgba(255,255,255,0.9)', // High contrast off-white
+                            fontSize: '0.95rem',
                             letterSpacing: '0.5px',
-                            fontWeight: '500'
+                            fontWeight: '500',
+                            textShadow: '0 2px 4px rgba(0,0,0,0.5)' // Shadow for better legibility against any bg
                         }}>
-                            Exibindo <span style={{ color: '#000', fontWeight: 'bold' }}>{filteredBooks.length}</span> de <span style={{ color: '#000' }}>{safeBooks.length}</span> livros
+                            Exibindo <span style={{ color: '#fff', fontWeight: 'bold' }}>{filteredBooks.length}</span> de <span style={{ color: '#fff' }}>{safeBooks.length}</span> livros
                         </span>
                     </div>
 
@@ -279,15 +278,15 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="48" height="48" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"
-                                style={{ color: '#ccc', marginBottom: '15px' }}
+                                style={{ color: 'rgba(255,255,255,0.4)', marginBottom: '15px' }}
                             >
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
-                            <p className="hero-subtitle" style={{ fontSize: '1.2rem', color: '#666' }}>
+                            <p className="hero-subtitle" style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.9)' }}>
                                 Nenhum livro encontrado.
                             </p>
-                            <p style={{ color: '#999', fontSize: '0.95rem' }}>
+                            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.95rem' }}>
                                 Tente ajustar seus filtros de busca ou autor.
                             </p>
                         </div>
