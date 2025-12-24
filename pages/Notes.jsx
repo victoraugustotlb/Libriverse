@@ -229,39 +229,56 @@ const Notes = ({ onNavigate, onEditNote }) => {
                                             onEditNote(note);
                                         }}
                                         style={{
-                                            background: 'transparent',
-                                            border: 'none',
-                                            color: 'rgba(255,255,255,0.6)',
+                                            background: 'rgba(255, 255, 255, 0.1)',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                            color: '#fff',
                                             cursor: 'pointer',
-                                            fontSize: '0.9rem',
-                                            transition: 'color 0.2s',
+                                            fontSize: '0.85rem',
+                                            padding: '6px 12px',
+                                            borderRadius: '20px',
+                                            transition: 'all 0.2s ease',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '4px'
+                                            gap: '6px',
+                                            fontWeight: '500'
                                         }}
-                                        onMouseEnter={(e) => e.target.style.color = '#fff'}
-                                        onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                                            e.target.style.transform = 'translateY(-1px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                                            e.target.style.transform = 'translateY(0)';
+                                        }}
                                     >
-                                        ✎ Editar
+                                        <span style={{ fontSize: '1rem' }}>✎</span> Editar
                                     </button>
                                     <button
                                         onClick={(e) => handleDelete(note.id, e)}
                                         style={{
-                                            background: 'transparent',
-                                            border: 'none',
-                                            color: '#ff4d4f', // Red for delete
+                                            background: 'rgba(255, 77, 79, 0.1)',
+                                            border: '1px solid rgba(255, 77, 79, 0.2)',
+                                            color: '#ff4d4f', // Red text
                                             cursor: 'pointer',
-                                            fontSize: '0.9rem',
-                                            opacity: 0.8,
-                                            transition: 'opacity 0.2s',
+                                            fontSize: '0.85rem',
+                                            padding: '6px 12px',
+                                            borderRadius: '20px',
+                                            transition: 'all 0.2s ease',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '4px'
+                                            gap: '6px',
+                                            fontWeight: '500'
                                         }}
-                                        onMouseEnter={(e) => e.target.style.opacity = '1'}
-                                        onMouseLeave={(e) => e.target.style.opacity = '0.8'}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.background = 'rgba(255, 77, 79, 0.2)';
+                                            e.target.style.transform = 'translateY(-1px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.background = 'rgba(255, 77, 79, 0.1)';
+                                            e.target.style.transform = 'translateY(0)';
+                                        }}
                                     >
-                                        🗑 Excluir
+                                        <span style={{ fontSize: '1rem' }}>🗑</span> Excluir
                                     </button>
                                 </div>
                             </div>

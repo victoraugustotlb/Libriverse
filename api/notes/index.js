@@ -117,5 +117,86 @@ export default async function handler(req, res) {
         }
     }
 
+    if (req.method === 'DELETE') {
+        const { id } = req.query;
+
+        if (!id) {
+            return res.status(400).json({ error: 'Note ID is required' });
+        }
+
+        try {
+            const result = await pool.query(
+                'DELETE FROM notes WHERE id = $1 AND user_id = $2 RETURNING *',
+                [id, user.userId]
+            );
+
+            if (result.rowCount === 0) {
+                return res.status(404).json({ error: 'Note not found or unauthorized' });
+            }
+
+            return res.status(200).json({ message: 'Note deleted successfully' });
+
+        } catch (error) {
+            console.error('Delete note error:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
+    if (req.method === 'PUT') {
+        const { id } = req.query;
+        const { bookId, chapter, page, content, isGeneral } = req.body;
+
+        if (!id) {
+            return res.status(400).json({ error: 'Note ID is required' });
+        }
+
+        try {
+            let realBookId = null;
+            if (bookId) {
+                const bookCheck = await pool.query(
+                    'SELECT global_book_id FROM user_books WHERE id = $1 AND user_id = $2',
+                    [bookId, user.userId]
+                );
+
+                if (bookCheck.rows.length > 0) {
+                    realBookId = bookCheck.rows[0].global_book_id;
+                } else {
+                    return res.status(400).json({ error: 'Livro selecionado inválido.' });
+                }
+            }
+
+            const result = await pool.query(
+                `UPDATE notes 
+                 SET book_id = $1, chapter = $2, page = $3, content = $4, is_general = $5
+                 WHERE id = $6 AND user_id = $7
+                 RETURNING *`,
+                [
+                    realBookId,
+                    chapter || null,
+                    page || null,
+                    content,
+                    isGeneral || false,
+                    id,
+                    user.userId
+                ]
+            );
+
+            if (result.rowCount === 0) {
+                return res.status(404).json({ error: 'Note not found or unauthorized' });
+            }
+
+            const updatedNote = result.rows[0];
+            return res.status(200).json({
+                ...updatedNote,
+                id: updatedNote.id,
+                date: new Date(updatedNote.created_at).toLocaleDateString('pt-BR')
+            });
+
+        } catch (error) {
+            console.error('Update note error:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
     return res.status(405).json({ error: 'Method not allowed' });
 }
