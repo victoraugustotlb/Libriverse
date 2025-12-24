@@ -49,6 +49,19 @@ const Notes = ({ onNavigate }) => {
         return roman;
     };
 
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredNotes = notes.filter(note => {
+        const searchLower = searchTerm.toLowerCase();
+        const title = note.isGeneral ? 'Nota Geral' : `Capítulo ${toRoman(note.chapter)}${note.page ? ` - Pág. ${note.page}` : ''}`;
+
+        return (
+            title.toLowerCase().includes(searchLower) ||
+            (note.content && note.content.toLowerCase().includes(searchLower)) ||
+            (note.bookTitle && note.bookTitle.toLowerCase().includes(searchLower))
+        );
+    });
+
     return (
         <div className="notes-page">
             <section className="hero">
@@ -58,6 +71,7 @@ const Notes = ({ onNavigate }) => {
                     {/* Controls Bar */}
                     <div style={{
                         display: 'flex',
+                        flexWrap: 'wrap',
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: '20px',
@@ -70,24 +84,45 @@ const Notes = ({ onNavigate }) => {
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                         marginBottom: '40px'
                     }}>
-                        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem' }}>
-                            Você tem <span style={{ color: '#fff', fontWeight: 'bold' }}>{notes.length}</span> anotações
+                        <div style={{ flex: '1 1 300px' }}>
+                            <input
+                                type="text"
+                                placeholder="Buscar nas anotações..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 16px',
+                                    borderRadius: '10px',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.1)',
+                                    color: '#fff',
+                                    outline: 'none',
+                                    fontSize: '0.95rem'
+                                }}
+                            />
                         </div>
 
-                        <button
-                            className="hero-cta"
-                            style={{
-                                marginTop: 0,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 20px',
-                                fontSize: '0.9rem'
-                            }}
-                            onClick={() => onNavigate('create-note')}
-                        >
-                            <span style={{ fontSize: '1.2em' }}>+</span> Nova Anotação
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', whiteSpace: 'nowrap' }}>
+                                <span style={{ color: '#fff', fontWeight: 'bold' }}>{filteredNotes.length}</span> anotações
+                            </div>
+
+                            <button
+                                className="hero-cta"
+                                style={{
+                                    marginTop: 0,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '10px 20px',
+                                    fontSize: '0.9rem'
+                                }}
+                                onClick={() => onNavigate('create-note')}
+                            >
+                                <span style={{ fontSize: '1.2em' }}>+</span> Nova Anotação
+                            </button>
+                        </div>
                     </div>
 
                     {/* Notes Grid */}
@@ -96,7 +131,7 @@ const Notes = ({ onNavigate }) => {
                         gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                         gap: '24px'
                     }}>
-                        {notes.map(note => (
+                        {filteredNotes.map(note => (
                             <div key={note.id} style={{
                                 background: 'rgba(20, 20, 20, 0.8)', // Dark background like toolbar
                                 backdropFilter: 'blur(20px)',
