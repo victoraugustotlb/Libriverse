@@ -20,6 +20,23 @@ const CreateNote = ({ onNavigate, books = [] }) => {
         onNavigate('notes');
     };
 
+    // Helper to convert to Roman numerals
+    const toRoman = (num) => {
+        if (!num || isNaN(num)) return num;
+        const n = parseInt(num);
+        if (n <= 0) return num;
+        const lookup = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+        let roman = '';
+        let i = n;
+        for (let key in lookup) {
+            while (i >= lookup[key]) {
+                roman += key;
+                i -= lookup[key];
+            }
+        }
+        return roman;
+    };
+
     return (
         <div className="create-note-page" style={{
             paddingTop: '40px',
@@ -171,37 +188,56 @@ const CreateNote = ({ onNavigate, books = [] }) => {
                         width: '50px',
                         background: '#f0f2f5',
                         borderRight: '1px solid #e1e4e8',
-                        padding: '24px 0',
+                        padding: chapter ? '60px 0 24px 0' : '24px 0', // Adjust padding if title exists
                         textAlign: 'center',
                         color: '#999',
                         fontFamily: 'monospace',
                         fontSize: '1rem',
                         lineHeight: '1.6',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        transition: 'padding 0.3s ease'
                     }}>
                         {lineNumbers.map(num => (
                             <div key={num}>{num}</div>
                         ))}
                     </div>
 
-                    {/* Text Area */}
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        placeholder="Comece a escrever sua anotação aqui..."
-                        style={{
-                            flex: 1,
-                            border: 'none',
-                            background: 'transparent',
-                            padding: '24px',
-                            fontSize: '1rem',
-                            lineHeight: '1.6',
-                            color: '#333',
-                            outline: 'none',
-                            resize: 'none',
-                            fontFamily: 'inherit'
-                        }}
-                    />
+                    {/* Content Column */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        {chapter && (
+                            <div style={{
+                                padding: '24px 24px 0 24px',
+                                textAlign: 'center',
+                                fontFamily: 'serif',
+                                fontSize: '2rem',
+                                color: '#1d1d1f',
+                                fontWeight: '700',
+                                letterSpacing: '2px',
+                                opacity: 0.9,
+                                transition: 'all 0.3s ease'
+                            }}>
+                                {toRoman(chapter)}
+                            </div>
+                        )}
+
+                        <textarea
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            placeholder="Comece a escrever sua anotação aqui..."
+                            style={{
+                                flex: 1,
+                                border: 'none',
+                                background: 'transparent',
+                                padding: '24px',
+                                fontSize: '1rem',
+                                lineHeight: '1.6',
+                                color: '#333',
+                                outline: 'none',
+                                resize: 'none',
+                                fontFamily: 'inherit'
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
