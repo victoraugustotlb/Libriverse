@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const CreateNote = ({ onNavigate, books = [] }) => {
+const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) => {
     const [selectedBookId, setSelectedBookId] = useState('');
     const [chapter, setChapter] = useState('');
     const [page, setPage] = useState('');
@@ -14,6 +14,33 @@ const CreateNote = ({ onNavigate, books = [] }) => {
         setLineNumbers(Array.from({ length: Math.max(lines, 1) }, (_, i) => i + 1));
     }, [content]);
 
+    // Load note data for editing
+    useEffect(() => {
+        if (noteToEdit) {
+            setContent(noteToEdit.content || '');
+            setChapter(noteToEdit.chapter || '');
+            setPage(noteToEdit.page || '');
+            setIsGeneralNote(noteToEdit.isGeneral || false);
+
+            // Resolve global bookId to user bookId for the dropdown
+            if (noteToEdit.bookId && books.length > 0) {
+                // noteToEdit.bookId is the GLOBAL ID (from API notes join)
+                // books (userBooks) have .id (user_book_id) and .global_book_id (checking api pattern)
+                // Wait, api user_books endpoint returns mapped object. 
+                // Let's check `api/books/index.js` output again.
+                // It returns: id (user_book), title, ... but DOES IT RETURN global_book_id? 
+                // Previous view of api/books/index.js line 60 says NO. It returns `id` (user_book) and `isbn`.
+                // This is a minimal conflict. We can match by Title?
+                // Or I can update api/books to return global_book_id?
+                // Matching by title is safer for now without changing more files.
+                const matchedBook = books.find(b => b.title === noteToEdit.bookTitle);
+                if (matchedBook) {
+                    setSelectedBookId(matchedBook.id);
+                }
+            }
+        }
+    }, [noteToEdit, books]);
+
     const handleSave = async () => {
         try {
             const token = localStorage.getItem('libriverse_token');
@@ -22,8 +49,11 @@ const CreateNote = ({ onNavigate, books = [] }) => {
                 return;
             }
 
-            const response = await fetch('/api/notes', {
-                method: 'POST',
+            const url = noteToEdit ? `/api/notes?id=${noteToEdit.id}` : '/api/notes';
+            const method = noteToEdit ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -38,7 +68,8 @@ const CreateNote = ({ onNavigate, books = [] }) => {
             });
 
             if (response.ok) {
-                alert('Anotação salva com sucesso!');
+                alert(noteToEdit ? 'Anotação atualizada!' : 'Anotação salva com sucesso!');
+                if (onClearEdit) onClearEdit();
                 onNavigate('notes');
             } else {
                 const data = await response.json();
@@ -48,6 +79,12 @@ const CreateNote = ({ onNavigate, books = [] }) => {
             console.error('Error saving note:', error);
             alert('Erro de conexão ao salvar nota');
         }
+    };
+
+    // Cleanup on unmount/back
+    const handleBack = () => {
+        if (onClearEdit) onClearEdit();
+        onNavigate('notes');
     };
 
     // Helper to convert to Roman numerals
@@ -76,7 +113,7 @@ const CreateNote = ({ onNavigate, books = [] }) => {
             <div className="container">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '30px' }}>
                     <button
-                        onClick={() => onNavigate('notes')}
+                        onClick={handleBack}
                         style={{
                             background: 'transparent',
                             border: 'none',
@@ -90,7 +127,9 @@ const CreateNote = ({ onNavigate, books = [] }) => {
                     >
                         ← Voltar
                     </button>
-                    <h1 className="hero-title" style={{ fontSize: '2rem', margin: 0, color: '#333' }}>Nova Anotação</h1>
+                    <h1 className="hero-title" style={{ fontSize: '2rem', margin: 0, color: '#333' }}>
+                        {noteToEdit ? 'Editar Anotação' : 'Nova Anotação'}
+                    </h1>
                     <button
                         className="hero-cta"
                         style={{ marginTop: 0, padding: '10px 24px' }}

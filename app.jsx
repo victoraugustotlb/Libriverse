@@ -187,6 +187,13 @@ const App = () => {
         setIsSearchModalOpen(true);
     };
 
+    const [noteToEdit, setNoteToEdit] = useState(null);
+
+    const handleEditNote = (note) => {
+        setNoteToEdit(note);
+        handleNavigate('create-note');
+    };
+
     return (
         <div className="app">
             {isLoading && <Loading />}
@@ -230,11 +237,16 @@ const App = () => {
             )}
 
             {view === 'notes' && (
-                <Notes onNavigate={handleNavigate} />
+                <Notes onNavigate={handleNavigate} onEditNote={handleEditNote} />
             )}
 
             {view === 'create-note' && (
-                <CreateNote onNavigate={handleNavigate} books={userBooks} />
+                <CreateNote
+                    onNavigate={handleNavigate}
+                    books={userBooks}
+                    noteToEdit={noteToEdit}
+                    onClearEdit={() => setNoteToEdit(null)}
+                />
             )}
 
             <Footer />

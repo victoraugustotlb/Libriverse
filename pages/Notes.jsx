@@ -1,8 +1,31 @@
 import React, { useState, useEffect } from 'react';
 
-const Notes = ({ onNavigate }) => {
+const Notes = ({ onNavigate, onEditNote }) => {
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const handleDelete = async (noteId, e) => {
+        e.stopPropagation(); // Prevent card click
+        if (!confirm('Tem certeza que deseja excluir esta anotação?')) return;
+
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            const response = await fetch(`/api/notes?id=${noteId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                setNotes(notes.filter(n => n.id !== noteId));
+            } else {
+                alert('Erro ao excluir anotação');
+            }
+        } catch (error) {
+            console.error('Error deleting note:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchNotes = async () => {
@@ -190,6 +213,57 @@ const Notes = ({ onNavigate }) => {
                                 }}>
                                     {note.content}
                                 </p>
+
+                                {/* Actions Footer */}
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    gap: '12px',
+                                    borderTop: '1px solid rgba(255,255,255,0.1)',
+                                    paddingTop: '16px',
+                                    marginTop: 'auto'
+                                }}>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onEditNote(note);
+                                        }}
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            color: 'rgba(255,255,255,0.6)',
+                                            cursor: 'pointer',
+                                            fontSize: '0.9rem',
+                                            transition: 'color 0.2s',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}
+                                        onMouseEnter={(e) => e.target.style.color = '#fff'}
+                                        onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}
+                                    >
+                                        ✎ Editar
+                                    </button>
+                                    <button
+                                        onClick={(e) => handleDelete(note.id, e)}
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            color: '#ff4d4f', // Red for delete
+                                            cursor: 'pointer',
+                                            fontSize: '0.9rem',
+                                            opacity: 0.8,
+                                            transition: 'opacity 0.2s',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}
+                                        onMouseEnter={(e) => e.target.style.opacity = '1'}
+                                        onMouseLeave={(e) => e.target.style.opacity = '0.8'}
+                                    >
+                                        🗑 Excluir
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
