@@ -38,13 +38,22 @@ export default async function handler(req, res) {
                     purchase_date DATE,
                     purchase_price DECIMAL(10, 2),
                     loaned_to TEXT,
-                    loaned_to TEXT,
                     loan_date DATE,
                     cover_type TEXT,
                     created_at TIMESTAMP DEFAULT NOW(),
                     CONSTRAINT unique_user_book UNIQUE (user_id, global_book_id)
                 );
             `);
+
+            // Ensure new columns exist (Migration for existing tables)
+            try {
+                await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS edition_date TEXT;`);
+                await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS translator TEXT;`);
+                await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS cover_type TEXT;`);
+            } catch (err) {
+                // Ignore if columns already exist or other benign errors
+                console.log('Migration check:', err.message);
+            }
 
             const result = await pool.query(
                 `SELECT 
