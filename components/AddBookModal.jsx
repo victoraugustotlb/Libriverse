@@ -13,6 +13,9 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
     const [translator, setTranslator] = useState('');
     const [isRead, setIsRead] = useState(false);
 
+    // New Mode: Old Book (No ISBN)
+    const [isOldBook, setIsOldBook] = useState(false);
+
     // Logs
     const [purchaseDate, setPurchaseDate] = useState('');
     const [purchasePrice, setPurchasePrice] = useState('');
@@ -100,8 +103,14 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 1. Check for duplicate ISBN if provided and not editing
-        if (isbn && !initialData) {
+        // 1. Validate ISBN presence for modern books
+        if (!isOldBook && !isbn.trim()) {
+            alert("Para livros modernos, o ISBN é obrigatório. Se for um livro antigo, ative o modo 'Livro Antigo'.");
+            return;
+        }
+
+        // 2. Check for duplicate ISBN if provided and not editing
+        if (isbn && !initialData && !isOldBook) {
             try {
                 const token = localStorage.getItem('libriverse_token');
                 const response = await fetch(`/api/books/search?q=${encodeURIComponent(isbn)}`, {
@@ -141,7 +150,8 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             loanDate: loanDate || null,
             editionDate,
             translator,
-            coverType
+            coverType,
+            isOldBook
         });
 
         // Close is handled by parent usually, but we can reset here or just rely on unmount/re-render
@@ -171,308 +181,354 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px' }}>
+            </div>
 
-                    {/* Top Section: Cover & Basic Info */}
-                    <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '40px' }}>
+            {/* Old Book Toggle */}
+            <div style={{
+                marginBottom: '30px',
+                padding: '15px',
+                background: isOldBook ? 'rgba(255, 193, 7, 0.1)' : 'var(--color-bg-tertiary)',
+                border: isOldBook ? '1px solid #ffc107' : '1px solid var(--color-border)',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+            }}>
+                <div>
+                    <span style={{ fontWeight: '600', color: isOldBook ? '#ffc107' : 'var(--color-text-primary)' }}>
+                        📚 {isOldBook ? 'Modo Livro Antigo Ativado' : 'Livro Moderno (Padrão)'}
+                    </span>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+                        {isOldBook ? 'ISBN não é obrigatório. Este livro será salvo em uma coleção separada.' : 'ISBN é obrigatório para garantir a identificação correta.'}
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => setIsOldBook(!isOldBook)}
+                    style={{
+                        padding: '8px 16px',
+                        background: isOldBook ? '#ffc107' : 'transparent',
+                        color: isOldBook ? '#000' : 'var(--color-text-secondary)',
+                        border: isOldBook ? 'none' : '1px solid var(--color-border)',
+                        borderRadius: '20px',
+                        fontWeight: '600',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    {isOldBook ? 'Voltar ao Padrão' : 'Ativar Modo Livro Antigo'}
+                </button>
+            </div>
 
-                        {/* Left: Drag & Drop Cover Zone */}
-                        <div
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
-                            style={{
-                                width: '200px',
-                                flexShrink: 0,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '10px'
-                            }}
-                        >
-                            <div style={{
-                                width: '100%',
-                                height: '300px', // Standard book ratio approx
-                                background: coverUrl ? `url(${coverUrl}) center/cover no-repeat` : (isDragging ? 'var(--color-bg-tertiary)' : 'var(--color-bg-secondary)'),
-                                border: `2px dashed ${isDragging ? 'var(--color-accent)' : 'var(--color-border)'}`,
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                position: 'relative',
-                                overflow: 'hidden'
-                            }} onClick={() => document.getElementById('coverInput').click()}>
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px' }}>
 
-                                {!coverUrl && (
-                                    <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)' }}>
-                                        <span style={{ fontSize: '2rem', display: 'block', marginBottom: '10px' }}>📷</span>
-                                        <p style={{ fontSize: '0.9rem' }}>Arraste uma imagem ou clique para enviar</p>
-                                    </div>
-                                )}
+                {/* Top Section: Cover & Basic Info */}
+                <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '40px' }}>
 
-                                <input
-                                    type="file"
-                                    id="coverInput"
-                                    accept="image/*"
-                                    onChange={handleFileSelect}
-                                    style={{ display: 'none' }}
-                                />
-                            </div>
+                    {/* Left: Drag & Drop Cover Zone */}
+                    <div
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        style={{
+                            width: '200px',
+                            flexShrink: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px'
+                        }}
+                    >
+                        <div style={{
+                            width: '100%',
+                            height: '300px', // Standard book ratio approx
+                            background: coverUrl ? `url(${coverUrl}) center/cover no-repeat` : (isDragging ? 'var(--color-bg-tertiary)' : 'var(--color-bg-secondary)'),
+                            border: `2px dashed ${isDragging ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }} onClick={() => document.getElementById('coverInput').click()}>
 
-                            {/* URL Fallback */}
+                            {!coverUrl && (
+                                <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)' }}>
+                                    <span style={{ fontSize: '2rem', display: 'block', marginBottom: '10px' }}>📷</span>
+                                    <p style={{ fontSize: '0.9rem' }}>Arraste uma imagem ou clique para enviar</p>
+                                </div>
+                            )}
+
                             <input
-                                type="url"
-                                className="auth-input"
-                                value={coverUrl}
-                                onChange={(e) => setCoverUrl(e.target.value)}
-                                placeholder="Ou cole a URL aqui..."
-                                style={{ fontSize: '0.8rem', padding: '8px' }}
+                                type="file"
+                                id="coverInput"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                style={{ display: 'none' }}
                             />
                         </div>
 
-                        {/* Right: Basic Fields */}
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
-                                Informações Principais
-                            </h3>
-
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="title">Nome do Livro</label>
-                                <input
-                                    type="text"
-                                    id="title"
-                                    className="auth-input"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    required
-                                    placeholder="Ex: O Pequeno Príncipe"
-                                />
-                            </div>
-
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="author">Autor</label>
-                                <input
-                                    type="text"
-                                    id="author"
-                                    className="auth-input"
-                                    value={author}
-                                    onChange={(e) => setAuthor(e.target.value)}
-                                    required
-                                    placeholder="Ex: Antoine de Saint-Exupéry"
-                                />
-                            </div>
-
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="translator">Tradutor</label>
-                                <input
-                                    type="text"
-                                    id="translator"
-                                    className="auth-input"
-                                    value={translator}
-                                    onChange={(e) => setTranslator(e.target.value)}
-                                    placeholder="Ex: Ferreira Gullar"
-                                />
-                            </div>
-
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="publisher">Editora</label>
-                                <input
-                                    type="text"
-                                    id="publisher"
-                                    className="auth-input"
-                                    value={publisher}
-                                    onChange={(e) => setPublisher(e.target.value)}
-                                    required
-                                    placeholder="Ex: Agir"
-                                />
-                            </div>
-
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="editionDate">Data da Edição</label>
-                                <input
-                                    type="text"
-                                    id="editionDate"
-                                    className="auth-input"
-                                    value={editionDate}
-                                    onChange={(e) => setEditionDate(e.target.value)}
-                                    placeholder="Ex: 2015 ou 1ª Edição"
-                                />
-                            </div>
-
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="isbn">ISBN</label>
-                                <input
-                                    type="text"
-                                    id="isbn"
-                                    className="auth-input"
-                                    value={isbn}
-                                    onChange={(e) => setIsbn(e.target.value)}
-                                    placeholder="Ex: 978-85-220-3136-1"
-                                />
-                            </div>
-                        </div>
+                        {/* URL Fallback */}
+                        <input
+                            type="url"
+                            className="auth-input"
+                            value={coverUrl}
+                            onChange={(e) => setCoverUrl(e.target.value)}
+                            placeholder="Ou cole a URL aqui..."
+                            style={{ fontSize: '0.8rem', padding: '8px' }}
+                        />
                     </div>
 
-                    {/* Bottom Section: Details & Logs */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-                        {/* Details Column */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
-                                Detalhes & Status
-                            </h3>
+                    {/* Right: Basic Fields */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
+                            Informações Principais
+                        </h3>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label htmlFor="pageCount">Páginas</label>
-                                    <input
-                                        type="number"
-                                        id="pageCount"
-                                        className="auth-input"
-                                        value={pageCount}
-                                        onChange={(e) => setPageCount(e.target.value)}
-                                        placeholder="0"
-                                    />
-                                </div>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label htmlFor="currentPage">Pág. Atual</label>
-                                    <input
-                                        type="number"
-                                        id="currentPage"
-                                        className="auth-input"
-                                        value={currentPage}
-                                        onChange={(e) => setCurrentPage(e.target.value)}
-                                        placeholder="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="language">Idioma</label>
-                                <input
-                                    type="text"
-                                    id="language"
-                                    className="auth-input"
-                                    placeholder="Ex: Português"
-                                    value={language}
-                                    onChange={(e) => setLanguage(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label htmlFor="coverType">Tipo de Capa</label>
-                                <select
-                                    id="coverType"
-                                    className="auth-input"
-                                    value={coverType}
-                                    onChange={(e) => setCoverType(e.target.value)}
-                                    style={{
-                                        appearance: 'none',
-                                        backgroundImage: `url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")`,
-                                        backgroundRepeat: 'no-repeat',
-                                        backgroundPosition: 'right .7em top 50%',
-                                        backgroundSize: '.65em auto',
-                                        paddingRight: '1.5em'
-                                    }}
-                                >
-                                    <option value="brochura" style={{ color: 'black' }}>Brochura</option>
-                                    <option value="dura" style={{ color: 'black' }}>Capa Dura</option>
-                                    <option value="aveludada" style={{ color: 'black' }}>Aveludada/Soft Touch</option>
-                                </select>
-                            </div>
-
-                            {/* Read Status Toggle */}
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                background: 'var(--color-bg-tertiary)',
-                                padding: '15px',
-                                borderRadius: 'var(--radius-md)',
-                                border: '1px solid var(--color-border)'
-                            }}>
-                                <span style={{ color: 'var(--color-text-primary)', fontWeight: '500' }}>Já li este livro</span>
-                                <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '46px', height: '24px' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={isRead}
-                                        onChange={(e) => setIsRead(e.target.checked)}
-                                        style={{ opacity: 0, width: 0, height: 0 }}
-                                    />
-                                    <span className="slider round" style={{
-                                        position: 'absolute',
-                                        cursor: 'pointer',
-                                        top: 0, left: 0, right: 0, bottom: 0,
-                                        backgroundColor: isRead ? 'var(--color-accent)' : '#d1d1d6', // Apple switch gray
-                                        transition: '.4s',
-                                        borderRadius: '34px'
-                                    }}>
-                                        <span style={{
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '20px', width: '20px',
-                                            left: isRead ? '24px' : '2px',
-                                            bottom: '2px',
-                                            backgroundColor: 'white',
-                                            transition: '.4s',
-                                            borderRadius: '50%',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                        }}></span>
-                                    </span>
-                                </label>
-                            </div>
-
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label htmlFor="title">Nome do Livro</label>
+                            <input
+                                type="text"
+                                id="title"
+                                className="auth-input"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                required
+                                placeholder="Ex: O Pequeno Príncipe"
+                            />
                         </div>
 
-                        {/* Logs Column */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
-                                Logs e Histórico
-                            </h3>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label htmlFor="author">Autor</label>
+                            <input
+                                type="text"
+                                id="author"
+                                className="auth-input"
+                                value={author}
+                                onChange={(e) => setAuthor(e.target.value)}
+                                required
+                                placeholder="Ex: Antoine de Saint-Exupéry"
+                            />
+                        </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Data Compra</label>
-                                    <input type="date" className="auth-input" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
-                                </div>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Preço (R$)</label>
-                                    <input type="number" step="0.01" className="auth-input" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} />
-                                </div>
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Emprestado para</label>
-                                    <input type="text" className="auth-input" value={loanedTo} onChange={(e) => setLoanedTo(e.target.value)} />
-                                </div>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Data Empréstimo</label>
-                                    <input type="date" className="auth-input" value={loanDate} onChange={(e) => setLoanDate(e.target.value)} />
-                                </div>
-                            </div>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label htmlFor="translator">Tradutor</label>
+                            <input
+                                type="text"
+                                id="translator"
+                                className="auth-input"
+                                value={translator}
+                                onChange={(e) => setTranslator(e.target.value)}
+                                placeholder="Ex: Ferreira Gullar"
+                            />
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label htmlFor="publisher">Editora</label>
+                            <input
+                                type="text"
+                                id="publisher"
+                                className="auth-input"
+                                value={publisher}
+                                onChange={(e) => setPublisher(e.target.value)}
+                                required
+                                placeholder="Ex: Agir"
+                            />
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label htmlFor="editionDate">Data da Edição</label>
+                            <input
+                                type="text"
+                                id="editionDate"
+                                className="auth-input"
+                                value={editionDate}
+                                onChange={(e) => setEditionDate(e.target.value)}
+                                placeholder="Ex: 2015 ou 1ª Edição"
+                            />
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label htmlFor="isbn">ISBN</label>
+                            <input
+                                type="text"
+                                id="isbn"
+                                className="auth-input"
+                                value={isbn}
+                                onChange={(e) => setIsbn(e.target.value)}
+                                placeholder={isOldBook ? "Opcional para livros antigos" : "Obrigatório (Ex: 978-85...)"}
+                                disabled={isOldBook}
+                                style={{
+                                    opacity: isOldBook ? 0.6 : 1,
+                                    cursor: isOldBook ? 'not-allowed' : 'text',
+                                    background: isOldBook ? 'var(--color-bg-secondary)' : 'var(--color-bg-primary)'
+                                }}
+                            />
                         </div>
                     </div>
-
-                </form>
-
-                <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'flex-end', gap: '15px' }}>
-                    <button type="button" onClick={onClose} style={{
-                        padding: '12px 24px',
-                        background: 'transparent',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        cursor: 'pointer',
-                        fontWeight: '600',
-                        color: 'var(--color-text-secondary)'
-                    }}>
-                        Cancelar
-                    </button>
-                    <button onClick={handleSubmit} className="auth-button" style={{ width: 'auto', marginTop: 0, padding: '12px 32px' }}>
-                        {initialData ? 'Salvar Livro' : 'Adicionar Livro'}
-                    </button>
                 </div>
+
+                {/* Bottom Section: Details & Logs */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                    {/* Details Column */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
+                            Detalhes & Status
+                        </h3>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="pageCount">Páginas</label>
+                                <input
+                                    type="number"
+                                    id="pageCount"
+                                    className="auth-input"
+                                    value={pageCount}
+                                    onChange={(e) => setPageCount(e.target.value)}
+                                    placeholder="0"
+                                />
+                            </div>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="currentPage">Pág. Atual</label>
+                                <input
+                                    type="number"
+                                    id="currentPage"
+                                    className="auth-input"
+                                    value={currentPage}
+                                    onChange={(e) => setCurrentPage(e.target.value)}
+                                    placeholder="0"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label htmlFor="language">Idioma</label>
+                            <input
+                                type="text"
+                                id="language"
+                                className="auth-input"
+                                placeholder="Ex: Português"
+                                value={language}
+                                onChange={(e) => setLanguage(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label htmlFor="coverType">Tipo de Capa</label>
+                            <select
+                                id="coverType"
+                                className="auth-input"
+                                value={coverType}
+                                onChange={(e) => setCoverType(e.target.value)}
+                                style={{
+                                    appearance: 'none',
+                                    backgroundImage: `url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right .7em top 50%',
+                                    backgroundSize: '.65em auto',
+                                    paddingRight: '1.5em'
+                                }}
+                            >
+                                <option value="brochura" style={{ color: 'black' }}>Brochura</option>
+                                <option value="dura" style={{ color: 'black' }}>Capa Dura</option>
+                                <option value="aveludada" style={{ color: 'black' }}>Aveludada/Soft Touch</option>
+                            </select>
+                        </div>
+
+                        {/* Read Status Toggle */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            background: 'var(--color-bg-tertiary)',
+                            padding: '15px',
+                            borderRadius: 'var(--radius-md)',
+                            border: '1px solid var(--color-border)'
+                        }}>
+                            <span style={{ color: 'var(--color-text-primary)', fontWeight: '500' }}>Já li este livro</span>
+                            <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '46px', height: '24px' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={isRead}
+                                    onChange={(e) => setIsRead(e.target.checked)}
+                                    style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span className="slider round" style={{
+                                    position: 'absolute',
+                                    cursor: 'pointer',
+                                    top: 0, left: 0, right: 0, bottom: 0,
+                                    backgroundColor: isRead ? 'var(--color-accent)' : '#d1d1d6', // Apple switch gray
+                                    transition: '.4s',
+                                    borderRadius: '34px'
+                                }}>
+                                    <span style={{
+                                        position: 'absolute',
+                                        content: '""',
+                                        height: '20px', width: '20px',
+                                        left: isRead ? '24px' : '2px',
+                                        bottom: '2px',
+                                        backgroundColor: 'white',
+                                        transition: '.4s',
+                                        borderRadius: '50%',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                    }}></span>
+                                </span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                    {/* Logs Column */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
+                            Logs e Histórico
+                        </h3>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label>Data Compra</label>
+                                <input type="date" className="auth-input" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+                            </div>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label>Preço (R$)</label>
+                                <input type="number" step="0.01" className="auth-input" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} />
+                            </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label>Emprestado para</label>
+                                <input type="text" className="auth-input" value={loanedTo} onChange={(e) => setLoanedTo(e.target.value)} />
+                            </div>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label>Data Empréstimo</label>
+                                <input type="date" className="auth-input" value={loanDate} onChange={(e) => setLoanDate(e.target.value)} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+            <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'flex-end', gap: '15px' }}>
+                <button type="button" onClick={onClose} style={{
+                    padding: '12px 24px',
+                    background: 'transparent',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    color: 'var(--color-text-secondary)'
+                }}>
+                    Cancelar
+                </button>
+                <button onClick={handleSubmit} className="auth-button" style={{ width: 'auto', marginTop: 0, padding: '12px 32px' }}>
+                    {initialData ? 'Salvar Livro' : 'Adicionar Livro'}
+                </button>
             </div>
         </div>
+        </div >
     );
 };
 
