@@ -1,10 +1,12 @@
 import React from 'react';
+import NoteViewModal from './NoteViewModal';
 
 const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
     const [currentPage, setCurrentPage] = React.useState(0);
     const [isRead, setIsRead] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState('details');
     const [notes, setNotes] = React.useState([]);
+    const [viewNote, setViewNote] = React.useState(null);
     const [notesLoading, setNotesLoading] = React.useState(false);
 
     const [imgError, setImgError] = React.useState(false);
@@ -184,6 +186,11 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                 }}>{book.title}</h2>
                                 <p style={{ fontSize: '1.25rem', color: 'var(--color-text-secondary)' }}>
                                     por <span style={{ color: 'var(--color-accent)', fontWeight: '500' }}>{book.author}</span>
+                                    {book.translator && (
+                                        <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', display: 'block', marginTop: '4px' }}>
+                                            Traduzido por {book.translator}
+                                        </span>
+                                    )}
                                 </p>
                             </div>
 
@@ -210,6 +217,14 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                 <div>
                                     <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Páginas</p>
                                     <p style={{ fontWeight: '500' }}>{book.pageCount || '-'}</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Edição</p>
+                                    <p style={{ fontWeight: '500' }}>{book.editionDate || '-'}</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Capa</p>
+                                    <p style={{ fontWeight: '500', textTransform: 'capitalize' }}>{book.coverType || '-'}</p>
                                 </div>
                                 <div>
                                     <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Status</p>
@@ -347,19 +362,43 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                 <div style={{ color: 'var(--color-text-secondary)', padding: '20px', textAlign: 'center' }}>Carregando anotações...</div>
                             ) : notes.length > 0 ? (
                                 notes.map(note => (
-                                    <div key={note.id} style={{
-                                        background: 'var(--color-bg-tertiary)',
-                                        padding: '15px',
-                                        borderRadius: '8px',
-                                        border: '1px solid var(--color-border)'
-                                    }}>
+                                    <div key={note.id}
+                                        onClick={() => setViewNote(note)}
+                                        style={{
+                                            background: 'var(--color-bg-tertiary)',
+                                            padding: '15px',
+                                            borderRadius: '8px',
+                                            border: '1px solid var(--color-border)',
+                                            cursor: 'pointer',
+                                            transition: 'transform 0.2s, box-shadow 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                                             <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
                                                 {note.isGeneral ? 'Nota Geral' : `Capítulo ${note.chapter || '?'} - Pág. ${note.page || '?'}`}
                                             </span>
                                             <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{note.date}</span>
                                         </div>
-                                        <p style={{ color: 'var(--color-text-secondary)', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>{note.content}</p>
+                                        <p style={{
+                                            color: 'var(--color-text-secondary)',
+                                            whiteSpace: 'pre-wrap',
+                                            lineHeight: '1.4',
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 7,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
+                                            {note.content}
+                                        </p>
                                     </div>
                                 ))
                             ) : (
@@ -371,6 +410,11 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                     )}
                 </div>
             </div>
+            <NoteViewModal
+                note={viewNote}
+                isOpen={!!viewNote}
+                onClose={() => setViewNote(null)}
+            />
         </div>
     );
 };

@@ -21,6 +21,8 @@ export default async function handler(req, res) {
                     cover_url TEXT,
                     page_count INTEGER,
                     language TEXT,
+                    edition_date TEXT,
+                    translator TEXT,
                     created_at TIMESTAMP DEFAULT NOW()
                 );
             `);
@@ -36,7 +38,9 @@ export default async function handler(req, res) {
                     purchase_date DATE,
                     purchase_price DECIMAL(10, 2),
                     loaned_to TEXT,
+                    loaned_to TEXT,
                     loan_date DATE,
+                    cover_type TEXT,
                     created_at TIMESTAMP DEFAULT NOW(),
                     CONSTRAINT unique_user_book UNIQUE (user_id, global_book_id)
                 );
@@ -46,9 +50,9 @@ export default async function handler(req, res) {
                 `SELECT 
                     ub.id, ub.user_id, ub.is_read, ub.current_page, 
                     ub.purchase_date, ub.purchase_price, ub.loaned_to, ub.loan_date,
-                    ub.created_at, ub.custom_cover_url, ub.global_book_id,
+                    ub.created_at, ub.custom_cover_url, ub.global_book_id, ub.cover_type,
                     gb.title, gb.author, gb.publisher, gb.cover_url as global_cover_url,
-                    gb.page_count, gb.language, gb.isbn
+                    gb.page_count, gb.language, gb.isbn, gb.edition_date, gb.translator
                  FROM user_books ub
                  JOIN global_books gb ON ub.global_book_id = gb.id
                  WHERE ub.user_id = $1 
@@ -73,7 +77,10 @@ export default async function handler(req, res) {
                 loanedTo: book.loaned_to,
                 loanDate: book.loan_date,
                 currentPage: book.current_page,
-                isbn: book.isbn
+                isbn: book.isbn,
+                editionDate: book.edition_date,
+                translator: book.translator,
+                coverType: book.cover_type
             }));
 
             return res.status(200).json(books);
@@ -86,10 +93,10 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
         const {
-            title, author, publisher, coverUrl,
             pageCount, language, isRead,
             purchaseDate, purchasePrice,
-            loanedTo, loanDate, currentPage, isbn
+            loanedTo, loanDate, currentPage, isbn,
+            editionDate, translator, coverType
         } = req.body;
 
         if (!title || !author) {
@@ -120,9 +127,13 @@ export default async function handler(req, res) {
             } else {
                 // Create in global_books
                 const resNewGlobal = await pool.query(
-                    `INSERT INTO global_books (title, author, publisher, cover_url, page_count, language, isbn)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-                    [title, author, publisher, coverUrl, pageCount || null, language || 'Português', isbn || null]
+                    `INSERT INTO global_books (title, author, publisher, cover_url, page_count, language, isbn, edition_date, translator)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+                    [
+                        title, author, publisher, coverUrl,
+                        pageCount || null, language || 'Português', isbn || null,
+                        editionDate || null, translator || null
+                    ]
                 );
                 globalBookId = resNewGlobal.rows[0].id;
             }
@@ -133,12 +144,13 @@ export default async function handler(req, res) {
                 `INSERT INTO user_books (
                     user_id, global_book_id, custom_cover_url,
                     is_read, current_page,
-                    purchase_date, purchase_price, loaned_to, loan_date
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+                    purchase_date, purchase_price, loaned_to, loan_date, cover_type
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
                 [
                     user.userId, globalBookId, coverUrl || null,
                     isRead || false, currentPage || 0,
-                    purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null
+                    purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null,
+                    coverType || null
                 ]
             );
 
@@ -148,7 +160,8 @@ export default async function handler(req, res) {
                 id: newBook.id, // user_book id
                 title, author, publisher,
                 coverUrl: newBook.custom_cover_url || coverUrl,
-                pageCount, language, isbn,
+                pageCount, language, isbn, editionDate, translator,
+                coverType: newBook.cover_type,
                 isRead: newBook.is_read,
                 currentPage: newBook.current_page,
                 createdAt: newBook.created_at,

@@ -9,6 +9,8 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
     const [pageCount, setPageCount] = useState('');
     const [currentPage, setCurrentPage] = useState('');
     const [language, setLanguage] = useState('');
+    const [editionDate, setEditionDate] = useState('');
+    const [translator, setTranslator] = useState('');
     const [isRead, setIsRead] = useState(false);
 
     // Logs
@@ -16,6 +18,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
     const [purchasePrice, setPurchasePrice] = useState('');
     const [loanedTo, setLoanedTo] = useState('');
     const [loanDate, setLoanDate] = useState('');
+    const [coverType, setCoverType] = useState('brochura');
 
     const [isDragging, setIsDragging] = useState(false);
 
@@ -68,6 +71,9 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             setPurchasePrice(initialData.purchasePrice || '');
             setLoanedTo(initialData.loanedTo || '');
             setLoanDate(initialData.loanDate || '');
+            setEditionDate(initialData.editionDate || '');
+            setTranslator(initialData.translator || '');
+            setCoverType(initialData.coverType || 'brochura');
         } else if (isOpen && !initialData) {
             // Reset form if opening fresh
             setTitle('');
@@ -83,6 +89,9 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             setPurchasePrice('');
             setLoanedTo('');
             setLoanDate('');
+            setEditionDate('');
+            setTranslator('');
+            setCoverType('brochura');
         }
     }, [isOpen, initialData]);
 
@@ -129,7 +138,10 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             purchaseDate: purchaseDate || null,
             purchasePrice: purchasePrice ? parseFloat(purchasePrice) : null,
             loanedTo: loanedTo || null,
-            loanDate: loanDate || null
+            loanDate: loanDate || null,
+            editionDate,
+            translator,
+            coverType
         });
 
         // Close is handled by parent usually, but we can reset here or just rely on unmount/re-render
@@ -252,6 +264,18 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                             </div>
 
                             <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="translator">Tradutor</label>
+                                <input
+                                    type="text"
+                                    id="translator"
+                                    className="auth-input"
+                                    value={translator}
+                                    onChange={(e) => setTranslator(e.target.value)}
+                                    placeholder="Ex: Ferreira Gullar"
+                                />
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
                                 <label htmlFor="publisher">Editora</label>
                                 <input
                                     type="text"
@@ -261,6 +285,18 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                                     onChange={(e) => setPublisher(e.target.value)}
                                     required
                                     placeholder="Ex: Agir"
+                                />
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="editionDate">Data da Edição</label>
+                                <input
+                                    type="text"
+                                    id="editionDate"
+                                    className="auth-input"
+                                    value={editionDate}
+                                    onChange={(e) => setEditionDate(e.target.value)}
+                                    placeholder="Ex: 2015 ou 1ª Edição"
                                 />
                             </div>
 
@@ -321,6 +357,28 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                                     value={language}
                                     onChange={(e) => setLanguage(e.target.value)}
                                 />
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="coverType">Tipo de Capa</label>
+                                <select
+                                    id="coverType"
+                                    className="auth-input"
+                                    value={coverType}
+                                    onChange={(e) => setCoverType(e.target.value)}
+                                    style={{
+                                        appearance: 'none',
+                                        backgroundImage: `url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")`,
+                                        backgroundRepeat: 'no-repeat',
+                                        backgroundPosition: 'right .7em top 50%',
+                                        backgroundSize: '.65em auto',
+                                        paddingRight: '1.5em'
+                                    }}
+                                >
+                                    <option value="brochura" style={{ color: 'black' }}>Brochura</option>
+                                    <option value="dura" style={{ color: 'black' }}>Capa Dura</option>
+                                    <option value="aveludada" style={{ color: 'black' }}>Aveludada/Soft Touch</option>
+                                </select>
                             </div>
 
                             {/* Read Status Toggle */}

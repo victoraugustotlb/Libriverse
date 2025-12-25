@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import NoteViewModal from '../components/NoteViewModal';
 
 const Notes = ({ onNavigate, onEditNote }) => {
     const [notes, setNotes] = useState([]);
+    const [selectedNote, setSelectedNote] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const handleDelete = async (noteId, e) => {
@@ -170,6 +172,7 @@ const Notes = ({ onNavigate, onEditNote }) => {
                                 color: '#fff',
                                 boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)'
                             }}
+                                onClick={() => setSelectedNote(note)}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = 'translateY(-5px)';
                                     e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
@@ -209,7 +212,12 @@ const Notes = ({ onNavigate, onEditNote }) => {
                                     color: 'rgba(255,255,255,0.8)',
                                     lineHeight: '1.5',
                                     whiteSpace: 'pre-line',
-                                    flex: 1
+                                    flex: 1,
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 7,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
                                 }}>
                                     {note.content}
                                 </p>
@@ -294,6 +302,11 @@ const Notes = ({ onNavigate, onEditNote }) => {
                     )}
                 </div>
             </section>
+            <NoteViewModal
+                note={selectedNote}
+                isOpen={!!selectedNote}
+                onClose={() => setSelectedNote(null)}
+            />
         </div>
     );
 };
