@@ -8,80 +8,85 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // Ensure tables exist (Schema Initialization for all methods)
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS global_books (
+                id SERIAL PRIMARY KEY,
+                isbn TEXT UNIQUE,
+                title TEXT NOT NULL,
+                author TEXT NOT NULL,
+                publisher TEXT,
+                cover_url TEXT,
+                page_count INTEGER,
+                language TEXT,
+                edition_date TEXT,
+                translator TEXT,
+                created_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS old_books (
+                id SERIAL PRIMARY KEY,
+                title TEXT NOT NULL,
+                author TEXT NOT NULL,
+                publisher TEXT,
+                cover_url TEXT,
+                page_count INTEGER,
+                language TEXT,
+                edition_date TEXT,
+                translator TEXT,
+                created_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS user_books (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id),
+                global_book_id INTEGER REFERENCES global_books(id),
+                old_book_id INTEGER REFERENCES old_books(id),
+                custom_cover_url TEXT,
+                is_read BOOLEAN DEFAULT FALSE,
+                current_page INTEGER DEFAULT 0,
+                purchase_date DATE,
+                purchase_price DECIMAL(10, 2),
+                loaned_to TEXT,
+                loan_date DATE,
+                cover_type TEXT,
+                created_at TIMESTAMP DEFAULT NOW(),
+                CONSTRAINT unique_user_book UNIQUE (user_id, global_book_id),
+                CONSTRAINT check_book_source CHECK (
+                    (global_book_id IS NOT NULL AND old_book_id IS NULL) OR
+                    (global_book_id IS NULL AND old_book_id IS NOT NULL)
+                )
+            );
+        `);
+
+        // Migrations
+        try {
+            await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS edition_date TEXT;`);
+            await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS translator TEXT;`);
+            await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS cover_type TEXT;`);
+            await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS old_book_id INTEGER REFERENCES old_books(id);`);
+            // We don't strictly need to recreate the constraint here every time if it might fail, 
+            // but for safety we can ignore if it fails or check existence. 
+            // For now, let's leave the constraint definition in CREATE TABLE.
+        } catch (err) {
+            console.log('Migration check:', err.message);
+        }
+    } catch (dbErr) {
+        console.error("Database initialization error:", dbErr);
+        return res.status(500).json({ error: 'Database initialization failed' });
+    }
+
     if (req.method === 'GET') {
         try {
-            // Ensure tables exist (lazy creation)
-            await pool.query(`
-                CREATE TABLE IF NOT EXISTS global_books (
-                    id SERIAL PRIMARY KEY,
-                    isbn TEXT UNIQUE,
-                    title TEXT NOT NULL,
-                    author TEXT NOT NULL,
-                    publisher TEXT,
-                    cover_url TEXT,
-                    page_count INTEGER,
-                    language TEXT,
-                    edition_date TEXT,
-                    translator TEXT,
-                    created_at TIMESTAMP DEFAULT NOW()
-                );
-            `);
-
-            await pool.query(`
-                CREATE TABLE IF NOT EXISTS old_books (
-                    id SERIAL PRIMARY KEY,
-                    title TEXT NOT NULL,
-                    author TEXT NOT NULL,
-                    publisher TEXT,
-                    cover_url TEXT,
-                    page_count INTEGER,
-                    language TEXT,
-                    edition_date TEXT,
-                    translator TEXT,
-                    created_at TIMESTAMP DEFAULT NOW()
-                );
-            `);
-
-            await pool.query(`
-                CREATE TABLE IF NOT EXISTS user_books (
-                    id SERIAL PRIMARY KEY,
-                    user_id INTEGER REFERENCES users(id),
-                    global_book_id INTEGER REFERENCES global_books(id),
-                    old_book_id INTEGER REFERENCES old_books(id),
-                    custom_cover_url TEXT,
-                    is_read BOOLEAN DEFAULT FALSE,
-                    current_page INTEGER DEFAULT 0,
-                    purchase_date DATE,
-                    purchase_price DECIMAL(10, 2),
-                    loaned_to TEXT,
-                    loan_date DATE,
-                    cover_type TEXT,
-                    created_at TIMESTAMP DEFAULT NOW(),
-                    CONSTRAINT unique_user_book UNIQUE (user_id, global_book_id),
-                    CONSTRAINT check_book_source CHECK (
-                        (global_book_id IS NOT NULL AND old_book_id IS NULL) OR
-                        (global_book_id IS NULL AND old_book_id IS NOT NULL)
-                    )
-                );
-            `);
-
-            // Migration: Add old_book_id if not exists
-            try {
-                await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS old_book_id INTEGER REFERENCES old_books(id);`);
-                await pool.query(`ALTER TABLE user_books DROP CONSTRAINT IF EXISTS check_book_source;`); // Drop to recreate or leave loose for migration
-            } catch (err) {
-                console.log('Migration old_book_id:', err.message);
-            }
-
-            // Ensure new columns exist (Migration for existing tables)
-            try {
-                await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS edition_date TEXT;`);
-                await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS translator TEXT;`);
-                await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS cover_type TEXT;`);
-            } catch (err) {
-                // Ignore if columns already exist or other benign errors
-                console.log('Migration check:', err.message);
-            }
 
             const result = await pool.query(
                 `SELECT 
