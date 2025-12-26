@@ -41,6 +41,37 @@ const App = () => {
     const [bookToEdit, setBookToEdit] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
+    // Theme Management
+    const [theme, setTheme] = useState(() => {
+        const savedTheme = localStorage.getItem('libriverse_theme');
+        return savedTheme || 'system';
+    });
+
+    useEffect(() => {
+        const applyTheme = (targetTheme) => {
+            const root = document.documentElement;
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            let effectiveTheme = targetTheme;
+            if (targetTheme === 'system') {
+                effectiveTheme = systemDark ? 'dark' : 'light';
+            }
+
+            root.setAttribute('data-theme', effectiveTheme);
+            localStorage.setItem('libriverse_theme', targetTheme);
+        };
+
+        applyTheme(theme);
+
+        // Listen for system changes if system mode is active
+        if (theme === 'system') {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleChange = () => applyTheme('system');
+            mediaQuery.addEventListener('change', handleChange);
+            return () => mediaQuery.removeEventListener('change', handleChange);
+        }
+    }, [theme]);
+
     // Fetch books when user is logged in
     React.useEffect(() => {
         setIsLoading(true);
@@ -208,6 +239,8 @@ const App = () => {
                 user={user}
                 view={view}
                 onOpenAddModal={() => setIsMethodModalOpen(true)}
+                theme={theme}
+                onUpdateTheme={setTheme}
             />
             {view === 'home' && <Home onNavigate={handleNavigate} />}
             {view === 'login' && <Login onNavigate={handleNavigate} />}

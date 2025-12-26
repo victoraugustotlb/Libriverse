@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
+const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -98,9 +98,21 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
                                 <div className="dropdown-item theme-toggle-row">
                                     <div className="dropdown-item-content">Theme</div>
                                     <div className="theme-options">
-                                        <div className="theme-option-btn" title="System">🖥️</div>
-                                        <div className="theme-option-btn" title="Light">☀️</div>
-                                        <div className="theme-option-btn active" title="Dark">🌙</div>
+                                        <div
+                                            className={`theme-option-btn ${theme === 'system' ? 'active' : ''}`}
+                                            title="System"
+                                            onClick={(e) => { e.stopPropagation(); onUpdateTheme('system'); }}
+                                        >🖥️</div>
+                                        <div
+                                            className={`theme-option-btn ${theme === 'light' ? 'active' : ''}`}
+                                            title="Light"
+                                            onClick={(e) => { e.stopPropagation(); onUpdateTheme('light'); }}
+                                        >☀️</div>
+                                        <div
+                                            className={`theme-option-btn ${theme === 'dark' ? 'active' : ''}`}
+                                            title="Dark"
+                                            onClick={(e) => { e.stopPropagation(); onUpdateTheme('dark'); }}
+                                        >🌙</div>
                                     </div>
                                 </div>
 
