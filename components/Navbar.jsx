@@ -44,17 +44,6 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
                             Início
                         </a>
                     </li>
-                    {view === 'library' && (
-                        <li>
-                            <a
-                                href="#"
-                                className="navbar-link highlight"
-                                onClick={(e) => { e.preventDefault(); onOpenAddModal(); }}
-                            >
-                                Adicionar
-                            </a>
-                        </li>
-                    )}
                     {user && (
                         <li>
                             <a
@@ -63,6 +52,17 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal }) => {
                                 onClick={(e) => { e.preventDefault(); onNavigate('notes'); }}
                             >
                                 Anotações
+                            </a>
+                        </li>
+                    )}
+                    {view === 'library' && (
+                        <li>
+                            <a
+                                href="#"
+                                className="navbar-link highlight"
+                                onClick={(e) => { e.preventDefault(); onOpenAddModal(); }}
+                            >
+                                Adicionar
                             </a>
                         </li>
                     )}

@@ -91,6 +91,12 @@ const App = () => {
             if (savedUser) setUser(JSON.parse(savedUser));
         }
 
+        // Helper to close all modals prevents them from persisting across views
+        setIsAddModalOpen(false);
+        setIsMethodModalOpen(false);
+        setIsSearchModalOpen(false);
+        setBookToEdit(null);
+
         setView(newView);
         window.scrollTo(0, 0);
     };

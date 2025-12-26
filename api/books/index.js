@@ -232,7 +232,7 @@ export default async function handler(req, res) {
                     user.userId, globalBookId, oldBookId, coverUrl || null,
                     isRead || false, currentPage || 0,
                     purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null,
-                    coverType || null, startDate || null, finishDate || null
+                    coverType || null, startDate || new Date(), finishDate || null
                 ]
             );
 
