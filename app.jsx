@@ -43,14 +43,26 @@ const App = () => {
 
     // Theme Management
     const [theme, setTheme] = useState(() => {
-        const savedTheme = localStorage.getItem('libriverse_theme');
-        return savedTheme || 'system';
+        try {
+            const savedTheme = localStorage.getItem('libriverse_theme');
+            return savedTheme || 'system';
+        } catch (error) {
+            console.error("Error accessing localStorage for theme:", error);
+            return 'system';
+        }
     });
 
     useEffect(() => {
         const applyTheme = (targetTheme) => {
             const root = document.documentElement;
-            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let systemDark = false;
+            try {
+                if (window.matchMedia) {
+                    systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+            } catch (e) {
+                console.error("Error matching media:", e);
+            }
 
             let effectiveTheme = targetTheme;
             if (targetTheme === 'system') {
@@ -58,13 +70,17 @@ const App = () => {
             }
 
             root.setAttribute('data-theme', effectiveTheme);
-            localStorage.setItem('libriverse_theme', targetTheme);
+            try {
+                localStorage.setItem('libriverse_theme', targetTheme);
+            } catch (e) {
+                // ignore storage errors
+            }
         };
 
         applyTheme(theme);
 
         // Listen for system changes if system mode is active
-        if (theme === 'system') {
+        if (theme === 'system' && window.matchMedia) {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const handleChange = () => applyTheme('system');
             mediaQuery.addEventListener('change', handleChange);
