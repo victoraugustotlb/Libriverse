@@ -57,6 +57,8 @@ export default async function handler(req, res) {
                 loaned_to TEXT,
                 loan_date DATE,
                 cover_type TEXT,
+                start_date DATE,
+                finish_date DATE,
                 created_at TIMESTAMP DEFAULT NOW(),
                 CONSTRAINT unique_user_book UNIQUE (user_id, global_book_id),
                 CONSTRAINT check_book_source CHECK (
@@ -71,6 +73,8 @@ export default async function handler(req, res) {
             await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS edition_date TEXT;`);
             await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS translator TEXT;`);
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS cover_type TEXT;`);
+            await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS start_date DATE;`);
+            await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS finish_date DATE;`);
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS old_book_id INTEGER REFERENCES old_books(id);`);
             // We don't strictly need to recreate the constraint here every time if it might fail, 
             // but for safety we can ignore if it fails or check existence. 
@@ -90,6 +94,7 @@ export default async function handler(req, res) {
                 `SELECT 
                     ub.id, ub.user_id, ub.is_read, ub.current_page, 
                     ub.purchase_date, ub.purchase_price, ub.loaned_to, ub.loan_date,
+                    ub.start_date, ub.finish_date,
                     ub.created_at, ub.custom_cover_url, ub.global_book_id, ub.old_book_id, ub.cover_type,
                     COALESCE(gb.title, ob.title) as title,
                     COALESCE(gb.author, ob.author) as author,
@@ -124,6 +129,8 @@ export default async function handler(req, res) {
                 purchasePrice: book.purchase_price,
                 loanedTo: book.loaned_to,
                 loanDate: book.loan_date,
+                startDate: book.start_date,
+                finishDate: book.finish_date,
                 currentPage: book.current_page,
                 isbn: book.isbn,
                 editionDate: book.edition_date,
@@ -147,6 +154,7 @@ export default async function handler(req, res) {
                 purchaseDate, purchasePrice,
                 loanedTo, loanDate, currentPage, isbn,
                 editionDate, translator, coverType,
+                startDate, finishDate,
                 isOldBook // Boolean flag from frontend
             } = req.body;
 
@@ -217,13 +225,14 @@ export default async function handler(req, res) {
                 `INSERT INTO user_books (
                     user_id, global_book_id, old_book_id, custom_cover_url,
                     is_read, current_page,
-                    purchase_date, purchase_price, loaned_to, loan_date, cover_type
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+                    purchase_date, purchase_price, loaned_to, loan_date, cover_type,
+                    start_date, finish_date
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
                 [
                     user.userId, globalBookId, oldBookId, coverUrl || null,
                     isRead || false, currentPage || 0,
                     purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null,
-                    coverType || null
+                    coverType || null, startDate || null, finishDate || null
                 ]
             );
 
@@ -242,7 +251,9 @@ export default async function handler(req, res) {
                 purchaseDate: newBook.purchase_date,
                 purchasePrice: newBook.purchase_price,
                 loanedTo: newBook.loaned_to,
-                loanDate: newBook.loan_date
+                loanDate: newBook.loan_date,
+                startDate: newBook.start_date,
+                finishDate: newBook.finish_date
             });
 
         } catch (error) {
@@ -281,7 +292,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'PUT') {
         const { id } = req.query;
-        const { currentPage, isRead } = req.body;
+        const { currentPage, isRead, startDate, finishDate } = req.body;
 
         if (!id) {
             return res.status(400).json({ error: 'Book ID is required' });
@@ -291,12 +302,16 @@ export default async function handler(req, res) {
             const result = await pool.query(
                 `UPDATE user_books 
                  SET current_page = COALESCE($1, current_page),
-                     is_read = COALESCE($2, is_read)
-                 WHERE id = $3 AND user_id = $4
+                     is_read = COALESCE($2, is_read),
+                     start_date = COALESCE($3, start_date),
+                     finish_date = COALESCE($4, finish_date)
+                 WHERE id = $5 AND user_id = $6
                  RETURNING *`,
                 [
                     currentPage !== undefined ? currentPage : null,
                     isRead !== undefined ? isRead : null,
+                    startDate !== undefined ? startDate : null,
+                    finishDate !== undefined ? finishDate : null,
                     id,
                     user.userId
                 ]
@@ -310,7 +325,9 @@ export default async function handler(req, res) {
             return res.status(200).json({
                 ...book,
                 currentPage: book.current_page,
-                isRead: book.is_read
+                isRead: book.is_read,
+                startDate: book.start_date,
+                finishDate: book.finish_date
             });
 
         } catch (error) {

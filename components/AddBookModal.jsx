@@ -20,7 +20,10 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
     const [purchaseDate, setPurchaseDate] = useState('');
     const [purchasePrice, setPurchasePrice] = useState('');
     const [loanedTo, setLoanedTo] = useState('');
+
     const [loanDate, setLoanDate] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [finishDate, setFinishDate] = useState('');
     const [coverType, setCoverType] = useState('brochura');
 
     const [isDragging, setIsDragging] = useState(false);
@@ -73,7 +76,10 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             setPurchaseDate(initialData.purchaseDate || '');
             setPurchasePrice(initialData.purchasePrice || '');
             setLoanedTo(initialData.loanedTo || '');
+
             setLoanDate(initialData.loanDate || '');
+            setStartDate(initialData.startDate || '');
+            setFinishDate(initialData.finishDate || '');
             setEditionDate(initialData.editionDate || '');
             setTranslator(initialData.translator || '');
             setCoverType(initialData.coverType || 'brochura');
@@ -91,7 +97,10 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             setPurchaseDate('');
             setPurchasePrice('');
             setLoanedTo('');
+
             setLoanDate('');
+            setStartDate('');
+            setFinishDate('');
             setEditionDate('');
             setTranslator('');
             setCoverType('brochura');
@@ -147,7 +156,10 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             purchaseDate: purchaseDate || null,
             purchasePrice: purchasePrice ? parseFloat(purchasePrice) : null,
             loanedTo: loanedTo || null,
+
             loanDate: loanDate || null,
+            startDate: startDate || null,
+            finishDate: finishDate || null,
             editionDate,
             translator,
             coverType,
@@ -504,6 +516,16 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                                 <div className="form-group" style={{ marginBottom: 0 }}>
                                     <label>Data Empréstimo</label>
                                     <input type="date" className="auth-input" value={loanDate} onChange={(e) => setLoanDate(e.target.value)} />
+                                </div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Data Início Leitura</label>
+                                    <input type="date" className="auth-input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label>Data Término</label>
+                                    <input type="date" className="auth-input" value={finishDate} onChange={(e) => setFinishDate(e.target.value)} />
                                 </div>
                             </div>
                         </div>

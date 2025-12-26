@@ -4,6 +4,8 @@ import NoteViewModal from './NoteViewModal';
 const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
     const [currentPage, setCurrentPage] = React.useState(0);
     const [isRead, setIsRead] = React.useState(false);
+    const [startDate, setStartDate] = React.useState('');
+    const [finishDate, setFinishDate] = React.useState('');
     const [activeTab, setActiveTab] = React.useState('details');
     const [notes, setNotes] = React.useState([]);
     const [viewNote, setViewNote] = React.useState(null);
@@ -15,6 +17,8 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
         if (book) {
             setCurrentPage(book.currentPage || 0);
             setIsRead(book.isRead || false);
+            setStartDate(book.startDate ? book.startDate.split('T')[0] : '');
+            setFinishDate(book.finishDate ? book.finishDate.split('T')[0] : '');
             setImgError(false); // Reset error state for new book
             setActiveTab('details'); // Reset tab
             setNotes([]); // Clear notes
@@ -62,6 +66,17 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
             onUpdate(book.id, {
                 currentPage: newPage,
                 isRead: newPage >= (book.pageCount || 1) // Auto-mark read if complete
+            });
+        }
+    };
+
+    const handleDateUpdate = (field, value) => {
+        if (field === 'startDate') setStartDate(value);
+        if (field === 'finishDate') setFinishDate(value);
+
+        if (onUpdate) {
+            onUpdate(book.id, {
+                [field]: value
             });
         }
     };
@@ -335,19 +350,44 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                             )}
 
                             {/* Logs Details */}
-                            {(book.purchaseDate || book.loanedTo) && (
-                                <div style={{
-                                    fontSize: '0.9rem',
-                                    color: 'var(--color-text-secondary)',
-                                    background: 'var(--color-bg-tertiary)',
-                                    padding: '15px',
-                                    borderRadius: '8px',
-                                    border: '1px solid var(--color-border)'
-                                }}>
-                                    {book.purchaseDate && <p style={{ marginBottom: '4px' }}>🛒 Comprado em <strong>{new Date(book.purchaseDate).toLocaleDateString()}</strong> por <strong>R$ {book.purchasePrice}</strong></p>}
-                                    {book.loanedTo && <p>🤝 Emprestado para <strong>{book.loanedTo}</strong> em {new Date(book.loanDate).toLocaleDateString()}</p>}
+                            <div style={{
+                                fontSize: '0.9rem',
+                                color: 'var(--color-text-secondary)',
+                                background: 'var(--color-bg-tertiary)',
+                                padding: '15px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--color-border)'
+                            }}>
+                                {(book.purchaseDate || book.loanedTo) && (
+                                    <div style={{ marginBottom: '15px', paddingBottom: '15px', borderBottom: '1px solid var(--color-border)' }}>
+                                        {book.purchaseDate && <p style={{ marginBottom: '4px' }}>🛒 Comprado em <strong>{new Date(book.purchaseDate).toLocaleDateString()}</strong> por <strong>R$ {book.purchasePrice}</strong></p>}
+                                        {book.loanedTo && <p>🤝 Emprestado para <strong>{book.loanedTo}</strong> em {new Date(book.loanDate).toLocaleDateString()}</p>}
+                                    </div>
+                                )}
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label style={{ fontSize: '0.8rem' }}>Início Leitura</label>
+                                        <input
+                                            type="date"
+                                            className="auth-input"
+                                            style={{ padding: '6px', fontSize: '0.9rem' }}
+                                            value={startDate}
+                                            onChange={(e) => handleDateUpdate('startDate', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label style={{ fontSize: '0.8rem' }}>Término Leitura</label>
+                                        <input
+                                            type="date"
+                                            className="auth-input"
+                                            style={{ padding: '6px', fontSize: '0.9rem' }}
+                                            value={finishDate}
+                                            onChange={(e) => handleDateUpdate('finishDate', e.target.value)}
+                                        />
+                                    </div>
                                 </div>
-                            )}
+                            </div>
 
                             <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
                                 <button className="delete-button" onClick={handleDelete} style={{ width: '100%' }}>
