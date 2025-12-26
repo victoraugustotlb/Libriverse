@@ -8,9 +8,7 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    if (!user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+
 
     // Ensure tables exist (Schema Initialization for all methods)
     try {
@@ -142,183 +140,184 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-        const {
-            title, author, publisher, coverUrl,
-            pageCount, language, isRead,
-            purchaseDate, purchasePrice,
-            loanedTo, loanDate, currentPage, isbn,
-            editionDate, translator, coverType,
-            isOldBook // Boolean flag from frontend
-        } = req.body;
+        try {
+            const {
+                title, author, publisher, coverUrl,
+                pageCount, language, isRead,
+                purchaseDate, purchasePrice,
+                loanedTo, loanDate, currentPage, isbn,
+                editionDate, translator, coverType,
+                isOldBook // Boolean flag from frontend
+            } = req.body;
 
-        if (!title || !author) {
-            return res.status(400).json({ error: 'Title and Author are required' });
-        }
-
-        // Validation: ISBN is required for non-old books
-        if (!isOldBook && !isbn) {
-            return res.status(400).json({ error: 'ISBN validation failed: ISBN is required for modern books.' });
-        }
-
-        let globalBookId = null;
-        let oldBookId = null;
-
-        if (isOldBook) {
-            // Insert into old_books (always create new for now, or could check duplicates locally)
-            const resOld = await pool.query(
-                `INSERT INTO old_books (title, author, publisher, cover_url, page_count, language, edition_date, translator)
-                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-                [title, author, publisher, coverUrl, pageCount || null, language || 'Português', editionDate || null, translator || null]
-            );
-            oldBookId = resOld.rows[0].id;
-        } else {
-            // Standard Global Book Logic
-            try {
-                // Check if exists in global_books
-                let existingGlobalBook;
-
-                if (isbn) {
-                    const resIsbn = await pool.query('SELECT id FROM global_books WHERE isbn = $1', [isbn]);
-                    if (resIsbn.rows.length > 0) existingGlobalBook = resIsbn.rows[0];
-                }
-
-                if (!existingGlobalBook) {
-                    // Fallback check by title + author if no ISBN match (fuzzy constraint)
-                    const resTitleAuthor = await pool.query(
-                        'SELECT id FROM global_books WHERE title ILIKE $1 AND author ILIKE $2',
-                        [title, author]
-                    );
-                    if (resTitleAuthor.rows.length > 0) existingGlobalBook = resTitleAuthor.rows[0];
-                }
-
-                if (existingGlobalBook) {
-                    globalBookId = existingGlobalBook.id;
-                } else {
-                    // Create in global_books
-                    const resNewGlobal = await pool.query(
-                        `INSERT INTO global_books (title, author, publisher, cover_url, page_count, language, isbn, edition_date, translator)
-                             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
-                        [
-                            title, author, publisher, coverUrl,
-                            pageCount || null, language || 'Português', isbn || null,
-                            editionDate || null, translator || null
-                        ]
-                    );
-                    globalBookId = resNewGlobal.rows[0].id;
-                }
-            } catch (err) {
-                console.error("Error handling global book:", err);
-                throw err; // Re-throw to be caught by outer catch
+            if (!title || !author) {
+                return res.status(400).json({ error: 'Title and Author are required' });
             }
-        }
 
-        // Create relation in user_books
-        // We save the coverUrl passed by the user as custom_cover_url if provided.
-        const result = await pool.query(
-            `INSERT INTO user_books (
+            // Validation: ISBN is required for non-old books
+            if (!isOldBook && !isbn) {
+                return res.status(400).json({ error: 'ISBN validation failed: ISBN is required for modern books.' });
+            }
+
+            let globalBookId = null;
+            let oldBookId = null;
+
+            if (isOldBook) {
+                // Insert into old_books (always create new for now, or could check duplicates locally)
+                const resOld = await pool.query(
+                    `INSERT INTO old_books (title, author, publisher, cover_url, page_count, language, edition_date, translator)
+                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+                    [title, author, publisher, coverUrl, pageCount || null, language || 'Português', editionDate || null, translator || null]
+                );
+                oldBookId = resOld.rows[0].id;
+            } else {
+                // Standard Global Book Logic
+                try {
+                    // Check if exists in global_books
+                    let existingGlobalBook;
+
+                    if (isbn) {
+                        const resIsbn = await pool.query('SELECT id FROM global_books WHERE isbn = $1', [isbn]);
+                        if (resIsbn.rows.length > 0) existingGlobalBook = resIsbn.rows[0];
+                    }
+
+                    if (!existingGlobalBook) {
+                        // Fallback check by title + author if no ISBN match (fuzzy constraint)
+                        const resTitleAuthor = await pool.query(
+                            'SELECT id FROM global_books WHERE title ILIKE $1 AND author ILIKE $2',
+                            [title, author]
+                        );
+                        if (resTitleAuthor.rows.length > 0) existingGlobalBook = resTitleAuthor.rows[0];
+                    }
+
+                    if (existingGlobalBook) {
+                        globalBookId = existingGlobalBook.id;
+                    } else {
+                        // Create in global_books
+                        const resNewGlobal = await pool.query(
+                            `INSERT INTO global_books (title, author, publisher, cover_url, page_count, language, isbn, edition_date, translator)
+                             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+                            [
+                                title, author, publisher, coverUrl,
+                                pageCount || null, language || 'Português', isbn || null,
+                                editionDate || null, translator || null
+                            ]
+                        );
+                        globalBookId = resNewGlobal.rows[0].id;
+                    }
+                } catch (err) {
+                    console.error("Error handling global book:", err);
+                    throw err; // Re-throw to be caught by outer catch
+                }
+            }
+
+            // Create relation in user_books
+            // We save the coverUrl passed by the user as custom_cover_url if provided.
+            const result = await pool.query(
+                `INSERT INTO user_books (
                     user_id, global_book_id, old_book_id, custom_cover_url,
                     is_read, current_page,
                     purchase_date, purchase_price, loaned_to, loan_date, cover_type
                 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
-            [
-                user.userId, globalBookId, oldBookId, coverUrl || null,
-                isRead || false, currentPage || 0,
-                purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null,
-                coverType || null
-            ]
-        );
+                [
+                    user.userId, globalBookId, oldBookId, coverUrl || null,
+                    isRead || false, currentPage || 0,
+                    purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null,
+                    coverType || null
+                ]
+            );
 
-        // Construct full response object
-        const newBook = result.rows[0];
-        return res.status(201).json({
-            id: newBook.id, // user_book id
-            title, author, publisher,
-            coverUrl: newBook.custom_cover_url || coverUrl,
-            pageCount, language, isbn, editionDate, translator,
-            coverType: newBook.cover_type,
-            isRead: newBook.is_read,
-            currentPage: newBook.current_page,
-            createdAt: newBook.created_at,
-            // Return new fields if needed
-            purchaseDate: newBook.purchase_date,
-            purchasePrice: newBook.purchase_price,
-            loanedTo: newBook.loaned_to,
-            loanDate: newBook.loan_date
-        });
+            // Construct full response object
+            const newBook = result.rows[0];
+            return res.status(201).json({
+                id: newBook.id, // user_book id
+                title, author, publisher,
+                coverUrl: newBook.custom_cover_url || coverUrl,
+                pageCount, language, isbn, editionDate, translator,
+                coverType: newBook.cover_type,
+                isRead: newBook.is_read,
+                currentPage: newBook.current_page,
+                createdAt: newBook.created_at,
+                // Return new fields if needed
+                purchaseDate: newBook.purchase_date,
+                purchasePrice: newBook.purchase_price,
+                loanedTo: newBook.loaned_to,
+                loanDate: newBook.loan_date
+            });
 
-    } catch (error) {
-        if (error.code === '23505') { // Unique violation
-            return res.status(409).json({ error: 'Book already in library' });
+        } catch (error) {
+            if (error.code === '23505') { // Unique violation
+                return res.status(409).json({ error: 'Book already in library' });
+            }
+            console.error('Add book error:', error);
+            return res.status(500).json({ error: 'Internal server error' });
         }
-        console.error('Add book error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-}
-
-if (req.method === 'DELETE') {
-    const { id } = req.query;
-
-    if (!id) {
-        return res.status(400).json({ error: 'Book ID is required' });
     }
 
-    try {
-        const result = await pool.query(
-            'DELETE FROM user_books WHERE id = $1 AND user_id = $2 RETURNING *',
-            [id, user.userId]
-        );
+    if (req.method === 'DELETE') {
+        const { id } = req.query;
 
-        if (result.rowCount === 0) {
-            return res.status(404).json({ error: 'Book not found or unauthorized' });
+        if (!id) {
+            return res.status(400).json({ error: 'Book ID is required' });
         }
 
-        return res.status(200).json({ message: 'Book deleted successfully' });
+        try {
+            const result = await pool.query(
+                'DELETE FROM user_books WHERE id = $1 AND user_id = $2 RETURNING *',
+                [id, user.userId]
+            );
 
-    } catch (error) {
-        console.error('Delete book error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+            if (result.rowCount === 0) {
+                return res.status(404).json({ error: 'Book not found or unauthorized' });
+            }
+
+            return res.status(200).json({ message: 'Book deleted successfully' });
+
+        } catch (error) {
+            console.error('Delete book error:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
     }
-}
 
-if (req.method === 'PUT') {
-    const { id } = req.query;
-    const { currentPage, isRead } = req.body;
+    if (req.method === 'PUT') {
+        const { id } = req.query;
+        const { currentPage, isRead } = req.body;
 
-    if (!id) {
-        return res.status(400).json({ error: 'Book ID is required' });
-    }
+        if (!id) {
+            return res.status(400).json({ error: 'Book ID is required' });
+        }
 
-    try {
-        const result = await pool.query(
-            `UPDATE user_books 
+        try {
+            const result = await pool.query(
+                `UPDATE user_books 
                  SET current_page = COALESCE($1, current_page),
                      is_read = COALESCE($2, is_read)
                  WHERE id = $3 AND user_id = $4
                  RETURNING *`,
-            [
-                currentPage !== undefined ? currentPage : null,
-                isRead !== undefined ? isRead : null,
-                id,
-                user.userId
-            ]
-        );
+                [
+                    currentPage !== undefined ? currentPage : null,
+                    isRead !== undefined ? isRead : null,
+                    id,
+                    user.userId
+                ]
+            );
 
-        if (result.rowCount === 0) {
-            return res.status(404).json({ error: 'Book not found or unauthorized' });
+            if (result.rowCount === 0) {
+                return res.status(404).json({ error: 'Book not found or unauthorized' });
+            }
+
+            const book = result.rows[0];
+            return res.status(200).json({
+                ...book,
+                currentPage: book.current_page,
+                isRead: book.is_read
+            });
+
+        } catch (error) {
+            console.error('Update book error:', error);
+            return res.status(500).json({ error: 'Internal server error' });
         }
-
-        const book = result.rows[0];
-        return res.status(200).json({
-            ...book,
-            currentPage: book.current_page,
-            isRead: book.is_read
-        });
-
-    } catch (error) {
-        console.error('Update book error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
     }
-}
 
-return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method not allowed' });
 }
