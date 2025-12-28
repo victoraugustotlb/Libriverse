@@ -33,7 +33,7 @@ export default async function handler(req, res) {
         }
 
         const token = jwt.sign(
-            { userId: user.id, email: user.email, name: user.name },
+            { userId: user.id, email: user.email, name: user.name, isAdmin: user.is_admin },
             JWT_SECRET,
             { expiresIn: '7d' }
         );
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
             message: 'Login successful',
             token,
-            user: { id: user.id, name: user.name, email: user.email }
+            user: { id: user.id, name: user.name, email: user.email, isAdmin: user.is_admin }
         });
     } catch (error) {
         console.error('Login error:', error);
