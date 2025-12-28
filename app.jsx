@@ -16,7 +16,7 @@ import Loading from './components/Loading.jsx';
 import Footer from './components/Footer.jsx';
 import Notes from './pages/Notes.jsx';
 import CreateNote from './pages/CreateNote.jsx';
-import AdminDashboard from './pages/AdminDashboard.jsx';
+
 
 const App = () => {
     const [view, setView] = useState(() => {
@@ -292,11 +292,7 @@ const App = () => {
                 />
             )}
 
-            {view === 'admin' && (
-                <AdminDashboard
-                    onNavigate={handleNavigate}
-                />
-            )}
+
 
             {view === 'notes' && (
                 <Notes onNavigate={handleNavigate} onEditNote={handleEditNote} />

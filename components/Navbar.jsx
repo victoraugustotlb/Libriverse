@@ -91,11 +91,7 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                                     <div className="dropdown-item-content">Account Settings</div>
                                 </a>
 
-                                {user.isAdmin && (
-                                    <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); onNavigate('admin'); setIsDropdownOpen(false); }}>
-                                        <div className="dropdown-item-content">Painel Admin</div>
-                                    </a>
-                                )}
+
 
 
                                 <div className="dropdown-divider"></div>
