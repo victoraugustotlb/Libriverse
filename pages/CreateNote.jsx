@@ -60,8 +60,8 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
                 },
                 body: JSON.stringify({
                     bookId: selectedBookId,
-                    chapter,
-                    page,
+                    chapter: isGeneralNote ? '' : chapter,
+                    page: isGeneralNote ? '' : page,
                     content,
                     isGeneral: isGeneralNote
                 })
@@ -160,16 +160,16 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
                         <select
                             value={selectedBookId}
                             onChange={(e) => setSelectedBookId(e.target.value)}
-                            disabled={isGeneralNote}
+                            // disabled={isGeneralNote} // Allow book selection even for general notes
                             style={{
                                 width: '100%',
                                 padding: '12px 16px',
                                 borderRadius: '10px',
                                 border: '1px solid rgba(255,255,255,0.2)',
                                 background: 'rgba(255,255,255,0.1)',
-                                color: isGeneralNote ? 'rgba(255,255,255,0.3)' : '#fff',
+                                color: '#fff',
                                 outline: 'none',
-                                cursor: isGeneralNote ? 'not-allowed' : 'pointer'
+                                cursor: 'pointer'
                             }}
                         >
                             <option value="" style={{ background: '#222' }}>Selecionar Livro...</option>
@@ -180,46 +180,48 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
                     </div>
 
                     {/* Chapter Input */}
-                    <div style={{ flex: '1 1 150px' }}>
-                        <input
-                            type="text"
-                            placeholder="Capítulo"
-                            value={chapter}
-                            onChange={(e) => setChapter(e.target.value)}
-                            disabled={isGeneralNote}
-                            style={{
-                                width: '100%',
-                                padding: '12px 16px',
-                                borderRadius: '10px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                background: 'rgba(255,255,255,0.1)',
-                                color: '#fff',
-                                outline: 'none',
-                                opacity: isGeneralNote ? 0.5 : 1
-                            }}
-                        />
-                    </div>
+                    {/* Chapter Input - Hidden for General Note */}
+                    {!isGeneralNote && (
+                        <div style={{ flex: '1 1 150px' }}>
+                            <input
+                                type="text"
+                                placeholder="Capítulo"
+                                value={chapter}
+                                onChange={(e) => setChapter(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 16px',
+                                    borderRadius: '10px',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.1)',
+                                    color: '#fff',
+                                    outline: 'none'
+                                }}
+                            />
+                        </div>
+                    )}
 
                     {/* Page Input */}
-                    <div style={{ flex: '0 1 100px' }}>
-                        <input
-                            type="text"
-                            placeholder="Pág."
-                            value={page}
-                            onChange={(e) => setPage(e.target.value.replace(/\D/g, ''))} // Only numbers
-                            disabled={isGeneralNote}
-                            style={{
-                                width: '100%',
-                                padding: '12px 16px',
-                                borderRadius: '10px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                background: 'rgba(255,255,255,0.1)',
-                                color: '#fff',
-                                outline: 'none',
-                                opacity: isGeneralNote ? 0.5 : 1
-                            }}
-                        />
-                    </div>
+                    {/* Page Input - Hidden for General Note */}
+                    {!isGeneralNote && (
+                        <div style={{ flex: '0 1 100px' }}>
+                            <input
+                                type="text"
+                                placeholder="Pág."
+                                value={page}
+                                onChange={(e) => setPage(e.target.value.replace(/\D/g, ''))} // Only numbers
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 16px',
+                                    borderRadius: '10px',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.1)',
+                                    color: '#fff',
+                                    outline: 'none'
+                                }}
+                            />
+                        </div>
+                    )}
 
                     {/* Divider */}
                     <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.1)', margin: '0 8px' }}></div>
