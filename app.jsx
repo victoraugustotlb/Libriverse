@@ -109,9 +109,25 @@ const App = () => {
                             console.error('API returned non-array books data:', data);
                             setUserBooks([]);
                         }
+                    } else {
+                        // Attempt to read error message from JSON
+                        let errorMsg = response.statusText;
+                        try {
+                            const errorData = await response.json();
+                            if (errorData.error) errorMsg = errorData.error;
+                        } catch (e) {
+                            // If not JSON (e.g. HTML 404/500 page from Vercel), use text
+                            const text = await response.text();
+                            if (text.toLowerCase().includes('<!doctype html>')) {
+                                errorMsg = "Erro de configuração: A API retornou HTML em vez de JSON. Verifique o vercel.json ou as variáveis de ambiente.";
+                            }
+                        }
+                        console.error(`Fetch failed: ${response.status} ${errorMsg}`);
+                        alert(`Erro ao carregar livros: ${errorMsg}`);
                     }
                 } catch (error) {
                     console.error('Failed to fetch books:', error);
+                    alert(`Erro de conexão ao buscar livros: ${error.message}`);
                 } finally {
                     // Small artificial delay for a smoother feeling if it's too fast
                     setTimeout(() => setIsLoading(false), 800);
