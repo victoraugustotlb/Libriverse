@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
+if (!process.env.JWT_SECRET) {
+    throw new Error('Please define the JWT_SECRET environment variable inside .env');
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export const verifyToken = (req) => {
     const authHeader = req.headers.authorization;

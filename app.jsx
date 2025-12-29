@@ -101,6 +101,15 @@ const App = () => {
                             'Authorization': `Bearer ${token}`
                         }
                     });
+                    if (response.status === 401) {
+                        localStorage.removeItem('libriverse_token');
+                        localStorage.removeItem('libriverse_user');
+                        setUser(null);
+                        setView('login');
+                        alert("Sessão expirada ou inválida. Por favor, faça login novamente.");
+                        return;
+                    }
+
                     if (response.ok) {
                         const data = await response.json();
                         if (Array.isArray(data)) {
