@@ -173,6 +173,21 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                             Detalhes
                         </button>
                         <button
+                            onClick={() => setActiveTab('synopsis')}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: activeTab === 'synopsis' ? '2px solid var(--color-accent)' : '2px solid transparent',
+                                color: activeTab === 'synopsis' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                                fontWeight: '600',
+                                fontSize: '1.1rem',
+                                cursor: 'pointer',
+                                paddingBottom: '5px'
+                            }}
+                        >
+                            Sinopse
+                        </button>
+                        <button
                             onClick={() => setActiveTab('notes')}
                             style={{
                                 background: 'none',
@@ -189,7 +204,7 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                         </button>
                     </div>
 
-                    {activeTab === 'details' ? (
+                    {activeTab === 'details' && (
                         <>
                             <div>
                                 <h2 style={{
@@ -395,7 +410,28 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                 </button>
                             </div>
                         </>
-                    ) : (
+                    )}
+
+                    {activeTab === 'synopsis' && (
+                        <div style={{ height: '100%' }}>
+                            <h3 style={{ fontSize: '1.5rem', marginBottom: '20px', color: 'var(--color-text-primary)' }}>Sinopse do Livro</h3>
+                            <div style={{
+                                fontSize: '1.1rem',
+                                lineHeight: '1.8',
+                                color: 'var(--color-text-secondary)',
+                                whiteSpace: 'pre-line',
+                                background: 'var(--color-bg-tertiary)',
+                                padding: '25px',
+                                borderRadius: 'var(--radius-lg)',
+                                border: '1px solid var(--color-border)',
+                                minHeight: '200px'
+                            }}>
+                                {book.synopsis ? book.synopsis : "Este livro ainda não possui uma sinopse cadastrada."}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'notes' && (
                         // Notes Tab Content
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             {notesLoading ? (

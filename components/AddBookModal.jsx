@@ -11,6 +11,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
     const [language, setLanguage] = useState('');
     const [editionDate, setEditionDate] = useState('');
     const [translator, setTranslator] = useState('');
+    const [synopsis, setSynopsis] = useState(''); // [NEW]
     const [isRead, setIsRead] = useState(false);
 
     // New Mode: Old Book (No ISBN)
@@ -82,6 +83,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             setFinishDate(initialData.finishDate || '');
             setEditionDate(initialData.editionDate || '');
             setTranslator(initialData.translator || '');
+            setSynopsis(initialData.synopsis || ''); // [NEW]
             setCoverType(initialData.coverType || 'brochura');
         } else if (isOpen && !initialData) {
             // Reset form if opening fresh
@@ -103,6 +105,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             setFinishDate('');
             setEditionDate('');
             setTranslator('');
+            setSynopsis(''); // [NEW]
             setCoverType('brochura');
         }
     }, [isOpen, initialData]);
@@ -163,6 +166,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             editionDate,
             translator,
             coverType,
+            synopsis, // [NEW]
             isOldBook
         });
 
@@ -377,6 +381,19 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                                         cursor: isOldBook ? 'not-allowed' : 'text',
                                         background: isOldBook ? 'var(--color-bg-secondary)' : 'var(--color-bg-primary)'
                                     }}
+                                />
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label htmlFor="synopsis">Sinopse</label>
+                                <textarea
+                                    id="synopsis"
+                                    className="auth-input"
+                                    value={synopsis}
+                                    onChange={(e) => setSynopsis(e.target.value)}
+                                    placeholder="Resumo ou descrição do livro..."
+                                    rows={4}
+                                    style={{ resize: 'vertical', minHeight: '80px' }}
                                 />
                             </div>
                         </div>

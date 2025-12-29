@@ -24,6 +24,7 @@ export default async function handler(req, res) {
                 language TEXT,
                 edition_date TEXT,
                 translator TEXT,
+                synopsis TEXT,
                 created_at TIMESTAMP DEFAULT NOW()
             );
         `);
@@ -39,6 +40,7 @@ export default async function handler(req, res) {
                 language TEXT,
                 edition_date TEXT,
                 translator TEXT,
+                synopsis TEXT,
                 created_at TIMESTAMP DEFAULT NOW()
             );
         `);
@@ -71,8 +73,11 @@ export default async function handler(req, res) {
         // Migrations
         try {
             await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS edition_date TEXT;`);
-
             await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS translator TEXT;`);
+            await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS synopsis TEXT;`); // [NEW]
+
+            await pool.query(`ALTER TABLE old_books ADD COLUMN IF NOT EXISTS synopsis TEXT;`); // [NEW]
+
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS cover_type TEXT;`);
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS start_date DATE;`);
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS finish_date DATE;`);
@@ -105,7 +110,8 @@ export default async function handler(req, res) {
                     COALESCE(gb.language, ob.language) as language,
                     gb.isbn,
                     COALESCE(gb.edition_date, ob.edition_date) as edition_date,
-                    COALESCE(gb.translator, ob.translator) as translator
+                    COALESCE(gb.translator, ob.translator) as translator,
+                    COALESCE(gb.synopsis, ob.synopsis) as synopsis
                  FROM user_books ub
                  LEFT JOIN global_books gb ON ub.global_book_id = gb.id
                  LEFT JOIN old_books ob ON ub.old_book_id = ob.id
@@ -136,6 +142,7 @@ export default async function handler(req, res) {
                 isbn: book.isbn,
                 editionDate: book.edition_date,
                 translator: book.translator,
+                synopsis: book.synopsis, // [NEW]
                 coverType: book.cover_type
             }));
 
@@ -155,7 +162,7 @@ export default async function handler(req, res) {
                 purchaseDate, purchasePrice,
                 loanedTo, loanDate, currentPage, isbn,
                 editionDate, translator, coverType,
-                startDate, finishDate,
+                startDate, finishDate, synopsis, // [NEW]
                 isOldBook // Boolean flag from frontend
             } = req.body;
 
@@ -174,9 +181,9 @@ export default async function handler(req, res) {
             if (isOldBook) {
                 // Insert into old_books (always create new for now, or could check duplicates locally)
                 const resOld = await pool.query(
-                    `INSERT INTO old_books (title, author, publisher, cover_url, page_count, language, edition_date, translator)
-                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-                    [title, author, publisher, coverUrl, pageCount || null, language || 'Português', editionDate || null, translator || null]
+                    `INSERT INTO old_books (title, author, publisher, cover_url, page_count, language, edition_date, translator, synopsis)
+                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+                    [title, author, publisher, coverUrl, pageCount || null, language || 'Português', editionDate || null, translator || null, synopsis || null]
                 );
                 oldBookId = resOld.rows[0].id;
             } else {
@@ -204,12 +211,12 @@ export default async function handler(req, res) {
                     } else {
                         // Create in global_books
                         const resNewGlobal = await pool.query(
-                            `INSERT INTO global_books (title, author, publisher, cover_url, page_count, language, isbn, edition_date, translator)
-                             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+                            `INSERT INTO global_books (title, author, publisher, cover_url, page_count, language, isbn, edition_date, translator, synopsis)
+                             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
                             [
                                 title, author, publisher, coverUrl,
                                 pageCount || null, language || 'Português', isbn || null,
-                                editionDate || null, translator || null
+                                editionDate || null, translator || null, synopsis || null
                             ]
                         );
                         globalBookId = resNewGlobal.rows[0].id;
