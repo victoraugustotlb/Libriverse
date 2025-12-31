@@ -93,9 +93,7 @@ const SearchBookModal = ({ isOpen, onClose, onSelectBook, initialQuery }) => {
                 </form>
 
                 <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {results.length === 0 && !loading && query && (
-                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Nenhum livro encontrado.</p>
-                    )}
+
 
                     {results.map((book, index) => (
                         <div key={index} className="pearl-card" style={{
