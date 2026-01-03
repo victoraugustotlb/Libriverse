@@ -229,7 +229,10 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                             Anotações
                         </button>
                         <button
-                            onClick={() => setActiveTab('logs')}
+                            onClick={() => {
+                                console.log("Clicked Registros Tab");
+                                setActiveTab('logs');
+                            }}
                             style={{
                                 background: 'none',
                                 border: 'none',
@@ -241,7 +244,7 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                 paddingBottom: '5px'
                             }}
                         >
-                            Registros
+                            REGISTROS
                         </button>
                     </div>
 
