@@ -307,6 +307,25 @@ export default async function handler(req, res) {
         }
 
         try {
+            // [NEW] Fetch current state before update for Logging
+            const currentBookRes = await pool.query(
+                `SELECT ub.current_page, COALESCE(gb.page_count, ob.page_count) as page_count
+                 FROM user_books ub
+                 LEFT JOIN global_books gb ON ub.global_book_id = gb.id
+                 LEFT JOIN old_books ob ON ub.old_book_id = ob.id
+                 WHERE ub.id = $1 AND ub.user_id = $2`,
+                [id, user.userId]
+            );
+
+            if (currentBookRes.rowCount === 0) {
+                return res.status(404).json({ error: 'Book not found or unauthorized' });
+            }
+
+            const previousState = currentBookRes.rows[0];
+            const previousPage = previousState.current_page || 0;
+            const totalPages = previousState.page_count; // Can be null if not set
+
+            // Perform Update
             const result = await pool.query(
                 `UPDATE user_books 
                  SET current_page = COALESCE($1, current_page),
@@ -330,6 +349,23 @@ export default async function handler(req, res) {
             }
 
             const book = result.rows[0];
+
+            // [NEW] Log Generation
+            if (currentPage !== undefined && currentPage !== previousPage) {
+                const pagesRead = currentPage - previousPage;
+                if (pagesRead !== 0) { // Log both forward and backward progress? user said "quantas páginas a mais foram lidas". Usually positive. But nice to have history.
+                    let percentage = 0;
+                    if (totalPages && totalPages > 0) {
+                        percentage = (currentPage / totalPages) * 100;
+                    }
+
+                    await pool.query(
+                        `INSERT INTO reading_logs (user_book_id, previous_page, current_page, pages_read, percentage)
+                         VALUES ($1, $2, $3, $4, $5)`,
+                        [id, previousPage, currentPage, pagesRead, percentage.toFixed(2)]
+                    );
+                }
+            }
             return res.status(200).json({
                 ...book,
                 currentPage: book.current_page,
