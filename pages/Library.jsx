@@ -94,10 +94,9 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                     {/* Unified Control Bar */}
                     <div style={{
                         display: 'flex',
-                        flexWrap: 'wrap',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        gap: '20px',
+                        gap: '16px',
                         background: 'rgba(20, 20, 20, 0.8)', // Darker, more solid background for contrast
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
