@@ -13,6 +13,8 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
     // Filter States
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedAuthor, setSelectedAuthor] = useState('');
+    const [selectedYear, setSelectedYear] = useState('');
+    const [selectedMonth, setSelectedMonth] = useState('');
     const [sortOption, setSortOption] = useState('recent'); // recent, oldest, az, za
 
     // Derived Data
@@ -20,12 +22,49 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
         return [...new Set(safeBooks.map(b => b.author))].sort();
     }, [safeBooks]);
 
+    const uniqueYears = useMemo(() => {
+        const years = new Set(safeBooks.map(b => {
+            const date = new Date(b.createdAt);
+            return isNaN(date.getTime()) ? null : date.getFullYear();
+        }).filter(y => y !== null));
+        return [...years].sort((a, b) => b - a); // Descending
+    }, [safeBooks]);
+
+    const months = [
+        { value: '0', label: 'Janeiro' },
+        { value: '1', label: 'Fevereiro' },
+        { value: '2', label: 'Março' },
+        { value: '3', label: 'Abril' },
+        { value: '4', label: 'Maio' },
+        { value: '5', label: 'Junho' },
+        { value: '6', label: 'Julho' },
+        { value: '7', label: 'Agosto' },
+        { value: '8', label: 'Setembro' },
+        { value: '9', label: 'Outubro' },
+        { value: '10', label: 'Novembro' },
+        { value: '11', label: 'Dezembro' },
+    ];
+
     const filteredBooks = useMemo(() => {
         let result = safeBooks.filter(book => {
             const matchesSearch = (book.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
                 (book.author?.toLowerCase() || '').includes(searchTerm.toLowerCase());
             const matchesAuthor = selectedAuthor ? book.author === selectedAuthor : true;
-            return matchesSearch && matchesAuthor;
+
+            let matchesDate = true;
+            if (book.createdAt) {
+                const date = new Date(book.createdAt);
+                if (!isNaN(date.getTime())) {
+                    if (selectedYear && date.getFullYear().toString() !== selectedYear) matchesDate = false;
+                    if (selectedMonth && date.getMonth().toString() !== selectedMonth) matchesDate = false;
+                } else if (selectedYear || selectedMonth) {
+                    matchesDate = false; // Filter is active but book has invalid date
+                }
+            } else if (selectedYear || selectedMonth) {
+                matchesDate = false; // Filter active but book has no date
+            }
+
+            return matchesSearch && matchesAuthor && matchesDate;
         });
 
         // Sorting
@@ -38,7 +77,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
         });
 
         return result;
-    }, [safeBooks, searchTerm, selectedAuthor, sortOption]);
+    }, [safeBooks, searchTerm, selectedAuthor, selectedYear, selectedMonth, sortOption]);
 
     // Group filtered books into shelves of 15
     const shelves = [];
@@ -144,6 +183,52 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 ))}
                             </select>
 
+                            {/* Year Filter */}
+                            <select
+                                value={selectedYear}
+                                onChange={(e) => setSelectedYear(e.target.value)}
+                                style={{
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.08)',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                    outline: 'none',
+                                    fontSize: '0.9rem',
+                                    fontWeight: '500',
+                                    minWidth: '100px'
+                                }}
+                            >
+                                <option value="" style={{ background: '#222', color: '#fff' }}>Ano</option>
+                                {uniqueYears.map(year => (
+                                    <option key={year} value={year} style={{ background: '#222', color: '#fff' }}>{year}</option>
+                                ))}
+                            </select>
+
+                            {/* Month Filter */}
+                            <select
+                                value={selectedMonth}
+                                onChange={(e) => setSelectedMonth(e.target.value)}
+                                style={{
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.08)',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                    outline: 'none',
+                                    fontSize: '0.9rem',
+                                    fontWeight: '500',
+                                    minWidth: '120px'
+                                }}
+                            >
+                                <option value="" style={{ background: '#222', color: '#fff' }}>Mês</option>
+                                {months.map(m => (
+                                    <option key={m.value} value={m.value} style={{ background: '#222', color: '#fff' }}>{m.label}</option>
+                                ))}
+                            </select>
+
                             {/* Tags Filter (Placeholder) */}
                             <select
                                 style={{
@@ -240,11 +325,13 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                         alignItems: 'center',
                         gap: '10px'
                     }}>
-                        {(searchTerm || selectedAuthor || sortOption !== 'recent') && (
+                        {(searchTerm || selectedAuthor || selectedYear || selectedMonth || sortOption !== 'recent') && (
                             <button
                                 onClick={() => {
                                     setSearchTerm('');
                                     setSelectedAuthor('');
+                                    setSelectedYear('');
+                                    setSelectedMonth('');
                                     setSortOption('recent');
                                 }}
                                 style={{
@@ -305,146 +392,148 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                         </div>
                     )}
                 </div>
-            </section>
+            </section >
 
-            {filteredBooks.length > 0 && (
-                <section className="bookshelf-section" style={{ paddingTop: '20px' }}>
-                    {viewMode === 'shelves' ? (
-                        <div className="container bookshelf-container">
-                            {shelves.map((shelfBooks, shelfIndex) => (
-                                <div
-                                    key={shelfIndex}
-                                    className="bookshelf-grid"
-                                    style={{ "--shelf-bg": `url("${bookshelfImg}")` }}
-                                >
-                                    {shelfBooks.map((book) => {
-                                        const deterministicIndex = book.id % 20;
-                                        const size = sizes[deterministicIndex % sizes.length];
+            {
+                filteredBooks.length > 0 && (
+                    <section className="bookshelf-section" style={{ paddingTop: '20px' }}>
+                        {viewMode === 'shelves' ? (
+                            <div className="container bookshelf-container">
+                                {shelves.map((shelfBooks, shelfIndex) => (
+                                    <div
+                                        key={shelfIndex}
+                                        className="bookshelf-grid"
+                                        style={{ "--shelf-bg": `url("${bookshelfImg}")` }}
+                                    >
+                                        {shelfBooks.map((book) => {
+                                            const deterministicIndex = book.id % 20;
+                                            const size = sizes[deterministicIndex % sizes.length];
 
-                                        return (
-                                            <div
-                                                key={book.id}
-                                                className={`shelf-book ${size}`}
-                                                style={{
-                                                    "--spine-bg": `url("${lombadaImg}")`
-                                                }}
-                                                data-tooltip={`${book.title} - ${book.author}`}
-                                                onClick={() => setSelectedBook(book)}
-                                            >
-                                                <div className="book-spine">
-                                                    <div className="spine-placeholder">
-                                                        <span className="spine-title">{book.title}</span>
+                                            return (
+                                                <div
+                                                    key={book.id}
+                                                    className={`shelf-book ${size}`}
+                                                    style={{
+                                                        "--spine-bg": `url("${lombadaImg}")`
+                                                    }}
+                                                    data-tooltip={`${book.title} - ${book.author}`}
+                                                    onClick={() => setSelectedBook(book)}
+                                                >
+                                                    <div className="book-spine">
+                                                        <div className="spine-placeholder">
+                                                            <span className="spine-title">{book.title}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        // SIMPLIFIED GRID VIEW
-                        <div className="container" style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                            gap: '30px',
-                            paddingBottom: '60px'
-                        }}>
-                            {filteredBooks.map(book => {
-                                const progress = book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0;
+                                            );
+                                        })}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            // SIMPLIFIED GRID VIEW
+                            <div className="container" style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                                gap: '30px',
+                                paddingBottom: '60px'
+                            }}>
+                                {filteredBooks.map(book => {
+                                    const progress = book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0;
 
-                                return (
-                                    <div
-                                        key={book.id}
-                                        onClick={() => setSelectedBook(book)}
-                                        style={{
-                                            background: '#fff',
-                                            borderRadius: '16px',
-                                            padding: '20px',
-                                            boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            transition: 'transform 0.2s',
-                                            color: '#333' // Force dark text on white card
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                                    >
-                                        {/* Cover */}
-                                        <div style={{
-                                            width: '100%',
-                                            aspectRatio: '2/3',
-                                            marginBottom: '15px',
-                                            borderRadius: '8px',
-                                            overflow: 'hidden',
-                                            boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
-                                        }}>
-                                            {book.coverUrl ? (
-                                                <img
-                                                    src={book.coverUrl}
-                                                    alt={book.title}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                />
-                                            ) : (
-                                                <div style={{
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    background: '#eee',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: '#999',
-                                                    fontSize: '0.8rem'
-                                                }}>
-                                                    Sem Capa
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Info */}
-                                        <h3 style={{
-                                            fontSize: '1.1rem',
-                                            fontWeight: '700',
-                                            marginBottom: '5px',
-                                            lineHeight: '1.2',
-                                            color: '#000'
-                                        }}>{book.title}</h3>
-
-                                        <p style={{
-                                            fontSize: '0.9rem',
-                                            color: '#666',
-                                            marginBottom: 'auto' // Push progress to bottom
-                                        }}>{book.author}</p>
-
-                                        {/* Progress */}
-                                        <div style={{ marginTop: '15px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '5px', color: '#666' }}>
-                                                <span>Progresso</span>
-                                                <span>{Math.round(progress)}%</span>
-                                            </div>
+                                    return (
+                                        <div
+                                            key={book.id}
+                                            onClick={() => setSelectedBook(book)}
+                                            style={{
+                                                background: '#fff',
+                                                borderRadius: '16px',
+                                                padding: '20px',
+                                                boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                transition: 'transform 0.2s',
+                                                color: '#333' // Force dark text on white card
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                        >
+                                            {/* Cover */}
                                             <div style={{
                                                 width: '100%',
-                                                height: '6px',
-                                                background: '#eee',
-                                                borderRadius: '3px',
-                                                overflow: 'hidden'
+                                                aspectRatio: '2/3',
+                                                marginBottom: '15px',
+                                                borderRadius: '8px',
+                                                overflow: 'hidden',
+                                                boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
                                             }}>
+                                                {book.coverUrl ? (
+                                                    <img
+                                                        src={book.coverUrl}
+                                                        alt={book.title}
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                ) : (
+                                                    <div style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        background: '#eee',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: '#999',
+                                                        fontSize: '0.8rem'
+                                                    }}>
+                                                        Sem Capa
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Info */}
+                                            <h3 style={{
+                                                fontSize: '1.1rem',
+                                                fontWeight: '700',
+                                                marginBottom: '5px',
+                                                lineHeight: '1.2',
+                                                color: '#000'
+                                            }}>{book.title}</h3>
+
+                                            <p style={{
+                                                fontSize: '0.9rem',
+                                                color: '#666',
+                                                marginBottom: 'auto' // Push progress to bottom
+                                            }}>{book.author}</p>
+
+                                            {/* Progress */}
+                                            <div style={{ marginTop: '15px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '5px', color: '#666' }}>
+                                                    <span>Progresso</span>
+                                                    <span>{Math.round(progress)}%</span>
+                                                </div>
                                                 <div style={{
-                                                    width: `${progress}%`,
-                                                    height: '100%',
-                                                    background: '#0070f3',
-                                                    borderRadius: '3px'
-                                                }}></div>
+                                                    width: '100%',
+                                                    height: '6px',
+                                                    background: '#eee',
+                                                    borderRadius: '3px',
+                                                    overflow: 'hidden'
+                                                }}>
+                                                    <div style={{
+                                                        width: `${progress}%`,
+                                                        height: '100%',
+                                                        background: '#0070f3',
+                                                        borderRadius: '3px'
+                                                    }}></div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </section>
-            )}
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </section>
+                )
+            }
 
             <BookDetailsModal
                 book={selectedBook}
@@ -453,7 +542,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                 onDelete={onDeleteBook}
                 onUpdate={onUpdateBook}
             />
-        </div>
+        </div >
     );
 };
 
