@@ -11,9 +11,6 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
     const [viewNote, setViewNote] = React.useState(null);
     const [notesLoading, setNotesLoading] = React.useState(false);
 
-    // Logs State
-    const [logs, setLogs] = React.useState([]);
-    const [logsLoading, setLogsLoading] = React.useState(false);
 
     const [imgError, setImgError] = React.useState(false);
 
@@ -26,7 +23,7 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
             setImgError(false); // Reset error state for new book
             setActiveTab('details'); // Reset tab
             setNotes([]); // Clear notes
-            setLogs([]); // Clear logs
+            setNotes([]); // Clear notes
         }
     }, [book]);
 
@@ -53,26 +50,6 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
             fetchBookNotes();
         }
 
-        if (activeTab === 'logs' && book?.id) {
-            const fetchLogs = async () => {
-                setLogsLoading(true);
-                try {
-                    const token = localStorage.getItem('libriverse_token');
-                    const response = await fetch(`/api/reading-logs?bookId=${book.id}`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        setLogs(data);
-                    }
-                } catch (error) {
-                    console.error("Error fetching logs:", error);
-                } finally {
-                    setLogsLoading(false);
-                }
-            };
-            fetchLogs();
-        }
     }, [activeTab, book]);
 
     if (!isOpen || !book) return null;
@@ -227,24 +204,6 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                             }}
                         >
                             Anotações
-                        </button>
-                        <button
-                            onClick={() => {
-                                console.log("Clicked Registros Tab");
-                                setActiveTab('logs');
-                            }}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                borderBottom: activeTab === 'logs' ? '2px solid var(--color-accent)' : '2px solid transparent',
-                                color: activeTab === 'logs' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-                                fontWeight: '600',
-                                fontSize: '1.1rem',
-                                cursor: 'pointer',
-                                paddingBottom: '5px'
-                            }}
-                        >
-                            REGISTROS
                         </button>
                     </div>
 
@@ -529,46 +488,6 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                         </div>
                     )}
 
-                    {activeTab === 'logs' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                            {logsLoading ? (
-                                <div style={{ color: 'var(--color-text-secondary)', textAlign: 'center', padding: '20px' }}>Carregando registros...</div>
-                            ) : logs.length > 0 ? (
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                                    <thead>
-                                        <tr style={{ borderBottom: '1px solid var(--color-border)', textAlign: 'left' }}>
-                                            <th style={{ padding: '10px', color: 'var(--color-text-secondary)' }}>Data</th>
-                                            <th style={{ padding: '10px', color: 'var(--color-text-secondary)' }}>Páginas Lidas</th>
-                                            <th style={{ padding: '10px', color: 'var(--color-text-secondary)' }}>Total</th>
-                                            <th style={{ padding: '10px', color: 'var(--color-text-secondary)' }}>Progresso</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {logs.map(log => (
-                                            <tr key={log.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                                                <td style={{ padding: '12px 10px', color: 'var(--color-text-primary)' }}>
-                                                    {new Date(log.date).toLocaleString()}
-                                                </td>
-                                                <td style={{ padding: '12px 10px', color: 'var(--color-text-primary)' }}>
-                                                    {log.pagesRead > 0 ? `+${log.pagesRead}` : log.pagesRead}
-                                                </td>
-                                                <td style={{ padding: '12px 10px', color: 'var(--color-text-primary)' }}>
-                                                    {log.currentPage}
-                                                </td>
-                                                <td style={{ padding: '12px 10px', color: 'var(--color-text-primary)' }}>
-                                                    {log.percentage}%
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            ) : (
-                                <div style={{ color: 'var(--color-text-secondary)', padding: '40px', textAlign: 'center', background: 'var(--color-bg-secondary)', borderRadius: '8px' }}>
-                                    Nenhum registro de leitura encontrado.
-                                </div>
-                            )}
-                        </div>
-                    )}
                 </div>
             </div>
             <NoteViewModal
