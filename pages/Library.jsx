@@ -94,226 +94,236 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                     {/* Unified Control Bar */}
                     <div style={{
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '16px',
-                        background: 'rgba(20, 20, 20, 0.8)', // Darker, more solid background for contrast
+                        flexDirection: 'column', // Stack vertically
+                        gap: '20px', // Space between Search and Controls
+                        background: 'rgba(20, 20, 20, 0.8)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
-                        padding: '16px 24px',
-                        borderRadius: '20px',
+                        padding: '24px', // Increased padding
+                        borderRadius: '24px',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
                     }}>
 
-                        {/* Left Side: Search & Filters */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, flexWrap: 'wrap' }}>
-                            {/* Search */}
-                            <div style={{ position: 'relative', minWidth: '200px', flex: '1 1 auto' }}>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar por título ou autor..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                        {/* Top Row: Search (Full Width) */}
+                        <div style={{ position: 'relative', width: '100%' }}>
+                            <input
+                                type="text"
+                                placeholder="Buscar por título ou autor..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '16px 20px', // Larger touch target
+                                    paddingLeft: '48px',
+                                    borderRadius: '16px',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.08)',
+                                    color: '#fff',
+                                    outline: 'none',
+                                    fontSize: '1rem', // Larger font
+                                    fontWeight: '500',
+                                    transition: 'all 0.2s'
+                                }}
+                                onFocus={(e) => {
+                                    e.target.style.background = 'rgba(255,255,255,0.15)';
+                                    e.target.style.borderColor = 'rgba(255,255,255,0.5)';
+                                    e.target.style.boxShadow = '0 0 15px rgba(255,255,255,0.1)';
+                                }}
+                                onBlur={(e) => {
+                                    e.target.style.background = 'rgba(255,255,255,0.08)';
+                                    e.target.style.borderColor = 'rgba(255,255,255,0.2)';
+                                    e.target.style.boxShadow = 'none';
+                                }}
+                            />
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                style={{
+                                    position: 'absolute',
+                                    left: '18px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: 'rgba(255,255,255,0.8)',
+                                    pointerEvents: 'none'
+                                }}
+                            >
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+
+                        {/* Bottom Row: Controls */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: '16px'
+                        }}>
+
+                            {/* Filters (Left) */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                {/* Author Filter */}
+                                <select
+                                    value={selectedAuthor}
+                                    onChange={(e) => setSelectedAuthor(e.target.value)}
                                     style={{
-                                        width: '100%',
                                         padding: '12px 16px',
-                                        paddingLeft: '40px',
                                         borderRadius: '12px',
                                         border: '1px solid rgba(255,255,255,0.2)',
                                         background: 'rgba(255,255,255,0.08)',
                                         color: '#fff',
+                                        cursor: 'pointer',
                                         outline: 'none',
-                                        fontSize: '0.95rem',
+                                        fontSize: '0.9rem',
                                         fontWeight: '500',
-                                        transition: 'all 0.2s'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.target.style.background = 'rgba(255,255,255,0.15)';
-                                        e.target.style.borderColor = 'rgba(255,255,255,0.5)';
-                                        e.target.style.boxShadow = '0 0 15px rgba(255,255,255,0.1)';
-                                    }}
-                                    onBlur={(e) => {
-                                        e.target.style.background = 'rgba(255,255,255,0.08)';
-                                        e.target.style.borderColor = 'rgba(255,255,255,0.2)';
-                                        e.target.style.boxShadow = 'none';
-                                    }}
-                                />
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="18" height="18" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                    style={{
-                                        position: 'absolute',
-                                        left: '14px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        color: 'rgba(255,255,255,0.8)',
-                                        pointerEvents: 'none'
+                                        minWidth: '150px'
                                     }}
                                 >
-                                    <circle cx="11" cy="11" r="8"></circle>
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                </svg>
+                                    <option value="" style={{ background: '#222', color: '#fff' }}>Todos os Autores</option>
+                                    {uniqueAuthors.map(author => (
+                                        <option key={author} value={author} style={{ background: '#222', color: '#fff' }}>{author}</option>
+                                    ))}
+                                </select>
+
+                                {/* Year Filter */}
+                                <select
+                                    value={selectedYear}
+                                    onChange={(e) => setSelectedYear(e.target.value)}
+                                    style={{
+                                        padding: '12px 16px',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        background: 'rgba(255,255,255,0.08)',
+                                        color: '#fff',
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                        fontSize: '0.9rem',
+                                        fontWeight: '500',
+                                        minWidth: '100px'
+                                    }}
+                                >
+                                    <option value="" style={{ background: '#222', color: '#fff' }}>Ano</option>
+                                    {uniqueYears.map(year => (
+                                        <option key={year} value={year} style={{ background: '#222', color: '#fff' }}>{year}</option>
+                                    ))}
+                                </select>
+
+                                {/* Month Filter */}
+                                <select
+                                    value={selectedMonth}
+                                    onChange={(e) => setSelectedMonth(e.target.value)}
+                                    style={{
+                                        padding: '12px 16px',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        background: 'rgba(255,255,255,0.08)',
+                                        color: '#fff',
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                        fontSize: '0.9rem',
+                                        fontWeight: '500',
+                                        minWidth: '120px'
+                                    }}
+                                >
+                                    <option value="" style={{ background: '#222', color: '#fff' }}>Mês</option>
+                                    {months.map(m => (
+                                        <option key={m.value} value={m.value} style={{ background: '#222', color: '#fff' }}>{m.label}</option>
+                                    ))}
+                                </select>
+
+                                {/* Tags Filter (Placeholder) */}
+                                <select
+                                    style={{
+                                        padding: '12px 16px',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        color: 'rgba(255,255,255,0.5)',
+                                        cursor: 'not-allowed',
+                                        outline: 'none',
+                                        fontSize: '0.9rem',
+                                        fontWeight: '500'
+                                    }}
+                                    disabled
+                                >
+                                    <option value="" style={{ background: '#222' }}>Tags</option>
+                                </select>
                             </div>
 
-                            {/* Author Filter */}
-                            <select
-                                value={selectedAuthor}
-                                onChange={(e) => setSelectedAuthor(e.target.value)}
-                                style={{
-                                    padding: '12px 16px',
-                                    borderRadius: '12px',
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    background: 'rgba(255,255,255,0.08)',
-                                    color: '#fff',
-                                    cursor: 'pointer',
-                                    outline: 'none',
-                                    fontSize: '0.9rem',
-                                    fontWeight: '500',
-                                    minWidth: '150px'
-                                }}
-                            >
-                                <option value="" style={{ background: '#222', color: '#fff' }}>Todos os Autores</option>
-                                {uniqueAuthors.map(author => (
-                                    <option key={author} value={author} style={{ background: '#222', color: '#fff' }}>{author}</option>
-                                ))}
-                            </select>
-
-                            {/* Year Filter */}
-                            <select
-                                value={selectedYear}
-                                onChange={(e) => setSelectedYear(e.target.value)}
-                                style={{
-                                    padding: '12px 16px',
-                                    borderRadius: '12px',
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    background: 'rgba(255,255,255,0.08)',
-                                    color: '#fff',
-                                    cursor: 'pointer',
-                                    outline: 'none',
-                                    fontSize: '0.9rem',
-                                    fontWeight: '500',
-                                    minWidth: '100px'
-                                }}
-                            >
-                                <option value="" style={{ background: '#222', color: '#fff' }}>Ano</option>
-                                {uniqueYears.map(year => (
-                                    <option key={year} value={year} style={{ background: '#222', color: '#fff' }}>{year}</option>
-                                ))}
-                            </select>
-
-                            {/* Month Filter */}
-                            <select
-                                value={selectedMonth}
-                                onChange={(e) => setSelectedMonth(e.target.value)}
-                                style={{
-                                    padding: '12px 16px',
-                                    borderRadius: '12px',
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    background: 'rgba(255,255,255,0.08)',
-                                    color: '#fff',
-                                    cursor: 'pointer',
-                                    outline: 'none',
-                                    fontSize: '0.9rem',
-                                    fontWeight: '500',
-                                    minWidth: '120px'
-                                }}
-                            >
-                                <option value="" style={{ background: '#222', color: '#fff' }}>Mês</option>
-                                {months.map(m => (
-                                    <option key={m.value} value={m.value} style={{ background: '#222', color: '#fff' }}>{m.label}</option>
-                                ))}
-                            </select>
-
-                            {/* Tags Filter (Placeholder) */}
-                            <select
-                                style={{
-                                    padding: '12px 16px',
-                                    borderRadius: '12px',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    color: 'rgba(255,255,255,0.5)',
-                                    cursor: 'not-allowed',
-                                    outline: 'none',
-                                    fontSize: '0.9rem',
-                                    fontWeight: '500'
-                                }}
-                                disabled
-                            >
-                                <option value="" style={{ background: '#222' }}>Tags</option>
-                            </select>
-                        </div>
-
-                        {/* Right Side: Sort & View Toggle */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            {/* Sort */}
-                            <select
-                                value={sortOption}
-                                onChange={(e) => setSortOption(e.target.value)}
-                                style={{
-                                    padding: '12px 16px',
-                                    borderRadius: '12px',
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    background: 'rgba(255,255,255,0.08)',
-                                    color: '#fff',
-                                    cursor: 'pointer',
-                                    outline: 'none',
-                                    fontSize: '0.9rem',
-                                    fontWeight: '500'
-                                }}
-                            >
-                                <option value="recent" style={{ background: '#222', color: '#fff' }}>Mais Recentes</option>
-                                <option value="oldest" style={{ background: '#222', color: '#fff' }}>Mais Antigos</option>
-                                <option value="az" style={{ background: '#222', color: '#fff' }}>A-Z</option>
-                                <option value="za" style={{ background: '#222', color: '#fff' }}>Z-A</option>
-                            </select>
-
-                            {/* View Toggle */}
-                            <div style={{
-                                display: 'flex',
-                                background: 'rgba(255,255,255,0.1)',
-                                padding: '4px',
-                                borderRadius: '12px',
-                                border: '1px solid rgba(255,255,255,0.1)'
-                            }}>
-                                <button
-                                    onClick={() => setViewMode('shelves')}
+                            {/* Actions (Right) */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                {/* Sort */}
+                                <select
+                                    value={sortOption}
+                                    onChange={(e) => setSortOption(e.target.value)}
                                     style={{
-                                        background: viewMode === 'shelves' ? 'rgba(255,255,255,0.2)' : 'transparent',
-                                        border: 'none',
-                                        color: viewMode === 'shelves' ? '#fff' : 'rgba(255,255,255,0.6)',
-                                        padding: '8px 16px',
-                                        borderRadius: '8px',
+                                        padding: '12px 16px',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        background: 'rgba(255,255,255,0.08)',
+                                        color: '#fff',
                                         cursor: 'pointer',
+                                        outline: 'none',
                                         fontSize: '0.9rem',
-                                        fontWeight: viewMode === 'shelves' ? '600' : '500',
-                                        transition: 'all 0.2s',
-                                        boxShadow: viewMode === 'shelves' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
+                                        fontWeight: '500'
                                     }}
-                                    title="Visualizar Estante"
                                 >
-                                    Estante
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('grid')}
-                                    style={{
-                                        background: viewMode === 'grid' ? 'rgba(255,255,255,0.2)' : 'transparent',
-                                        border: 'none',
-                                        color: viewMode === 'grid' ? '#fff' : 'rgba(255,255,255,0.6)',
-                                        padding: '8px 16px',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        fontSize: '0.9rem',
-                                        fontWeight: viewMode === 'grid' ? '600' : '500',
-                                        transition: 'all 0.2s',
-                                        boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
-                                    }}
-                                    title="Visualizar Grade"
-                                >
-                                    Lista
-                                </button>
+                                    <option value="recent" style={{ background: '#222', color: '#fff' }}>Mais Recentes</option>
+                                    <option value="oldest" style={{ background: '#222', color: '#fff' }}>Mais Antigos</option>
+                                    <option value="az" style={{ background: '#222', color: '#fff' }}>A-Z</option>
+                                    <option value="za" style={{ background: '#222', color: '#fff' }}>Z-A</option>
+                                </select>
+
+                                {/* View Toggle */}
+                                <div style={{
+                                    display: 'flex',
+                                    background: 'rgba(255,255,255,0.1)',
+                                    padding: '4px',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255,255,255,0.1)'
+                                }}>
+                                    <button
+                                        onClick={() => setViewMode('shelves')}
+                                        style={{
+                                            background: viewMode === 'shelves' ? 'rgba(255,255,255,0.2)' : 'transparent',
+                                            border: 'none',
+                                            color: viewMode === 'shelves' ? '#fff' : 'rgba(255,255,255,0.6)',
+                                            padding: '8px 16px',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            fontSize: '0.9rem',
+                                            fontWeight: viewMode === 'shelves' ? '600' : '500',
+                                            transition: 'all 0.2s',
+                                            boxShadow: viewMode === 'shelves' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
+                                        }}
+                                        title="Visualizar Estante"
+                                    >
+                                        Estante
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('grid')}
+                                        style={{
+                                            background: viewMode === 'grid' ? 'rgba(255,255,255,0.2)' : 'transparent',
+                                            border: 'none',
+                                            color: viewMode === 'grid' ? '#fff' : 'rgba(255,255,255,0.6)',
+                                            padding: '8px 16px',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            fontSize: '0.9rem',
+                                            fontWeight: viewMode === 'grid' ? '600' : '500',
+                                            transition: 'all 0.2s',
+                                            boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
+                                        }}
+                                        title="Visualizar Grade"
+                                    >
+                                        Lista
+                                    </button>
+                                </div>
                             </div>
+
                         </div>
                     </div>
 
