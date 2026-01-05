@@ -131,12 +131,13 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                         <div style={{
                             width: '160px',
                             height: '240px',
-                            background: 'linear-gradient(135deg, #e0e0e0 0%, #d0d0d0 100%)',
+                            background: 'var(--color-bg-tertiary)',
+                            border: '1px solid var(--color-border)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             textAlign: 'center',
-                            color: '#666',
+                            color: 'var(--color-text-secondary)',
                             padding: '20px',
                             borderRadius: '8px',
                             fontWeight: '600',
@@ -265,8 +266,8 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                             display: 'inline-block',
                                             padding: '4px 12px',
                                             borderRadius: '20px',
-                                            background: isRead ? 'var(--color-accent)' : '#e0e0e0',
-                                            color: isRead ? 'white' : '#555',
+                                            background: isRead ? 'var(--color-accent)' : 'var(--color-bg-tertiary)',
+                                            color: isRead ? 'white' : 'var(--color-text-secondary)',
                                             fontSize: '0.85rem',
                                             fontWeight: '600'
                                         }}>

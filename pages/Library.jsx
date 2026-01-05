@@ -107,9 +107,9 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                     }}>
 
                         {/* Left Side: Search & Filters */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, flexWrap: 'wrap' }}>
                             {/* Search */}
-                            <div style={{ position: 'relative', minWidth: '280px', flex: '1 1 auto' }}>
+                            <div style={{ position: 'relative', minWidth: '200px', flex: '1 1 auto' }}>
                                 <input
                                     type="text"
                                     placeholder="Buscar por título ou autor..."
