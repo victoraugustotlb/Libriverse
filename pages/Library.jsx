@@ -106,9 +106,10 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
                     }}>
 
-                        {/* Left Side: Search */}
-                        <div style={{ flex: '1 1 300px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ position: 'relative', width: '100%' }}>
+                        {/* Left Side: Search & Filters */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, flexWrap: 'wrap' }}>
+                            {/* Search */}
+                            <div style={{ position: 'relative', minWidth: '280px', flex: '1 1 auto' }}>
                                 <input
                                     type="text"
                                     placeholder="Buscar por título ou autor..."
@@ -121,7 +122,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                         borderRadius: '12px',
                                         border: '1px solid rgba(255,255,255,0.2)',
                                         background: 'rgba(255,255,255,0.08)',
-                                        color: '#fff', // High contrast white
+                                        color: '#fff',
                                         outline: 'none',
                                         fontSize: '0.95rem',
                                         fontWeight: '500',
@@ -147,7 +148,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                         left: '14px',
                                         top: '50%',
                                         transform: 'translateY(-50%)',
-                                        color: 'rgba(255,255,255,0.8)', // Brighter icon
+                                        color: 'rgba(255,255,255,0.8)',
                                         pointerEvents: 'none'
                                     }}
                                 >
@@ -155,10 +156,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                 </svg>
                             </div>
-                        </div>
 
-                        {/* Middle: Filters & Sort */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                             {/* Author Filter */}
                             <select
                                 value={selectedAuthor}
@@ -245,7 +243,10 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                             >
                                 <option value="" style={{ background: '#222' }}>Tags</option>
                             </select>
+                        </div>
 
+                        {/* Right Side: Sort & View Toggle */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             {/* Sort */}
                             <select
                                 value={sortOption}
@@ -267,52 +268,52 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 <option value="az" style={{ background: '#222', color: '#fff' }}>A-Z</option>
                                 <option value="za" style={{ background: '#222', color: '#fff' }}>Z-A</option>
                             </select>
-                        </div>
 
-                        {/* Right: View Toggle */}
-                        <div style={{
-                            display: 'flex',
-                            background: 'rgba(255,255,255,0.1)',
-                            padding: '4px',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.1)'
-                        }}>
-                            <button
-                                onClick={() => setViewMode('shelves')}
-                                style={{
-                                    background: viewMode === 'shelves' ? 'rgba(255,255,255,0.2)' : 'transparent',
-                                    border: 'none',
-                                    color: viewMode === 'shelves' ? '#fff' : 'rgba(255,255,255,0.6)',
-                                    padding: '8px 16px',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.9rem',
-                                    fontWeight: viewMode === 'shelves' ? '600' : '500',
-                                    transition: 'all 0.2s',
-                                    boxShadow: viewMode === 'shelves' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
-                                }}
-                                title="Visualizar Estante"
-                            >
-                                Estante
-                            </button>
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                style={{
-                                    background: viewMode === 'grid' ? 'rgba(255,255,255,0.2)' : 'transparent',
-                                    border: 'none',
-                                    color: viewMode === 'grid' ? '#fff' : 'rgba(255,255,255,0.6)',
-                                    padding: '8px 16px',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.9rem',
-                                    fontWeight: viewMode === 'grid' ? '600' : '500',
-                                    transition: 'all 0.2s',
-                                    boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
-                                }}
-                                title="Visualizar Grade"
-                            >
-                                Lista
-                            </button>
+                            {/* View Toggle */}
+                            <div style={{
+                                display: 'flex',
+                                background: 'rgba(255,255,255,0.1)',
+                                padding: '4px',
+                                borderRadius: '12px',
+                                border: '1px solid rgba(255,255,255,0.1)'
+                            }}>
+                                <button
+                                    onClick={() => setViewMode('shelves')}
+                                    style={{
+                                        background: viewMode === 'shelves' ? 'rgba(255,255,255,0.2)' : 'transparent',
+                                        border: 'none',
+                                        color: viewMode === 'shelves' ? '#fff' : 'rgba(255,255,255,0.6)',
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.9rem',
+                                        fontWeight: viewMode === 'shelves' ? '600' : '500',
+                                        transition: 'all 0.2s',
+                                        boxShadow: viewMode === 'shelves' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
+                                    }}
+                                    title="Visualizar Estante"
+                                >
+                                    Estante
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    style={{
+                                        background: viewMode === 'grid' ? 'rgba(255,255,255,0.2)' : 'transparent',
+                                        border: 'none',
+                                        color: viewMode === 'grid' ? '#fff' : 'rgba(255,255,255,0.6)',
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.9rem',
+                                        fontWeight: viewMode === 'grid' ? '600' : '500',
+                                        transition: 'all 0.2s',
+                                        boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
+                                    }}
+                                    title="Visualizar Grade"
+                                >
+                                    Lista
+                                </button>
+                            </div>
                         </div>
                     </div>
 

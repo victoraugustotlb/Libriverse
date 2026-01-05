@@ -109,7 +109,6 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                 {/* Left Side: Cover */}
                 <div style={{
                     width: '35%',
-                    background: 'var(--color-bg-secondary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
