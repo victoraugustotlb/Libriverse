@@ -442,17 +442,59 @@ export default async function handler(req, res) {
                 return res.status(404).json({ error: 'Book not found or unauthorized' });
             }
 
-            const book = result.rows[0];
+            // [FIX] Fetch full details to return the complete object (joined with global_books)
+            const fullBookRes = await pool.query(`
+                 SELECT 
+                    ub.id, ub.user_id, ub.is_read, ub.current_page, 
+                    ub.purchase_date, ub.purchase_price, ub.loaned_to, ub.loan_date,
+                    ub.start_date, ub.finish_date,
+                    ub.rating, ub.review,
+                    ub.created_at, ub.custom_cover_url, ub.global_book_id, ub.old_book_id, ub.cover_type,
+                    COALESCE(gb.title, ob.title) as title,
+                    COALESCE(gb.author, ob.author) as author,
+                    COALESCE(gb.publisher, ob.publisher) as publisher,
+                    COALESCE(gb.cover_url, ob.cover_url) as global_cover_url,
+                    COALESCE(gb.page_count, ob.page_count) as page_count,
+                    COALESCE(gb.language, ob.language) as language,
+                    COALESCE(gb.isbn, ob.isbn) as isbn,
+                    COALESCE(gb.edition_date, ob.edition_date) as edition_date,
+                    COALESCE(gb.translator, ob.translator) as translator,
+                    COALESCE(gb.synopsis, ob.synopsis) as synopsis,
+                    COALESCE(ub.tags, gb.tags, ob.tags) as tags
+                 FROM user_books ub
+                 LEFT JOIN global_books gb ON ub.global_book_id = gb.id
+                 LEFT JOIN old_books ob ON ub.old_book_id = ob.id
+                 WHERE ub.id = $1 AND ub.user_id = $2
+            `, [id, user.userId]);
+
+            const fullBook = fullBookRes.rows[0];
 
             return res.status(200).json({
-                ...book,
-                currentPage: book.current_page,
-                isRead: book.is_read,
-                startDate: book.start_date,
-                finishDate: book.finish_date,
-                rating: book.rating,
-                review: book.review,
-                tags: book.tags ? book.tags.split(',') : []
+                id: fullBook.id,
+                globalId: fullBook.global_book_id,
+                title: fullBook.title,
+                author: fullBook.author,
+                publisher: fullBook.publisher,
+                coverUrl: fullBook.custom_cover_url || fullBook.global_cover_url,
+                createdAt: fullBook.created_at,
+                pageCount: fullBook.page_count,
+                language: fullBook.language,
+                isRead: fullBook.is_read,
+                purchaseDate: fullBook.purchase_date,
+                purchasePrice: fullBook.purchase_price,
+                loanedTo: fullBook.loaned_to,
+                loanDate: fullBook.loan_date,
+                startDate: fullBook.start_date,
+                finishDate: fullBook.finish_date,
+                currentPage: fullBook.current_page,
+                isbn: fullBook.isbn,
+                editionDate: fullBook.edition_date,
+                translator: fullBook.translator,
+                synopsis: fullBook.synopsis,
+                tags: fullBook.tags ? fullBook.tags.split(',').filter(Boolean) : [],
+                coverType: fullBook.cover_type,
+                rating: fullBook.rating, // [NEW]
+                review: fullBook.review // [NEW]
             });
 
         } catch (error) {
