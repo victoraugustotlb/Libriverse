@@ -19,6 +19,9 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
 
     const [imgError, setImgError] = React.useState(false);
 
+    // Calculate progress for display
+    const progress = book && book.pageCount ? Math.min(((currentPage || 0) / book.pageCount) * 100, 100) : 0;
+
     React.useEffect(() => {
         if (book) {
             setCurrentPage(book.currentPage || 0);
