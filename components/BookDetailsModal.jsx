@@ -267,6 +267,27 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                     <p style={{ fontWeight: '500', textTransform: 'capitalize' }}>{book.coverType || '-'}</p>
                                 </div>
                                 <div>
+                                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Tags</p>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                                        {book.tags && book.tags.length > 0 ? (
+                                            book.tags.map((tag, index) => (
+                                                <span key={index} style={{
+                                                    fontSize: '0.75rem',
+                                                    background: 'var(--color-bg-tertiary)',
+                                                    border: '1px solid var(--color-border)',
+                                                    padding: '2px 8px',
+                                                    borderRadius: '12px',
+                                                    color: 'var(--color-text-secondary)'
+                                                }}>
+                                                    {tag}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <span style={{ fontWeight: '500' }}>-</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
                                     <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Status</p>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                         <span style={{

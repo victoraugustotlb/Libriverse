@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import BookDetailsModal from '../components/BookDetailsModal';
 import lombadaImg from '../images/lombada-final.png';
 import bookshelfImg from '../images/estante.png';
+import { BOOK_TAGS } from '../utils/bookTags';
 
 const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdateBook, user, onUpdatePreference }) => {
     const safeBooks = Array.isArray(books) ? books : [];
@@ -41,6 +42,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
     const [selectedAuthor, setSelectedAuthor] = useState('');
     const [selectedYear, setSelectedYear] = useState('');
     const [selectedMonth, setSelectedMonth] = useState('');
+    const [selectedTag, setSelectedTag] = useState(''); // [NEW]
     const [sortOption, setSortOption] = useState('recent'); // recent, oldest, az, za
 
     // Derived Data
@@ -76,6 +78,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
             const matchesSearch = (book.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
                 (book.author?.toLowerCase() || '').includes(searchTerm.toLowerCase());
             const matchesAuthor = selectedAuthor ? book.author === selectedAuthor : true;
+            const matchesTag = selectedTag ? (book.tags && book.tags.includes(selectedTag)) : true; // [NEW]
 
             let matchesDate = true;
             if (book.createdAt) {
@@ -90,7 +93,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                 matchesDate = false; // Filter active but book has no date
             }
 
-            return matchesSearch && matchesAuthor && matchesDate;
+            return matchesSearch && matchesAuthor && matchesDate && matchesTag;
         });
 
         // Sorting
@@ -103,7 +106,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
         });
 
         return result;
-    }, [safeBooks, searchTerm, selectedAuthor, selectedYear, selectedMonth, sortOption]);
+    }, [safeBooks, searchTerm, selectedAuthor, selectedYear, selectedMonth, selectedTag, sortOption]);
 
     // Group filtered books into shelves of 15
     const shelves = [];
@@ -211,6 +214,29 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                     <option value="" style={{ background: '#222', color: '#fff' }}>Todos os Autores</option>
                                     {uniqueAuthors.map(author => (
                                         <option key={author} value={author} style={{ background: '#222', color: '#fff' }}>{author}</option>
+                                    ))}
+                                </select>
+
+                                {/* Tag Filter */}
+                                <select
+                                    value={selectedTag}
+                                    onChange={(e) => setSelectedTag(e.target.value)}
+                                    style={{
+                                        padding: '12px 16px',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        background: 'rgba(255,255,255,0.08)',
+                                        color: '#fff',
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                        fontSize: '0.9rem',
+                                        fontWeight: '500',
+                                        minWidth: '150px'
+                                    }}
+                                >
+                                    <option value="" style={{ background: '#222', color: '#fff' }}>Todas as Tags</option>
+                                    {BOOK_TAGS.map(tag => (
+                                        <option key={tag} value={tag} style={{ background: '#222', color: '#fff' }}>{tag}</option>
                                     ))}
                                 </select>
 
@@ -482,18 +508,27 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                             key={book.id}
                                             onClick={() => setSelectedBook(book)}
                                             style={{
-                                                background: '#fff',
+                                                background: 'var(--color-card-bg)',
                                                 borderRadius: '16px',
                                                 padding: '20px',
-                                                boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                                                boxShadow: 'var(--shadow-sm)',
                                                 cursor: 'pointer',
                                                 display: 'flex',
                                                 flexDirection: 'column',
                                                 transition: 'transform 0.2s',
-                                                color: '#333' // Force dark text on white card
+                                                color: 'var(--color-text-primary)',
+                                                border: '1px solid var(--color-border)'
                                             }}
-                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(-5px)';
+                                                e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                                                e.currentTarget.style.borderColor = 'var(--color-accent)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                                                e.currentTarget.style.borderColor = 'var(--color-border)';
+                                            }}
                                         >
                                             {/* Cover */}
                                             <div style={{
@@ -502,7 +537,8 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                                 marginBottom: '15px',
                                                 borderRadius: '8px',
                                                 overflow: 'hidden',
-                                                boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
+                                                boxShadow: '0 5px 15px rgba(0,0,0,0.2)',
+                                                background: 'var(--color-bg-secondary)'
                                             }}>
                                                 {book.coverUrl ? (
                                                     <img
@@ -514,11 +550,11 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                                     <div style={{
                                                         width: '100%',
                                                         height: '100%',
-                                                        background: '#eee',
+                                                        background: 'var(--color-bg-secondary)',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
-                                                        color: '#999',
+                                                        color: 'var(--color-text-secondary)',
                                                         fontSize: '0.8rem'
                                                     }}>
                                                         Sem Capa
@@ -532,32 +568,33 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                                 fontWeight: '700',
                                                 marginBottom: '5px',
                                                 lineHeight: '1.2',
-                                                color: '#000'
+                                                color: 'var(--color-text-primary)'
                                             }}>{book.title}</h3>
 
                                             <p style={{
                                                 fontSize: '0.9rem',
-                                                color: '#666',
+                                                color: 'var(--color-text-secondary)',
                                                 marginBottom: 'auto' // Push progress to bottom
                                             }}>{book.author}</p>
 
                                             {/* Progress */}
                                             <div style={{ marginTop: '15px' }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '5px', color: '#666' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '5px', color: 'var(--color-text-secondary)' }}>
                                                     <span>Progresso</span>
                                                     <span>{Math.round(progress)}%</span>
                                                 </div>
                                                 <div style={{
                                                     width: '100%',
                                                     height: '6px',
-                                                    background: '#eee',
+                                                    background: 'var(--color-bg-tertiary)',
                                                     borderRadius: '3px',
-                                                    overflow: 'hidden'
+                                                    overflow: 'hidden',
+                                                    border: '1px solid var(--color-border)'
                                                 }}>
                                                     <div style={{
                                                         width: `${progress}%`,
                                                         height: '100%',
-                                                        background: '#0070f3',
+                                                        background: 'var(--color-accent)',
                                                         borderRadius: '3px'
                                                     }}></div>
                                                 </div>

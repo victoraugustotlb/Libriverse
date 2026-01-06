@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNotification } from '../context/NotificationContext';
+import { BOOK_TAGS } from '../utils/bookTags';
 
 const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearch }) => {
     const { showNotification, showConfirm } = useNotification();
@@ -15,6 +16,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
     const [translator, setTranslator] = useState('');
     const [synopsis, setSynopsis] = useState(''); // [NEW]
     const [isRead, setIsRead] = useState(false);
+    const [selectedTags, setSelectedTags] = useState([]); // [NEW]
 
     // New Mode: Old Book (No ISBN)
     const [isOldBook, setIsOldBook] = useState(false);
@@ -92,6 +94,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             setTranslator(initialData.translator || '');
             setSynopsis(initialData.synopsis || ''); // [NEW]
             setCoverType(initialData.coverType || 'brochura');
+            setSelectedTags(initialData.tags || []); // [NEW]
         } else if (isOpen && !initialData) {
             // Reset form if opening fresh
             setTitle('');
@@ -114,6 +117,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             setTranslator('');
             setSynopsis(''); // [NEW]
             setCoverType('brochura');
+            setSelectedTags([]); // [NEW]
         }
     }, [isOpen, initialData]);
 
@@ -175,7 +179,8 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             translator,
             coverType,
             synopsis, // [NEW]
-            isOldBook
+            isOldBook,
+            tags: selectedTags // [NEW]
         });
 
         // Close is handled by parent usually, but we can reset here or just rely on unmount/re-render
@@ -216,6 +221,14 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             showNotification("Erro de conexão.", "error");
         } finally {
             setIsSubmittingReport(false);
+        }
+    };
+
+    const toggleTag = (tag) => {
+        if (selectedTags.includes(tag)) {
+            setSelectedTags(selectedTags.filter(t => t !== tag));
+        } else {
+            setSelectedTags([...selectedTags, tag]);
         }
     };
 
@@ -620,6 +633,45 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                                     <option value="dura" style={{ color: 'black' }}>Capa Dura</option>
                                     <option value="aveludada" style={{ color: 'black' }}>Aveludada/Soft Touch</option>
                                 </select>
+                            </div>
+
+                            {/* Tag Selection */}
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label>Tags</label>
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '8px',
+                                    padding: '10px',
+                                    border: '1px solid var(--color-border)',
+                                    borderRadius: 'var(--radius-md)',
+                                    background: 'var(--color-bg-primary)',
+                                    maxHeight: '150px',
+                                    overflowY: 'auto'
+                                }}>
+                                    {BOOK_TAGS.map(tag => (
+                                        <div
+                                            key={tag}
+                                            onClick={() => toggleTag(tag)}
+                                            style={{
+                                                padding: '5px 10px',
+                                                borderRadius: '20px',
+                                                fontSize: '0.8rem',
+                                                cursor: 'pointer',
+                                                background: selectedTags.includes(tag) ? 'var(--color-accent)' : 'var(--color-bg-tertiary)',
+                                                color: selectedTags.includes(tag) ? '#fff' : 'var(--color-text-primary)',
+                                                border: selectedTags.includes(tag) ? 'none' : '1px solid var(--color-border)',
+                                                transition: 'all 0.2s',
+                                                userSelect: 'none'
+                                            }}
+                                        >
+                                            {tag}
+                                        </div>
+                                    ))}
+                                </div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '5px' }}>
+                                    Selecione as categorias que melhor descrevem este livro.
+                                </p>
                             </div>
 
                             {/* Read Status Toggle */}
