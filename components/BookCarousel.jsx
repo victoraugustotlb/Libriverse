@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook, onOpenAddModal }) => {
-    // Merge books with a placeholder for "Add Book"
-    const items = [...books, { id: 'add-placeholder', type: 'placeholder' }];
+    // Merge books with a placeholder for "Add Book", ensuring no nulls
+    const items = [...(books || []).filter(Boolean), { id: 'add-placeholder', type: 'placeholder' }];
     const [activeIndex, setActiveIndex] = useState(0);
     const [pageInput, setPageInput] = useState('');
 

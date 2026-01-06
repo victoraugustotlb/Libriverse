@@ -499,7 +499,8 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                         className="bookshelf-grid"
                                         style={{ "--shelf-bg": `url("${bookshelfImg}")` }}
                                     >
-                                        {shelfBooks.map((book) => {
+                                        {shelfBooks.filter(Boolean).map((book) => {
+                                            if (!book) return null;
                                             const deterministicIndex = book.id % 20;
                                             const size = sizes[deterministicIndex % sizes.length];
 
@@ -532,7 +533,8 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 gap: '30px',
                                 paddingBottom: '60px'
                             }}>
-                                {filteredBooks.map(book => {
+                                {filteredBooks.filter(Boolean).map(book => {
+                                    if (!book) return null; // Extra safety
                                     const progress = book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0;
 
                                     return (

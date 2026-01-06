@@ -54,7 +54,8 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook, on
                         gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                         gap: '30px'
                     }}>
-                        {readingBooks.map((book) => {
+                        {readingBooks.filter(Boolean).map((book) => {
+                            if (!book) return null;
                             const progress = book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0;
 
                             return (

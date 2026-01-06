@@ -4,6 +4,8 @@ import RatingPopup from './RatingPopup'; // [NEW]
 import { useNotification } from '../context/NotificationContext';
 
 const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
+    if (!isOpen || !book) return null;
+
     const { showNotification, showConfirm } = useNotification();
     const [currentPage, setCurrentPage] = React.useState(0);
     const [isRead, setIsRead] = React.useState(false);
