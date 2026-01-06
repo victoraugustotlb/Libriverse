@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNotification } from '../context/NotificationContext';
 
 const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearch }) => {
+    const { showNotification, showConfirm } = useNotification();
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [publisher, setPublisher] = useState('');
@@ -122,7 +124,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
 
         // 1. Validate ISBN presence for modern books
         if (!isOldBook && !isbn.trim()) {
-            alert("Para livros modernos, o ISBN é obrigatório. Se for um livro antigo, ative o modo 'Livro Antigo'.");
+            showNotification("Para livros modernos, o ISBN é obrigatório. Se for um livro antigo, ative o modo 'Livro Antigo'.", "info");
             return;
         }
 
@@ -139,8 +141,9 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                     const duplicate = results.find(b => b.isbn === isbn);
 
                     if (duplicate) {
-                        const confirmSearch = window.confirm(
-                            `Encontramos um livro com o ISBN ${isbn} na base de dados: "${duplicate.title}".\n\nDeseja usar os dados existentes em vez de cadastrar manualmente?`
+                        const confirmSearch = await showConfirm(
+                            `Encontramos um livro com o ISBN ${isbn} na base de dados: "${duplicate.title}".\n\nDeseja usar os dados existentes em vez de cadastrar manualmente?`,
+                            "Livro Encontrado"
                         );
 
                         if (confirmSearch) {
@@ -202,15 +205,15 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
             });
 
             if (response.ok) {
-                alert("Erro reportado com sucesso! Obrigado por ajudar a melhorar a biblioteca.");
+                showNotification("Erro reportado com sucesso! Obrigado por ajudar a melhorar a biblioteca.", "success");
                 setIsReportModalOpen(false);
                 setReportDescription('');
             } else {
-                alert("Falha ao enviar reporte. Tente novamente.");
+                showNotification("Falha ao enviar reporte. Tente novamente.", "error");
             }
         } catch (error) {
             console.error("Error reporting book:", error);
-            alert("Erro de conexão.");
+            showNotification("Erro de conexão.", "error");
         } finally {
             setIsSubmittingReport(false);
         }

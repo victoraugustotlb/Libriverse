@@ -18,7 +18,10 @@ import Notes from './pages/Notes.jsx';
 import CreateNote from './pages/CreateNote.jsx';
 
 
-const App = () => {
+import { NotificationProvider, useNotification } from './context/NotificationContext';
+
+const AppContent = () => {
+    const { showNotification } = useNotification();
     const [view, setView] = useState(() => {
         const savedUser = localStorage.getItem('libriverse_user');
         return savedUser ? 'user-home' : 'home';
@@ -144,7 +147,7 @@ const App = () => {
                         localStorage.removeItem('libriverse_user');
                         setUser(null);
                         setView('login');
-                        alert("Sessão expirada ou inválida. Por favor, faça login novamente.");
+                        showNotification("Sessão expirada ou inválida. Por favor, faça login novamente.", "error");
                         return;
                     }
 
@@ -170,11 +173,11 @@ const App = () => {
                             }
                         }
                         console.error(`Fetch failed: ${response.status} ${errorMsg}`);
-                        alert(`Erro ao carregar livros: ${errorMsg}`);
+                        showNotification(`Erro ao carregar livros: ${errorMsg}`, "error");
                     }
                 } catch (error) {
                     console.error('Failed to fetch books:', error);
-                    alert(`Erro de conexão ao buscar livros: ${error.message}`);
+                    showNotification(`Erro de conexão ao buscar livros: ${error.message}`, "error");
                 } finally {
                     // Small artificial delay for a smoother feeling if it's too fast
                     setTimeout(() => setIsLoading(false), 800);
@@ -227,12 +230,13 @@ const App = () => {
             if (response.ok) {
                 const newBook = await response.json();
                 setUserBooks([newBook, ...userBooks]);
+                showNotification('Livro adicionado com sucesso!', 'success');
             } else {
-                alert('Erro ao adicionar livro.');
+                showNotification('Erro ao adicionar livro.', 'error');
             }
         } catch (error) {
             console.error('Error adding book:', error);
-            alert('Erro de conexão.');
+            showNotification('Erro de conexão.', 'error');
         }
     };
 
@@ -248,19 +252,20 @@ const App = () => {
 
             if (response.ok) {
                 setUserBooks(userBooks.filter(book => book.id !== bookId));
+                showNotification('Livro removido com sucesso!', 'success');
             } else {
-                alert('Erro ao excluir livro.');
+                showNotification('Erro ao excluir livro.', 'error');
             }
         } catch (error) {
             console.error('Error deleting book:', error);
-            alert('Erro de conexão.');
+            showNotification('Erro de conexão.', 'error');
         }
     };
 
     const handleUpdateBook = async (bookId, updates) => {
         if (!bookId) {
             console.error("handleUpdateBook called without bookId");
-            alert("Erro interno: ID do livro não encontrado.");
+            showNotification("Erro interno: ID do livro não encontrado.", "error");
             return;
         }
 
@@ -278,6 +283,7 @@ const App = () => {
             if (response.ok) {
                 const updatedBook = await response.json();
                 setUserBooks(userBooks.map(b => b.id === bookId ? { ...b, ...updatedBook } : b));
+                showNotification('Livro atualizado com sucesso!', 'success');
             } else {
                 const errorData = await response.json().catch(() => ({}));
                 const errorMessage = errorData.error || `Erro ${response.status}: ${response.statusText}`;
@@ -287,15 +293,17 @@ const App = () => {
                     debugInfo = `\nDebug: Method=${errorData.debug.method}, URL=${errorData.debug.url}`;
                 }
 
-                alert(`Erro ao atualizar livro: ${errorMessage}${debugInfo}`);
+                showNotification(`Erro ao atualizar livro: ${errorMessage}`, "error");
             }
         } catch (error) {
             console.error('Error updating book:', error);
+            showNotification('Erro de conexão ao atualizar.', 'error');
         }
     };
 
     const handleUpdateUser = (updatedUser) => {
         setUser(updatedUser);
+        showNotification('Perfil atualizado com sucesso!', 'success');
     };
 
     const handleSwitchToSearch = (query) => {
@@ -409,6 +417,14 @@ const App = () => {
                 }}
             />
         </div>
+    );
+};
+
+const App = () => {
+    return (
+        <NotificationProvider>
+            <AppContent />
+        </NotificationProvider>
     );
 };
 

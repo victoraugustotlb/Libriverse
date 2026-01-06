@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNotification } from '../context/NotificationContext';
 
 const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) => {
+    const { showNotification } = useNotification();
     const [selectedBookId, setSelectedBookId] = useState('');
     const [chapter, setChapter] = useState('');
     const [page, setPage] = useState('');
@@ -45,7 +47,7 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
         try {
             const token = localStorage.getItem('libriverse_token');
             if (!token) {
-                alert('Você precisa estar logado para salvar uma nota.');
+                showNotification('Você precisa estar logado para salvar uma nota.', 'error');
                 return;
             }
 
@@ -68,16 +70,16 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
             });
 
             if (response.ok) {
-                alert(noteToEdit ? 'Anotação atualizada!' : 'Anotação salva com sucesso!');
+                showNotification(noteToEdit ? 'Anotação atualizada!' : 'Anotação salva com sucesso!', 'success');
                 if (onClearEdit) onClearEdit();
                 onNavigate('notes');
             } else {
                 const data = await response.json();
-                alert(data.error || 'Erro ao salvar anotação');
+                showNotification(data.error || 'Erro ao salvar anotação', 'error');
             }
         } catch (error) {
             console.error('Error saving note:', error);
-            alert('Erro de conexão ao salvar nota');
+            showNotification('Erro de conexão ao salvar nota', 'error');
         }
     };
 

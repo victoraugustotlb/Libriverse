@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNotification } from '../context/NotificationContext';
 
 const Login = ({ onNavigate }) => {
+    const { showNotification } = useNotification();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -20,12 +22,13 @@ const Login = ({ onNavigate }) => {
                 localStorage.setItem('libriverse_token', data.token);
                 localStorage.setItem('libriverse_user', JSON.stringify(data.user));
                 onNavigate('user-home');
+                showNotification(`Bem-vindo, ${data.user.name}!`, 'success');
             } else {
-                alert(data.error || 'Credenciais inválidas');
+                showNotification(data.error || 'Credenciais inválidas', 'error');
             }
         } catch (error) {
             console.error('Login fetch error:', error);
-            alert('Erro de conexão com o servidor');
+            showNotification('Erro de conexão com o servidor', 'error');
         }
     };
 

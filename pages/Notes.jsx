@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import NoteViewModal from '../components/NoteViewModal';
+import { useNotification } from '../context/NotificationContext';
 
 const Notes = ({ onNavigate, onEditNote }) => {
+    const { showNotification, showConfirm } = useNotification();
     const [notes, setNotes] = useState([]);
     const [selectedNote, setSelectedNote] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const handleDelete = async (noteId, e) => {
         e.stopPropagation(); // Prevent card click
-        if (!confirm('Tem certeza que deseja excluir esta anotação?')) return;
+
+        const confirmed = await showConfirm(
+            'Tem certeza que deseja excluir esta anotação?',
+            'Excluir Anotação'
+        );
+
+        if (!confirmed) return;
 
         try {
             const token = localStorage.getItem('libriverse_token');
@@ -21,11 +29,13 @@ const Notes = ({ onNavigate, onEditNote }) => {
 
             if (response.ok) {
                 setNotes(notes.filter(n => n.id !== noteId));
+                showNotification('Anotação excluída com sucesso', 'success');
             } else {
-                alert('Erro ao excluir anotação');
+                showNotification('Erro ao excluir anotação', 'error');
             }
         } catch (error) {
             console.error('Error deleting note:', error);
+            showNotification('Erro de conexão', 'error');
         }
     };
 

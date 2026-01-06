@@ -389,7 +389,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                             letterSpacing: '0.5px',
                             fontWeight: '500'
                         }}>
-                            Exibindo <span style={{ color: '#000', fontWeight: 'bold' }}>{filteredBooks.length}</span> de <span style={{ color: '#000' }}>{safeBooks.length}</span> livros
+                            Exibindo <span style={{ color: '#fff', fontWeight: 'bold' }}>{filteredBooks.length}</span> de <span style={{ color: '#fff' }}>{safeBooks.length}</span> livros
                         </span>
                     </div>
 

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNotification } from '../context/NotificationContext';
 
 const Register = ({ onNavigate }) => {
+    const { showNotification } = useNotification();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -12,12 +14,12 @@ const Register = ({ onNavigate }) => {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-            alert('As senhas não coincidem!');
+            showNotification('As senhas não coincidem!', 'error');
             return;
         }
 
         if (!acceptTerms || !acceptPrivacy) {
-            alert('Você deve aceitar os Termos de Uso e a Política de Privacidade para criar uma conta.');
+            showNotification('Você deve aceitar os Termos de Uso e a Política de Privacidade para criar uma conta.', 'error');
             return;
         }
 
@@ -43,16 +45,17 @@ const Register = ({ onNavigate }) => {
                     localStorage.setItem('libriverse_token', loginData.token);
                     localStorage.setItem('libriverse_user', JSON.stringify(loginData.user));
                     onNavigate('user-home');
+                    showNotification('Conta criada com sucesso!', 'success');
                 } else {
-                    alert('Conta criada! Por favor, faça login.');
+                    showNotification('Conta criada! Por favor, faça login.', 'info');
                     onNavigate('login');
                 }
             } else {
-                alert(data.error || 'Erro ao criar conta');
+                showNotification(data.error || 'Erro ao criar conta', 'error');
             }
         } catch (error) {
             console.error('Registration fetch error:', error);
-            alert('Erro de conexão com o servidor');
+            showNotification('Erro de conexão com o servidor', 'error');
         }
     };
 

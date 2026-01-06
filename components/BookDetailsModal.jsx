@@ -1,7 +1,9 @@
 import React from 'react';
 import NoteViewModal from './NoteViewModal';
+import { useNotification } from '../context/NotificationContext';
 
 const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
+    const { showNotification, showConfirm } = useNotification();
     const [currentPage, setCurrentPage] = React.useState(0);
     const [isRead, setIsRead] = React.useState(false);
     const [startDate, setStartDate] = React.useState('');
@@ -61,7 +63,7 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
         const newPage = parseInt(currentPage, 10);
 
         if (isNaN(newPage)) {
-            alert("Por favor, digite um número de página válido.");
+            showNotification("Por favor, digite um número de página válido.", "error");
             return;
         }
 
@@ -84,8 +86,13 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
         }
     };
 
-    const handleDelete = () => {
-        if (window.confirm('Tem certeza que deseja excluir este livro da sua biblioteca?')) {
+    const handleDelete = async () => {
+        const confirmed = await showConfirm(
+            'Tem certeza que deseja excluir este livro da sua biblioteca? Esta ação não pode ser desfeita.',
+            'Excluir Livro'
+        );
+
+        if (confirmed) {
             onDelete(book.id);
             onClose();
         }
