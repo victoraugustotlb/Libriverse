@@ -97,7 +97,10 @@ export default async function handler(req, res) {
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS start_date DATE;`);
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS finish_date DATE;`);
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS old_book_id INTEGER REFERENCES old_books(id);`);
+            await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS old_book_id INTEGER REFERENCES old_books(id);`);
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS tags TEXT;`); // [NEW] overrides global tags if not null
+            await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS rating INTEGER;`); // [NEW] 1-5 stars
+            await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS review TEXT;`); // [NEW] User review
             // We don't strictly need to recreate the constraint here every time if it might fail, 
             // but for safety we can ignore if it fails or check existence. 
             // For now, let's leave the constraint definition in CREATE TABLE.
@@ -117,6 +120,7 @@ export default async function handler(req, res) {
                     ub.id, ub.user_id, ub.is_read, ub.current_page, 
                     ub.purchase_date, ub.purchase_price, ub.loaned_to, ub.loan_date,
                     ub.start_date, ub.finish_date,
+                    ub.rating, ub.review,
                     ub.created_at, ub.custom_cover_url, ub.global_book_id, ub.old_book_id, ub.cover_type,
                     COALESCE(gb.title, ob.title) as title,
                     COALESCE(gb.author, ob.author) as author,
@@ -155,6 +159,8 @@ export default async function handler(req, res) {
                 loanDate: book.loan_date,
                 startDate: book.start_date,
                 finishDate: book.finish_date,
+                rating: book.rating, // [NEW]
+                review: book.review, // [NEW]
                 currentPage: book.current_page,
                 isbn: book.isbn,
                 editionDate: book.edition_date,
@@ -183,6 +189,7 @@ export default async function handler(req, res) {
                 editionDate, translator, coverType,
                 startDate, finishDate, synopsis, // [NEW]
                 tags, // [NEW] array of strings
+                rating, review, // [NEW]
                 isOldBook // Boolean flag from frontend
             } = req.body;
 
@@ -321,14 +328,14 @@ export default async function handler(req, res) {
                     user_id, global_book_id, old_book_id, custom_cover_url,
                     is_read, current_page,
                     purchase_date, purchase_price, loaned_to, loan_date, cover_type,
-                    start_date, finish_date, tags
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`,
+                    start_date, finish_date, tags, rating, review
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *`,
                 [
                     user.userId, globalBookId, oldBookId, coverUrl || null,
                     isRead || false, currentPage || 0,
                     purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null,
                     coverType || null, startDate || new Date(), finishDate || null,
-                    userTags
+                    userTags, rating || null, review || null
                 ]
             );
 
@@ -349,8 +356,11 @@ export default async function handler(req, res) {
                 loanedTo: newBook.loaned_to,
                 loanDate: newBook.loan_date,
                 startDate: newBook.start_date,
+                startDate: newBook.start_date,
                 finishDate: newBook.finish_date,
-                tags: (newBook.tags || (tags && Array.isArray(tags) ? tags.join(',') : '')).split(',').filter(Boolean)
+                tags: (newBook.tags || (tags && Array.isArray(tags) ? tags.join(',') : '')).split(',').filter(Boolean),
+                rating: newBook.rating, // [NEW]
+                review: newBook.review // [NEW]
             });
 
         } catch (error) {

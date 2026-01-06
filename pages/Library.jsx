@@ -43,6 +43,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
     const [selectedYear, setSelectedYear] = useState('');
     const [selectedMonth, setSelectedMonth] = useState('');
     const [selectedTag, setSelectedTag] = useState(''); // [NEW]
+    const [selectedRating, setSelectedRating] = useState(''); // [NEW]
     const [sortOption, setSortOption] = useState('recent'); // recent, oldest, az, za
 
     // Derived Data
@@ -80,6 +81,14 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
             const matchesAuthor = selectedAuthor ? book.author === selectedAuthor : true;
             const matchesTag = selectedTag ? (book.tags && book.tags.includes(selectedTag)) : true; // [NEW]
 
+            let matchesRating = true;
+            if (selectedRating) {
+                const rating = book.rating || 0;
+                if (selectedRating === '5') matchesRating = rating === 5;
+                else if (selectedRating === '4+') matchesRating = rating >= 4;
+                else if (selectedRating === '3+') matchesRating = rating >= 3;
+            }
+
             let matchesDate = true;
             if (book.createdAt) {
                 const date = new Date(book.createdAt);
@@ -93,7 +102,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                 matchesDate = false; // Filter active but book has no date
             }
 
-            return matchesSearch && matchesAuthor && matchesDate && matchesTag;
+            return matchesSearch && matchesAuthor && matchesDate && matchesTag && matchesRating;
         });
 
         // Sorting
@@ -106,7 +115,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
         });
 
         return result;
-    }, [safeBooks, searchTerm, selectedAuthor, selectedYear, selectedMonth, selectedTag, sortOption]);
+    }, [safeBooks, searchTerm, selectedAuthor, selectedYear, selectedMonth, selectedTag, selectedRating, sortOption]);
 
     // Group filtered books into shelves of 15
     const shelves = [];
@@ -238,6 +247,29 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                     {BOOK_TAGS.map(tag => (
                                         <option key={tag} value={tag} style={{ background: '#222', color: '#fff' }}>{tag}</option>
                                     ))}
+                                </select>
+
+                                {/* Rating Filter */}
+                                <select
+                                    value={selectedRating}
+                                    onChange={(e) => setSelectedRating(e.target.value)}
+                                    style={{
+                                        padding: '12px 16px',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        background: 'rgba(255,255,255,0.08)',
+                                        color: '#fff',
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                        fontSize: '0.9rem',
+                                        fontWeight: '500',
+                                        minWidth: '150px'
+                                    }}
+                                >
+                                    <option value="" style={{ background: '#222', color: '#fff' }}>Todas as Avaliações</option>
+                                    <option value="5" style={{ background: '#222', color: '#fff' }}>★★★★★ (5 Estrelas)</option>
+                                    <option value="4+" style={{ background: '#222', color: '#fff' }}>★★★★☆ (4+ Estrelas)</option>
+                                    <option value="3+" style={{ background: '#222', color: '#fff' }}>★★★☆☆ (3+ Estrelas)</option>
                                 </select>
 
                                 {/* Year Filter */}

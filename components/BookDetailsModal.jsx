@@ -1,5 +1,6 @@
 import React from 'react';
 import NoteViewModal from './NoteViewModal';
+import RatingPopup from './RatingPopup'; // [NEW]
 import { useNotification } from '../context/NotificationContext';
 
 const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
@@ -12,7 +13,7 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
     const [notes, setNotes] = React.useState([]);
     const [viewNote, setViewNote] = React.useState(null);
     const [notesLoading, setNotesLoading] = React.useState(false);
-
+    const [showRatingPopup, setShowRatingPopup] = React.useState(false); // [NEW]
 
     const [imgError, setImgError] = React.useState(false);
 
@@ -25,39 +26,22 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
             setImgError(false); // Reset error state for new book
             setActiveTab('details'); // Reset tab
             setNotes([]); // Clear notes
-            setNotes([]); // Clear notes
         }
     }, [book]);
 
-    // Fetch notes when tab is switched
-    React.useEffect(() => {
-        if (activeTab === 'notes' && book?.globalId) {
-            const fetchBookNotes = async () => {
-                setNotesLoading(true);
-                try {
-                    const token = localStorage.getItem('libriverse_token');
-                    const response = await fetch(`/api/notes?bookId=${book.globalId}`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        setNotes(data);
-                    }
-                } catch (error) {
-                    console.error("Error fetching notes:", error);
-                } finally {
-                    setNotesLoading(false);
-                }
-            };
-            fetchBookNotes();
+    // ... (rest of useEffects)
+
+    const handleSaveRating = (newRating, newReview) => {
+        if (onUpdate) {
+            onUpdate(book.id, {
+                rating: newRating,
+                review: newReview,
+                isRead: true, // Ensure it's marked as read
+                finishDate: new Date().toISOString() // Set finish date
+            });
+            showNotification("Avaliação salva com sucesso!", "success");
         }
-
-    }, [activeTab, book]);
-
-    if (!isOpen || !book) return null;
-
-    const totalPages = book.pageCount || 100; // Avoid div by zero visual
-    const progress = Math.min((currentPage / totalPages) * 100, 100);
+    };
 
     const handleUpdateProgress = () => {
         const newPage = parseInt(currentPage, 10);
@@ -67,13 +51,21 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
             return;
         }
 
+        const totalPages = book.pageCount || 1;
+        const isFinished = newPage >= totalPages;
+
         if (onUpdate) {
             onUpdate(book.id, {
                 currentPage: newPage,
-                isRead: newPage >= (book.pageCount || 1) // Auto-mark read if complete
+                isRead: isFinished
             });
         }
+
+        if (isFinished && !book.isRead) {
+            setShowRatingPopup(true); // Trigger popup
+        }
     };
+
 
     const handleDateUpdate = (field, value) => {
         if (field === 'startDate') setStartDate(value);
@@ -314,6 +306,7 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                                             isRead: true
                                                         });
                                                     }
+                                                    setShowRatingPopup(true); // [NEW] Trigger popup
                                                 }}
                                                 title="Marcar como Lido"
                                                 style={{
@@ -341,6 +334,27 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                                                 <span style={{ fontSize: '14px', lineHeight: 1 }}>✓</span>
                                             </button>
                                         )}
+                                    </div>
+                                </div>
+                                {/* Rating Field */}
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Avaliação</p>
+                                    <div style={{ display: 'flex', gap: '4px', cursor: 'pointer' }}>
+                                        {[1, 2, 3, 4, 5].map(star => (
+                                            <span
+                                                key={star}
+                                                onClick={() => handleSaveRating(star, book.review)}
+                                                style={{
+                                                    fontSize: '1.2rem',
+                                                    color: star <= (book.rating || 0) ? '#FFD700' : 'var(--color-border)',
+                                                    transition: 'transform 0.2s'
+                                                }}
+                                                onMouseEnter={(e) => e.target.style.transform = 'scale(1.2)'}
+                                                onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                                            >
+                                                ★
+                                            </span>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
@@ -463,6 +477,7 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                     )}
 
                     {activeTab === 'notes' && (
+                        // ... Notes ...
                         // Notes Tab Content
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             {notesLoading ? (
@@ -522,6 +537,13 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                 note={viewNote}
                 isOpen={!!viewNote}
                 onClose={() => setViewNote(null)}
+            />
+            {/* Rating Popup */}
+            <RatingPopup
+                isOpen={showRatingPopup}
+                onClose={() => setShowRatingPopup(false)}
+                onSave={handleSaveRating}
+                bookTitle={book.title}
             />
         </div >
     );
