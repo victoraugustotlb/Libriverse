@@ -356,7 +356,6 @@ export default async function handler(req, res) {
                 loanedTo: newBook.loaned_to,
                 loanDate: newBook.loan_date,
                 startDate: newBook.start_date,
-                startDate: newBook.start_date,
                 finishDate: newBook.finish_date,
                 tags: (newBook.tags || (tags && Array.isArray(tags) ? tags.join(',') : '')).split(',').filter(Boolean),
                 rating: newBook.rating, // [NEW]
@@ -399,31 +398,44 @@ export default async function handler(req, res) {
 
     if (req.method === 'PUT') {
         const { id } = req.query;
-        const { currentPage, isRead, startDate, finishDate } = req.body;
-
-        if (!id) {
-            return res.status(400).json({ error: 'Book ID is required' });
-        }
-
         try {
+            const {
+                currentPage, isRead, purchaseDate, purchasePrice, loanedTo, loanDate,
+                coverType, startDate, finishDate, tags, rating, review
+            } = req.body;
 
-            // Perform Update
+            // Build dynamic update query
+            const fields = [];
+            const values = [];
+            let idx = 1;
+
+            if (currentPage !== undefined) { fields.push(`current_page = $${idx++}`); values.push(currentPage); }
+            if (isRead !== undefined) { fields.push(`is_read = $${idx++}`); values.push(isRead); }
+            if (purchaseDate !== undefined) { fields.push(`purchase_date = $${idx++}`); values.push(purchaseDate); }
+            if (purchasePrice !== undefined) { fields.push(`purchase_price = $${idx++}`); values.push(purchasePrice); }
+            if (loanedTo !== undefined) { fields.push(`loaned_to = $${idx++}`); values.push(loanedTo); }
+            if (loanDate !== undefined) { fields.push(`loan_date = $${idx++}`); values.push(loanDate); }
+            if (coverType !== undefined) { fields.push(`cover_type = $${idx++}`); values.push(coverType); }
+            if (startDate !== undefined) { fields.push(`start_date = $${idx++}`); values.push(startDate); }
+            if (finishDate !== undefined) { fields.push(`finish_date = $${idx++}`); values.push(finishDate); }
+            if (tags !== undefined) { fields.push(`tags = $${idx++}`); values.push(Array.isArray(tags) ? tags.join(',') : tags); }
+            if (rating !== undefined) { fields.push(`rating = $${idx++}`); values.push(rating); }
+            if (review !== undefined) { fields.push(`review = $${idx++}`); values.push(review); }
+
+            if (fields.length === 0) {
+                return res.status(400).json({ error: 'No fields to update' });
+            }
+
+            // Add ID and UserID to values
+            values.push(id);
+            values.push(user.userId);
+
             const result = await pool.query(
                 `UPDATE user_books 
-                 SET current_page = COALESCE($1, current_page),
-                     is_read = COALESCE($2, is_read),
-                     start_date = COALESCE($3, start_date),
-                     finish_date = COALESCE($4, finish_date)
-                 WHERE id = $5 AND user_id = $6
+                 SET ${fields.join(', ')}
+                 WHERE id = $${idx} AND user_id = $${idx + 1}
                  RETURNING *`,
-                [
-                    currentPage !== undefined ? currentPage : null,
-                    isRead !== undefined ? isRead : null,
-                    startDate !== undefined ? startDate : null,
-                    finishDate !== undefined ? finishDate : null,
-                    id,
-                    user.userId
-                ]
+                values
             );
 
             if (result.rowCount === 0) {
@@ -437,7 +449,10 @@ export default async function handler(req, res) {
                 currentPage: book.current_page,
                 isRead: book.is_read,
                 startDate: book.start_date,
-                finishDate: book.finish_date
+                finishDate: book.finish_date,
+                rating: book.rating,
+                review: book.review,
+                tags: book.tags ? book.tags.split(',') : []
             });
 
         } catch (error) {
