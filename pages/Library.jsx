@@ -3,12 +3,38 @@ import BookDetailsModal from '../components/BookDetailsModal';
 import lombadaImg from '../images/lombada-final.png';
 import bookshelfImg from '../images/estante.png';
 
-const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdateBook }) => {
+const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdateBook, user, onUpdatePreference }) => {
     const safeBooks = Array.isArray(books) ? books : [];
     const [selectedBook, setSelectedBook] = useState(null);
     const sizes = ["small", "medium", "large", "xlarge"];
 
-    const [viewMode, setViewMode] = useState('shelves'); // 'shelves' or 'grid'
+    const [viewMode, setViewMode] = useState(() => {
+        try {
+            if (user && user.view_mode) return user.view_mode;
+            return localStorage.getItem('libriverse_view_mode') || 'shelves';
+        } catch (e) {
+            return 'shelves';
+        }
+    });
+
+    // Sync from user prop if it changes (e.g. after login with different pref)
+    React.useEffect(() => {
+        if (user && user.view_mode && user.view_mode !== viewMode) {
+            setViewMode(user.view_mode);
+        }
+    }, [user?.view_mode]); // Only depend on the specific field
+
+    React.useEffect(() => {
+        try {
+            localStorage.setItem('libriverse_view_mode', viewMode);
+            // Sync with backend
+            if (onUpdatePreference && user && user.view_mode !== viewMode) {
+                onUpdatePreference({ view_mode: viewMode });
+            }
+        } catch (e) {
+            console.error('Failed to save view mode:', e);
+        }
+    }, [viewMode]); // User dependency not needed here as we check against it, but if user changes validly we want Effect 1 to handle it
 
     // Filter States
     const [searchTerm, setSearchTerm] = useState('');

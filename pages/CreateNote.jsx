@@ -108,7 +108,8 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
         <div className="create-note-page" style={{
             paddingTop: '40px',
             minHeight: '100vh',
-            background: '#fff'
+            background: 'var(--color-bg-primary)',
+            color: 'var(--color-text-primary)'
         }}>
             <div className="container">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '30px' }}>
@@ -117,7 +118,7 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
                         style={{
                             background: 'transparent',
                             border: 'none',
-                            color: '#666',
+                            color: 'var(--color-text-secondary)',
                             fontSize: '1rem',
                             cursor: 'pointer',
                             display: 'flex',
@@ -127,7 +128,7 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
                     >
                         ← Voltar
                     </button>
-                    <h1 className="hero-title" style={{ fontSize: '2rem', margin: 0, color: '#333' }}>
+                    <h1 className="hero-title" style={{ fontSize: '2rem', margin: 0, color: 'var(--color-text-primary)' }}>
                         {noteToEdit ? 'Editar Anotação' : 'Nova Anotação'}
                     </h1>
                     <button
@@ -248,9 +249,9 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
                 <div style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    background: '#f8f9fa',
+                    background: 'var(--color-bg-secondary)',
                     borderRadius: '12px',
-                    border: '1px solid #e1e4e8',
+                    border: '1px solid var(--color-border)',
                     minHeight: '60vh',
                     boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
                     overflow: 'hidden'
@@ -262,7 +263,7 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
                             textAlign: 'center',
                             fontFamily: 'serif',
                             fontSize: '2rem',
-                            color: '#1d1d1f',
+                            color: 'var(--color-text-primary)',
                             fontWeight: '700',
                             letterSpacing: '2px',
                             opacity: 0.9,
@@ -277,11 +278,11 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
                         {/* Line Numbers */}
                         <div style={{
                             width: '50px',
-                            background: '#f0f2f5',
-                            borderRight: '1px solid #e1e4e8',
+                            background: 'var(--color-bg-tertiary)',
+                            borderRight: '1px solid var(--color-border)',
                             padding: '24px 0',
                             textAlign: 'center',
-                            color: '#999',
+                            color: 'var(--color-text-secondary)',
                             fontFamily: 'monospace',
                             fontSize: '1rem',
                             lineHeight: '1.6',
@@ -304,7 +305,7 @@ const CreateNote = ({ onNavigate, books = [], noteToEdit = null, onClearEdit }) 
                                 padding: '24px',
                                 fontSize: '1rem',
                                 lineHeight: '1.6',
-                                color: '#333',
+                                color: 'var(--color-text-primary)',
                                 outline: 'none',
                                 resize: 'none',
                                 fontFamily: 'inherit'

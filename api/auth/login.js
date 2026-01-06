@@ -41,7 +41,13 @@ export default async function handler(req, res) {
         return res.status(200).json({
             message: 'Login successful',
             token,
-            user: { id: user.id, name: user.name, email: user.email }
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                theme: user.theme,
+                view_mode: user.view_mode
+            }
         });
     } catch (error) {
         console.error('Login error:', error);

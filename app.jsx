@@ -45,6 +45,13 @@ const App = () => {
     // Theme Management
     const [theme, setTheme] = useState(() => {
         try {
+            // Priority: User Preference (if logged in) -> LocalStorage -> System
+            // Note: User state might not be ready on initial render if just loaded from LS
+            const savedUser = localStorage.getItem('libriverse_user');
+            if (savedUser) {
+                const parsedUser = JSON.parse(savedUser);
+                if (parsedUser.theme) return parsedUser.theme;
+            }
             const savedTheme = localStorage.getItem('libriverse_theme');
             return savedTheme || 'system';
         } catch (error) {
@@ -52,6 +59,32 @@ const App = () => {
             return 'system';
         }
     });
+
+    const savePreferences = async (newPreferences) => {
+        if (!user) return;
+
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            const response = await fetch('/api/user/preferences', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(newPreferences)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Update user state with new preferences
+                const updatedUser = { ...user, ...data.preferences };
+                setUser(updatedUser);
+                localStorage.setItem('libriverse_user', JSON.stringify(updatedUser));
+            }
+        } catch (error) {
+            console.error('Error saving preferences:', error);
+        }
+    };
 
     useEffect(() => {
         const applyTheme = (targetTheme) => {
@@ -73,6 +106,10 @@ const App = () => {
             root.setAttribute('data-theme', effectiveTheme);
             try {
                 localStorage.setItem('libriverse_theme', targetTheme);
+                // Sync with backend if logged in and changed
+                if (user && user.theme !== targetTheme) {
+                    savePreferences({ theme: targetTheme });
+                }
             } catch (e) {
                 // ignore storage errors
             }
@@ -87,7 +124,7 @@ const App = () => {
             mediaQuery.addEventListener('change', handleChange);
             return () => mediaQuery.removeEventListener('change', handleChange);
         }
-    }, [theme]);
+    }, [theme, user]); // Add user to dependency
 
     // Fetch books when user is logged in
     React.useEffect(() => {
@@ -314,6 +351,8 @@ const App = () => {
                     books={userBooks}
                     onDeleteBook={handleDeleteBook}
                     onUpdateBook={handleUpdateBook}
+                    user={user}
+                    onUpdatePreference={savePreferences}
                 />
             )}
 
