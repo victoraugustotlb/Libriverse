@@ -70,6 +70,19 @@ export default async function handler(req, res) {
             );
         `);
 
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS book_reports (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id),
+                isbn VARCHAR(20),
+                book_title VARCHAR(255),
+                issue_type VARCHAR(50),
+                description TEXT,
+                status VARCHAR(20) DEFAULT 'open',
+                created_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
+
         // Migrations
         try {
             await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS edition_date TEXT;`);
@@ -157,6 +170,7 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
         try {
             const {
+                type, description, issueType, // For reports
                 title, author, publisher, coverUrl,
                 pageCount, language, isRead,
                 purchaseDate, purchasePrice,
@@ -165,6 +179,20 @@ export default async function handler(req, res) {
                 startDate, finishDate, synopsis, // [NEW]
                 isOldBook // Boolean flag from frontend
             } = req.body;
+
+            // --- REPORT HANDLING ---
+            if (type === 'report') {
+                if (!description) {
+                    return res.status(400).json({ error: 'Description is required for reports' });
+                }
+                const reportResult = await pool.query(
+                    `INSERT INTO book_reports (user_id, isbn, book_title, issue_type, description)
+                      VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+                    [user.userId, isbn || null, title || 'Unknown', issueType || 'other', description]
+                );
+                return res.status(201).json({ message: 'Report submitted successfully', reportId: reportResult.rows[0].id });
+            }
+            // -----------------------
 
             if (!title || !author) {
                 return res.status(400).json({ error: 'Title and Author are required' });

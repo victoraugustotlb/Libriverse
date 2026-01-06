@@ -27,6 +27,11 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
     const [finishDate, setFinishDate] = useState('');
     const [coverType, setCoverType] = useState('brochura');
 
+    // Reporting
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [reportDescription, setReportDescription] = useState('');
+    const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+
     const [isDragging, setIsDragging] = useState(false);
 
     const handleDragOver = (e) => {
@@ -174,6 +179,43 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
         onClose();
     };
 
+    const handleReportSubmit = async (e) => {
+        e.preventDefault();
+        if (!reportDescription.trim()) return;
+
+        setIsSubmittingReport(true);
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            const response = await fetch('/api/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    type: 'report',
+                    isbn,
+                    title,
+                    description: reportDescription,
+                    issueType: 'user_report'
+                })
+            });
+
+            if (response.ok) {
+                alert("Erro reportado com sucesso! Obrigado por ajudar a melhorar a biblioteca.");
+                setIsReportModalOpen(false);
+                setReportDescription('');
+            } else {
+                alert("Falha ao enviar reporte. Tente novamente.");
+            }
+        } catch (error) {
+            console.error("Error reporting book:", error);
+            alert("Erro de conexão.");
+        } finally {
+            setIsSubmittingReport(false);
+        }
+    };
+
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="login-card" onClick={(e) => e.stopPropagation()} style={{
@@ -195,7 +237,85 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                     <p className="auth-subtitle" style={{ fontSize: '1.1rem' }}>
                         {initialData ? 'Verifique as informações antes de salvar' : 'Preencha os detalhes do novo livro'}
                     </p>
+
+                    {/* Report Button (Only if ISBN exists or it is potentially a global book) */}
+                    {isbn && !isOldBook && (
+                        <button
+                            type="button"
+                            onClick={() => setIsReportModalOpen(true)}
+                            style={{
+                                marginTop: '10px',
+                                background: 'transparent',
+                                border: '1px solid #ff5252',
+                                color: '#ff5252',
+                                padding: '5px 10px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '0.8rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                            }}
+                        >
+                            ⚠️ Reportar Erro neste Livro
+                        </button>
+                    )}
                 </div>
+
+                {isReportModalOpen && (
+                    <div style={{
+                        marginBottom: '30px',
+                        padding: '20px',
+                        background: 'rgba(255, 82, 82, 0.1)',
+                        border: '1px solid #ff5252',
+                        borderRadius: '8px'
+                    }}>
+                        <h4 style={{ color: '#ff5252', marginTop: 0 }}>Reportar Erro no Cadastro Global</h4>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '10px' }}>
+                            Encontrou algo errado (capa, título, autor)? Descreva abaixo para que possamos corrigir.
+                        </p>
+                        <textarea
+                            className="auth-input"
+                            value={reportDescription}
+                            onChange={(e) => setReportDescription(e.target.value)}
+                            placeholder="Ex: A capa está incorreta; O autor é tal..."
+                            rows={3}
+                            style={{ marginBottom: '10px' }}
+                        />
+                        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                            <button
+                                type="button"
+                                onClick={() => setIsReportModalOpen(false)}
+                                style={{
+                                    background: 'transparent',
+                                    border: '1px solid var(--color-border)',
+                                    color: 'var(--color-text-primary)',
+                                    padding: '5px 15px',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleReportSubmit}
+                                disabled={isSubmittingReport}
+                                style={{
+                                    background: '#ff5252',
+                                    border: 'none',
+                                    color: 'white',
+                                    padding: '5px 15px',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    opacity: isSubmittingReport ? 0.7 : 1
+                                }}
+                            >
+                                {isSubmittingReport ? 'Enviando...' : 'Enviar Reporte'}
+                            </button>
+                        </div>
+                    </div>
+                )}
 
 
 
@@ -269,6 +389,39 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                                 position: 'relative',
                                 overflow: 'hidden'
                             }} onClick={() => document.getElementById('coverInput').click()}>
+
+                                {coverUrl && (
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setCoverUrl('');
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '10px',
+                                            right: '10px',
+                                            background: 'rgba(0, 0, 0, 0.6)',
+                                            color: '#fff',
+                                            border: 'none',
+                                            borderRadius: '50%',
+                                            width: '32px',
+                                            height: '32px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer',
+                                            zIndex: 10,
+                                            fontSize: '1.2rem',
+                                            transition: 'background 0.2s'
+                                        }}
+                                        title="Remover imagem"
+                                        onMouseEnter={(e) => e.target.style.background = 'rgba(255, 0, 0, 0.8)'}
+                                        onMouseLeave={(e) => e.target.style.background = 'rgba(0, 0, 0, 0.6)'}
+                                    >
+                                        &times;
+                                    </button>
+                                )}
 
                                 {!coverUrl && (
                                     <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)' }}>
