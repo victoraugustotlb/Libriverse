@@ -65,7 +65,7 @@ const App = () => {
 
         try {
             const token = localStorage.getItem('libriverse_token');
-            const response = await fetch('/api/user/preferences', {
+            const response = await fetch('/api/auth/update-profile', { // Changed endpoint
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,7 +77,8 @@ const App = () => {
             if (response.ok) {
                 const data = await response.json();
                 // Update user state with new preferences
-                const updatedUser = { ...user, ...data.preferences };
+                // The endpoint now returns { user: ... }
+                const updatedUser = { ...user, ...data.user };
                 setUser(updatedUser);
                 localStorage.setItem('libriverse_user', JSON.stringify(updatedUser));
             }

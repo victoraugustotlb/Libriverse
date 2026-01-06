@@ -23,15 +23,27 @@ export default async function handler(req, res) {
         const decoded = jwt.verify(token, JWT_SECRET);
         const userId = decoded.userId;
 
-        const { name, newPassword, confirmPassword } = req.body;
+        const { name, newPassword, confirmPassword, theme, view_mode } = req.body;
 
-        if (!name) {
-            return res.status(400).json({ error: 'Name is required' });
+        // Dynamic query builder
+        let updates = [];
+        let values = [];
+        let paramCount = 1;
+
+        if (name) {
+            updates.push(`name = $${paramCount++}`);
+            values.push(name);
         }
 
-        let query = 'UPDATE users SET name = $1';
-        let values = [name];
-        let paramCount = 1;
+        if (theme) {
+            updates.push(`theme = $${paramCount++}`);
+            values.push(theme);
+        }
+
+        if (view_mode) {
+            updates.push(`view_mode = $${paramCount++}`);
+            values.push(view_mode);
+        }
 
         if (newPassword) {
             if (newPassword !== confirmPassword) {
@@ -40,14 +52,22 @@ export default async function handler(req, res) {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-            paramCount++;
-            query += `, password = $${paramCount}`;
+            updates.push(`password = $${paramCount++}`);
             values.push(hashedPassword);
         }
 
-        paramCount++;
-        query += ` WHERE id = $${paramCount} RETURNING id, name, email`;
+        if (updates.length === 0) {
+            return res.status(400).json({ error: 'No fields to update' });
+        }
+
+        // Add userId as the last parameter
         values.push(userId);
+        const query = `
+            UPDATE users 
+            SET ${updates.join(', ')} 
+            WHERE id = $${paramCount} 
+            RETURNING id, name, email, theme, view_mode
+        `;
 
         const result = await pool.query(query, values);
 
@@ -56,9 +76,6 @@ export default async function handler(req, res) {
         }
 
         const updatedUser = result.rows[0];
-
-        // Ensure we don't return password
-        delete updatedUser.password;
 
         return res.status(200).json({
             message: 'Profile updated successfully',
