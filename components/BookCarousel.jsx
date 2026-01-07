@@ -201,18 +201,28 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook, onOpenAdd
                                         background: 'var(--color-bg-secondary)'
                                     }}>
                                         <h2 style={{
-                                            fontSize: '2rem',
+                                            fontSize: '1.5rem', // Reduced from 2rem
                                             fontWeight: '700',
-                                            margin: '0 0 10px 0',
+                                            margin: '0 0 5px 0',
                                             color: 'var(--color-text-primary)',
-                                            lineHeight: '1.2'
-                                        }}>{item.title}</h2>
+                                            lineHeight: '1.2',
+                                            // Handle long text with clamp
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: '2',
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            height: '3.6rem' // Fixed height for 2 lines
+                                        }} title={item.title}>{item.title}</h2>
 
                                         <p style={{
-                                            fontSize: '1.1rem',
+                                            fontSize: '1rem',
                                             color: 'var(--color-accent)',
-                                            marginBottom: '30px',
-                                            fontWeight: '500'
+                                            marginBottom: '20px',
+                                            fontWeight: '500',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
                                         }}>por {item.author}</p>
 
                                         {/* Stats */}

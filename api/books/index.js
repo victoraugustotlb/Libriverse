@@ -456,7 +456,7 @@ export default async function handler(req, res) {
                     COALESCE(gb.cover_url, ob.cover_url) as global_cover_url,
                     COALESCE(gb.page_count, ob.page_count) as page_count,
                     COALESCE(gb.language, ob.language) as language,
-                    COALESCE(gb.isbn, ob.isbn) as isbn,
+                    gb.isbn as isbn, -- Old books don't have ISBN
                     COALESCE(gb.edition_date, ob.edition_date) as edition_date,
                     COALESCE(gb.translator, ob.translator) as translator,
                     COALESCE(gb.synopsis, ob.synopsis) as synopsis,
