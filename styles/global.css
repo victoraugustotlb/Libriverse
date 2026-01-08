@@ -669,15 +669,24 @@ body {
     padding: 75px 45px 45px 45px;
 }
 
+@media (max-width: 1024px) {
+    .bookshelf-grid {
+        width: 100%;
+        padding: 40px 25px 30px 25px;
+        background-size: 100% 100%;
+        /* Ensure it stretches but keeps aspect ratio reasonably or covers */
+    }
+
+    .bookshelf-container {
+        padding: 0 var(--spacing-sm);
+    }
+}
+
 @media (max-width: 768px) {
     .bookshelf-grid {
         width: 100%;
         padding: 40px 15px 30px 15px;
         background-size: cover;
-    }
-
-    .bookshelf-container {
-        padding: 0 var(--spacing-sm);
     }
 }
 
@@ -1023,6 +1032,14 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 30px;
+}
+
+@media (max-width: 1024px) {
+    .books-grid-layout {
+        gap: 20px;
+        padding: 0 10px;
+        /* Prevent edge touching */
+    }
 }
 
 @media (max-width: 768px) {
