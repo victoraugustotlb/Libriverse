@@ -5,6 +5,16 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook, onOpenAdd
     const items = [...(books || []).filter(Boolean), { id: 'add-placeholder', type: 'placeholder' }];
     const [activeIndex, setActiveIndex] = useState(0);
     const [pageInput, setPageInput] = useState('');
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    // Track screen size for responsive layout
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Update local input when active book changes
     useEffect(() => {
@@ -102,9 +112,10 @@ const BookCarousel = ({ books, onSelectBook, onNavigate, onUpdateBook, onOpenAdd
                     // We allow more items to be visible to prevent "abrupt ending"
                     if (Math.abs(offset) > 5) return null;
 
-                    const CARD_WIDTH = 600; // Reduced from 700 to fit better
-                    const GAP = 30; // Reduced gap
-                    const NEIGHBOR_OFFSET = 120; // Reduced offset for tighter stacking
+                    // Responsive Dynamic Widths
+                    const CARD_WIDTH = isMobile ? window.innerWidth * 0.85 : 600;
+                    const GAP = isMobile ? 10 : 30;
+                    const NEIGHBOR_OFFSET = isMobile ? 40 : 120; // Tighter overlapping on mobile
 
                     let translateX = 0;
 

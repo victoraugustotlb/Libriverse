@@ -130,48 +130,21 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                     <h1 className="hero-title" style={{ marginBottom: '40px' }}>Sua Biblioteca</h1>
 
                     {/* Unified Control Bar */}
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column', // Stack vertically
-                        gap: '20px', // Space between Search and Controls
-                        background: 'rgba(20, 20, 20, 0.8)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        padding: '24px', // Increased padding
-                        borderRadius: '24px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
-                    }}>
+                    <div className="library-control-bar">
 
                         {/* Top Row: Search (Full Width) */}
-                        <div style={{ position: 'relative', width: '100%' }}>
+                        <div className="library-search-container">
                             <input
                                 type="text"
                                 placeholder="Buscar por título ou autor..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '16px 20px', // Larger touch target
-                                    paddingLeft: '48px',
-                                    borderRadius: '16px',
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    background: 'rgba(255,255,255,0.08)',
-                                    color: '#fff',
-                                    outline: 'none',
-                                    fontSize: '1rem', // Larger font
-                                    fontWeight: '500',
-                                    transition: 'all 0.2s'
-                                }}
+                                className="library-search-input"
                                 onFocus={(e) => {
-                                    e.target.style.background = 'rgba(255,255,255,0.15)';
-                                    e.target.style.borderColor = 'rgba(255,255,255,0.5)';
-                                    e.target.style.boxShadow = '0 0 15px rgba(255,255,255,0.1)';
+                                    // kept minimal inline overrides if needed or move to CSS
                                 }}
                                 onBlur={(e) => {
-                                    e.target.style.background = 'rgba(255,255,255,0.08)';
-                                    e.target.style.borderColor = 'rgba(255,255,255,0.2)';
-                                    e.target.style.boxShadow = 'none';
+                                    // kept minimal inline overrides
                                 }}
                             />
                             <svg
@@ -193,36 +166,20 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                         </div>
 
                         {/* Bottom Row: Controls */}
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            flexWrap: 'wrap',
-                            gap: '16px'
-                        }}>
+                        <div className="library-controls-row">
 
                             {/* Filters (Left) */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                            <div className="library-filters-group">
                                 {/* Author Filter */}
                                 <select
                                     value={selectedAuthor}
                                     onChange={(e) => setSelectedAuthor(e.target.value)}
-                                    style={{
-                                        padding: '12px 16px',
-                                        borderRadius: '12px',
-                                        border: '1px solid rgba(255,255,255,0.2)',
-                                        background: 'rgba(255,255,255,0.08)',
-                                        color: '#fff',
-                                        cursor: 'pointer',
-                                        outline: 'none',
-                                        fontSize: '0.9rem',
-                                        fontWeight: '500',
-                                        minWidth: '150px'
-                                    }}
+                                    className="library-select"
+                                    style={{ minWidth: '150px' }}
                                 >
-                                    <option value="" style={{ background: '#222', color: '#fff' }}>Todos os Autores</option>
+                                    <option value="">Todos os Autores</option>
                                     {uniqueAuthors.map(author => (
-                                        <option key={author} value={author} style={{ background: '#222', color: '#fff' }}>{author}</option>
+                                        <option key={author} value={author}>{author}</option>
                                     ))}
                                 </select>
 
@@ -230,22 +187,12 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 <select
                                     value={selectedTag}
                                     onChange={(e) => setSelectedTag(e.target.value)}
-                                    style={{
-                                        padding: '12px 16px',
-                                        borderRadius: '12px',
-                                        border: '1px solid rgba(255,255,255,0.2)',
-                                        background: 'rgba(255,255,255,0.08)',
-                                        color: '#fff',
-                                        cursor: 'pointer',
-                                        outline: 'none',
-                                        fontSize: '0.9rem',
-                                        fontWeight: '500',
-                                        minWidth: '150px'
-                                    }}
+                                    className="library-select"
+                                    style={{ minWidth: '150px' }}
                                 >
-                                    <option value="" style={{ background: '#222', color: '#fff' }}>Todas as Tags</option>
+                                    <option value="">Todas as Tags</option>
                                     {BOOK_TAGS.map(tag => (
-                                        <option key={tag} value={tag} style={{ background: '#222', color: '#fff' }}>{tag}</option>
+                                        <option key={tag} value={tag}>{tag}</option>
                                     ))}
                                 </select>
 
@@ -253,45 +200,25 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 <select
                                     value={selectedRating}
                                     onChange={(e) => setSelectedRating(e.target.value)}
-                                    style={{
-                                        padding: '12px 16px',
-                                        borderRadius: '12px',
-                                        border: '1px solid rgba(255,255,255,0.2)',
-                                        background: 'rgba(255,255,255,0.08)',
-                                        color: '#fff',
-                                        cursor: 'pointer',
-                                        outline: 'none',
-                                        fontSize: '0.9rem',
-                                        fontWeight: '500',
-                                        minWidth: '150px'
-                                    }}
+                                    className="library-select"
+                                    style={{ minWidth: '150px' }}
                                 >
-                                    <option value="" style={{ background: '#222', color: '#fff' }}>Todas as Avaliações</option>
-                                    <option value="5" style={{ background: '#222', color: '#fff' }}>★★★★★ (5 Estrelas)</option>
-                                    <option value="4+" style={{ background: '#222', color: '#fff' }}>★★★★☆ (4+ Estrelas)</option>
-                                    <option value="3+" style={{ background: '#222', color: '#fff' }}>★★★☆☆ (3+ Estrelas)</option>
+                                    <option value="">Todas as Avaliações</option>
+                                    <option value="5">★★★★★ (5 Estrelas)</option>
+                                    <option value="4+">★★★★☆ (4+ Estrelas)</option>
+                                    <option value="3+">★★★☆☆ (3+ Estrelas)</option>
                                 </select>
 
                                 {/* Year Filter */}
                                 <select
                                     value={selectedYear}
                                     onChange={(e) => setSelectedYear(e.target.value)}
-                                    style={{
-                                        padding: '12px 16px',
-                                        borderRadius: '12px',
-                                        border: '1px solid rgba(255,255,255,0.2)',
-                                        background: 'rgba(255,255,255,0.08)',
-                                        color: '#fff',
-                                        cursor: 'pointer',
-                                        outline: 'none',
-                                        fontSize: '0.9rem',
-                                        fontWeight: '500',
-                                        minWidth: '100px'
-                                    }}
+                                    className="library-select"
+                                    style={{ minWidth: '100px' }}
                                 >
-                                    <option value="" style={{ background: '#222', color: '#fff' }}>Ano</option>
+                                    <option value="">Ano</option>
                                     {uniqueYears.map(year => (
-                                        <option key={year} value={year} style={{ background: '#222', color: '#fff' }}>{year}</option>
+                                        <option key={year} value={year}>{year}</option>
                                     ))}
                                 </select>
 
@@ -299,66 +226,28 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                 <select
                                     value={selectedMonth}
                                     onChange={(e) => setSelectedMonth(e.target.value)}
-                                    style={{
-                                        padding: '12px 16px',
-                                        borderRadius: '12px',
-                                        border: '1px solid rgba(255,255,255,0.2)',
-                                        background: 'rgba(255,255,255,0.08)',
-                                        color: '#fff',
-                                        cursor: 'pointer',
-                                        outline: 'none',
-                                        fontSize: '0.9rem',
-                                        fontWeight: '500',
-                                        minWidth: '120px'
-                                    }}
+                                    className="library-select"
+                                    style={{ minWidth: '120px' }}
                                 >
-                                    <option value="" style={{ background: '#222', color: '#fff' }}>Mês</option>
+                                    <option value="">Mês</option>
                                     {months.map(m => (
-                                        <option key={m.value} value={m.value} style={{ background: '#222', color: '#fff' }}>{m.label}</option>
+                                        <option key={m.value} value={m.value}>{m.label}</option>
                                     ))}
-                                </select>
-
-                                {/* Tags Filter (Placeholder) */}
-                                <select
-                                    style={{
-                                        padding: '12px 16px',
-                                        borderRadius: '12px',
-                                        border: '1px solid rgba(255,255,255,0.1)',
-                                        background: 'rgba(255,255,255,0.05)',
-                                        color: 'rgba(255,255,255,0.5)',
-                                        cursor: 'not-allowed',
-                                        outline: 'none',
-                                        fontSize: '0.9rem',
-                                        fontWeight: '500'
-                                    }}
-                                    disabled
-                                >
-                                    <option value="" style={{ background: '#222' }}>Tags</option>
                                 </select>
                             </div>
 
                             {/* Actions (Right) */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div className="library-actions-group">
                                 {/* Sort */}
                                 <select
                                     value={sortOption}
                                     onChange={(e) => setSortOption(e.target.value)}
-                                    style={{
-                                        padding: '12px 16px',
-                                        borderRadius: '12px',
-                                        border: '1px solid rgba(255,255,255,0.2)',
-                                        background: 'rgba(255,255,255,0.08)',
-                                        color: '#fff',
-                                        cursor: 'pointer',
-                                        outline: 'none',
-                                        fontSize: '0.9rem',
-                                        fontWeight: '500'
-                                    }}
+                                    className="library-select"
                                 >
-                                    <option value="recent" style={{ background: '#222', color: '#fff' }}>Mais Recentes</option>
-                                    <option value="oldest" style={{ background: '#222', color: '#fff' }}>Mais Antigos</option>
-                                    <option value="az" style={{ background: '#222', color: '#fff' }}>A-Z</option>
-                                    <option value="za" style={{ background: '#222', color: '#fff' }}>Z-A</option>
+                                    <option value="recent">Mais Recentes</option>
+                                    <option value="oldest">Mais Antigos</option>
+                                    <option value="az">A-Z</option>
+                                    <option value="za">Z-A</option>
                                 </select>
 
                                 {/* View Toggle */}
@@ -527,10 +416,7 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                             </div>
                         ) : (
                             // SIMPLIFIED GRID VIEW
-                            <div className="container" style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                                gap: '30px',
+                            <div className="container books-grid-layout" style={{
                                 paddingBottom: '60px'
                             }}>
                                 {filteredBooks.filter(Boolean).map(book => {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const dropdownRef = useRef(null);
 
     // Close dropdown when clicking outside
@@ -17,6 +18,12 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
         };
     }, [dropdownRef]);
 
+    // Close mobile menu when navigating
+    const handleNavigate = (page) => {
+        onNavigate(page);
+        setIsMobileMenuOpen(false);
+    };
+
     // Helper to get initials
     const getInitials = (name) => {
         if (!name) return 'U';
@@ -29,17 +36,27 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                 <a
                     href="#"
                     className="navbar-logo"
-                    onClick={(e) => { e.preventDefault(); onNavigate(user ? 'user-home' : 'home'); }}
+                    onClick={(e) => { e.preventDefault(); handleNavigate(user ? 'user-home' : 'home'); }}
                 >
                     Libriverse
                 </a>
 
-                <ul className="navbar-links">
+                <button
+                    className="navbar-toggle"
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    aria-label="Toggle navigation"
+                >
+                    <span className="bar"></span>
+                    <span className="bar"></span>
+                    <span className="bar"></span>
+                </button>
+
+                <ul className={`navbar-links ${isMobileMenuOpen ? 'active' : ''}`}>
                     <li>
                         <a
                             href="#"
                             className="navbar-link"
-                            onClick={(e) => { e.preventDefault(); onNavigate(user ? 'user-home' : 'home'); }}
+                            onClick={(e) => { e.preventDefault(); handleNavigate(user ? 'user-home' : 'home'); }}
                         >
                             Início
                         </a>
@@ -49,7 +66,7 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                             <a
                                 href="#"
                                 className="navbar-link"
-                                onClick={(e) => { e.preventDefault(); onNavigate('notes'); }}
+                                onClick={(e) => { e.preventDefault(); handleNavigate('notes'); }}
                             >
                                 Anotações
                             </a>
@@ -83,11 +100,11 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                                     <div className="user-email-display">{user.email || 'user@libriverse.com'}</div>
                                 </div>
 
-                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); onNavigate('user-home'); setIsDropdownOpen(false); }}>
+                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); handleNavigate('user-home'); setIsDropdownOpen(false); }}>
                                     <div className="dropdown-item-content">Dashboard</div>
                                 </a>
 
-                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); onNavigate('account-settings'); setIsDropdownOpen(false); }}>
+                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); handleNavigate('account-settings'); setIsDropdownOpen(false); }}>
                                     <div className="dropdown-item-content">Account Settings</div>
                                 </a>
 
@@ -120,12 +137,12 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
 
                                 <div className="dropdown-divider"></div>
 
-                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); onNavigate('home'); setIsDropdownOpen(false); }}>
+                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); handleNavigate('home'); setIsDropdownOpen(false); }}>
                                     <div className="dropdown-item-content">Home Page</div>
                                     <span className="kbd-shortcut">⌂</span>
                                 </a>
 
-                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); onNavigate('logout'); }}>
+                                <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); handleNavigate('logout'); }}>
                                     <div className="dropdown-item-content">Log Out</div>
                                     <span className="kbd-shortcut">→</span>
                                 </a>
@@ -141,7 +158,7 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                                 <a
                                     href="#"
                                     className="navbar-link"
-                                    onClick={(e) => { e.preventDefault(); onNavigate('login'); }}
+                                    onClick={(e) => { e.preventDefault(); handleNavigate('login'); }}
                                 >
                                     Login
                                 </a>
@@ -150,7 +167,7 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                                 <a
                                     href="#"
                                     className="navbar-link"
-                                    onClick={(e) => { e.preventDefault(); onNavigate('register'); }}
+                                    onClick={(e) => { e.preventDefault(); handleNavigate('register'); }}
                                 >
                                     Sign Up
                                 </a>

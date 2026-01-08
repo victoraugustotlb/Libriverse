@@ -49,11 +49,9 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook, on
                         color: 'var(--color-text-primary)'
                     }}>Todos os Livros ({readingBooks.length})</h2>
 
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                        gap: '30px'
-                    }}>
+
+
+                    <div className="books-grid-layout">
                         {readingBooks.filter(Boolean).map((book) => {
                             if (!book) return null;
                             const progress = book.pageCount ? Math.min(((book.currentPage || 0) / book.pageCount) * 100, 100) : 0;
@@ -159,7 +157,8 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook, on
                         })}
                     </div>
                 </section>
-            )}
+            )
+            }
 
             <BookDetailsModal
                 book={selectedBook}
@@ -168,7 +167,7 @@ const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook, on
                 onDelete={onDeleteBook}
                 onUpdate={onUpdateBook}
             />
-        </div>
+        </div >
     );
 };
 
