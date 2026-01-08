@@ -650,14 +650,16 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    justify-content: flex-start;
+    justify-content: center;
+    /* Center books on shelf */
     align-items: flex-end;
     padding: var(--spacing-xl) 0;
     position: relative;
     margin-bottom: 80px;
 
     width: 100%;
-    max-width: 1125px;
+    max-width: 1400px;
+    /* Increased from 1125px for better landscape view */
     margin-left: auto;
     margin-right: auto;
 
@@ -1047,10 +1049,9 @@ body {
 @media (max-width: 1024px) {
     .books-grid-layout {
         gap: 15px;
-        /* Smaller gap */
         padding: 0 10px;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        /* Smaller min card size */
+        grid-template-columns: repeat(4, 1fr);
+        /* Fixed 4 columns as requested */
     }
 }
 
