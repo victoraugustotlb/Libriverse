@@ -671,14 +671,24 @@ body {
 
 @media (max-width: 1024px) {
     .bookshelf-grid {
-        width: 100%;
-        padding: 40px 25px 30px 25px;
+        width: 100vw !important;
+        /* Force viewport width */
+        max-width: none !important;
+        margin-left: calc(-1 * var(--spacing-sm));
+        /* Pull back to edge if container has padding */
+        width: calc(100% + 2 * var(--spacing-sm));
+        /* account for container padding pull-back */
+        padding: 40px 10px 30px 10px;
+        /* Minimal padding */
         background-size: 100% 100%;
-        /* Ensure it stretches but keeps aspect ratio reasonably or covers */
+        box-sizing: border-box;
     }
 
     .bookshelf-container {
-        padding: 0 var(--spacing-sm);
+        padding: 0 !important;
+        /* Remove container padding */
+        width: 100% !important;
+        max-width: 100% !important;
     }
 }
 
@@ -1036,9 +1046,11 @@ body {
 
 @media (max-width: 1024px) {
     .books-grid-layout {
-        gap: 20px;
+        gap: 15px;
+        /* Smaller gap */
         padding: 0 10px;
-        /* Prevent edge touching */
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        /* Smaller min card size */
     }
 }
 
