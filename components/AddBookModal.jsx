@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNotification } from '../context/NotificationContext';
 import { BOOK_TAGS } from '../utils/bookTags';
 
-const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearch }) => {
+const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearch, isWishlistMode }) => {
     const { showNotification, showConfirm } = useNotification();
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
@@ -674,86 +674,90 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                                 </p>
                             </div>
 
-                            {/* Read Status Toggle */}
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                background: 'var(--color-bg-tertiary)',
-                                padding: '15px',
-                                borderRadius: 'var(--radius-md)',
-                                border: '1px solid var(--color-border)'
-                            }}>
-                                <span style={{ color: 'var(--color-text-primary)', fontWeight: '500' }}>Já li este livro</span>
-                                <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '46px', height: '24px' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={isRead}
-                                        onChange={(e) => setIsRead(e.target.checked)}
-                                        style={{ opacity: 0, width: 0, height: 0 }}
-                                    />
-                                    <span className="slider round" style={{
-                                        position: 'absolute',
-                                        cursor: 'pointer',
-                                        top: 0, left: 0, right: 0, bottom: 0,
-                                        backgroundColor: isRead ? 'var(--color-accent)' : '#d1d1d6', // Apple switch gray
-                                        transition: '.4s',
-                                        borderRadius: '34px'
-                                    }}>
-                                        <span style={{
+                            {/* [MODIFIED] Hide Read Status Toggle in Wishlist Mode */}
+                            {!isWishlistMode && (
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    background: 'var(--color-bg-tertiary)',
+                                    padding: '15px',
+                                    borderRadius: 'var(--radius-md)',
+                                    border: '1px solid var(--color-border)'
+                                }}>
+                                    <span style={{ color: 'var(--color-text-primary)', fontWeight: '500' }}>Já li este livro</span>
+                                    <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '46px', height: '24px' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isRead}
+                                            onChange={(e) => setIsRead(e.target.checked)}
+                                            style={{ opacity: 0, width: 0, height: 0 }}
+                                        />
+                                        <span className="slider round" style={{
                                             position: 'absolute',
-                                            content: '""',
-                                            height: '20px', width: '20px',
-                                            left: isRead ? '24px' : '2px',
-                                            bottom: '2px',
-                                            backgroundColor: 'white',
+                                            cursor: 'pointer',
+                                            top: 0, left: 0, right: 0, bottom: 0,
+                                            backgroundColor: isRead ? 'var(--color-accent)' : '#d1d1d6', // Apple switch gray
                                             transition: '.4s',
-                                            borderRadius: '50%',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                        }}></span>
-                                    </span>
-                                </label>
-                            </div>
+                                            borderRadius: '34px'
+                                        }}>
+                                            <span style={{
+                                                position: 'absolute',
+                                                content: '""',
+                                                height: '20px', width: '20px',
+                                                left: isRead ? '24px' : '2px',
+                                                bottom: '2px',
+                                                backgroundColor: 'white',
+                                                transition: '.4s',
+                                                borderRadius: '50%',
+                                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                            }}></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            )}
 
                         </div>
 
-                        {/* Logs Column */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
-                                Logs e Histórico
-                            </h3>
+                        {/* Logs Column - Hide or Disable parts if Wishlist Mode */}
+                        {!isWishlistMode && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
+                                    Logs e Histórico
+                                </h3>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Data Compra</label>
-                                    <input type="date" className="auth-input" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label>Data Compra</label>
+                                        <input type="date" className="auth-input" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+                                    </div>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label>Preço (R$)</label>
+                                        <input type="number" step="0.01" className="auth-input" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} />
+                                    </div>
                                 </div>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Preço (R$)</label>
-                                    <input type="number" step="0.01" className="auth-input" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label>Emprestado para</label>
+                                        <input type="text" className="auth-input" value={loanedTo} onChange={(e) => setLoanedTo(e.target.value)} />
+                                    </div>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label>Data Empréstimo</label>
+                                        <input type="date" className="auth-input" value={loanDate} onChange={(e) => setLoanDate(e.target.value)} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label>Data Início Leitura</label>
+                                        <input type="date" className="auth-input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                                    </div>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label>Data Término</label>
+                                        <input type="date" className="auth-input" value={finishDate} onChange={(e) => setFinishDate(e.target.value)} />
+                                    </div>
                                 </div>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Emprestado para</label>
-                                    <input type="text" className="auth-input" value={loanedTo} onChange={(e) => setLoanedTo(e.target.value)} />
-                                </div>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Data Empréstimo</label>
-                                    <input type="date" className="auth-input" value={loanDate} onChange={(e) => setLoanDate(e.target.value)} />
-                                </div>
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Data Início Leitura</label>
-                                    <input type="date" className="auth-input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                                </div>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label>Data Término</label>
-                                    <input type="date" className="auth-input" value={finishDate} onChange={(e) => setFinishDate(e.target.value)} />
-                                </div>
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                 </form>

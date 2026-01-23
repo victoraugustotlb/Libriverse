@@ -4,7 +4,9 @@ import BookCarousel from '../components/BookCarousel';
 
 const UserHome = ({ user, books = [], onNavigate, onUpdateBook, onDeleteBook, onOpenAddModal }) => {
     const [selectedBook, setSelectedBook] = useState(null);
-    const readingBooks = books.filter(b => !b.isRead);
+    // [FIX] Filter out wishlist books
+    const activeBooks = books.filter(b => !b.isWishlist);
+    const readingBooks = activeBooks.filter(b => !b.isRead);
 
     return (
         <div className="user-home-page">

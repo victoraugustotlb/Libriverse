@@ -417,6 +417,7 @@ const AppContent = () => {
                 onAddBook={handleAddBook}
                 initialData={bookToEdit}
                 onSwitchToSearch={handleSwitchToSearch}
+                isWishlistMode={view === 'wishlist'} // [NEW]
             />
 
             <SearchBookModal

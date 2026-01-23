@@ -367,94 +367,140 @@ const BookDetailsModal = ({ book, isOpen, onClose, onDelete, onUpdate }) => {
                             </div>
 
                             {/* Reading Progress */}
-                            {book.pageCount > 0 && (
-                                <div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
-                                        <p style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>Progresso de Leitura</p>
-                                        <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{Math.round(progress)}%</span>
-                                    </div>
-
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-bg-tertiary)', padding: '5px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-                                            <input
-                                                type="number"
-                                                value={currentPage}
-                                                onChange={(e) => setCurrentPage(e.target.value)}
-                                                style={{
-                                                    width: '60px',
-                                                    padding: '5px',
-                                                    border: 'none',
-                                                    background: 'transparent',
-                                                    textAlign: 'center',
-                                                    fontWeight: '600',
-                                                    fontSize: '1rem',
-                                                    color: 'var(--color-text-primary)'
-                                                }}
-                                            />
-                                            <span style={{ color: 'var(--color-text-secondary)', marginRight: '8px', fontSize: '0.9rem' }}>/ {book.pageCount}</span>
-                                        </div>
-                                        <button
-                                            onClick={handleUpdateProgress}
-                                            style={{
-                                                padding: '8px 20px',
-                                                background: 'var(--color-accent)',
-                                                border: 'none',
-                                                borderRadius: '8px',
-                                                color: 'white',
-                                                cursor: 'pointer',
-                                                fontWeight: '500',
-                                                fontSize: '0.9rem',
-                                                transition: 'background 0.2s'
-                                            }}
-                                        >
-                                            Atualizar
-                                        </button>
-                                    </div>
-                                    <div style={{ width: '100%', height: '10px', background: 'var(--color-bg-secondary)', borderRadius: '5px', overflow: 'hidden' }}>
-                                        <div style={{ width: `${progress}% `, height: '100%', background: 'linear-gradient(to right, var(--color-accent), #5ac8fa)', transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)', borderRadius: '5px' }}></div>
-                                    </div>
+                            {book.isWishlist ? (
+                                <div style={{
+                                    background: 'var(--color-bg-tertiary)',
+                                    padding: '20px',
+                                    borderRadius: '12px',
+                                    textAlign: 'center',
+                                    marginBottom: '20px',
+                                    border: '1px solid var(--color-border)'
+                                }}>
+                                    <p style={{ marginBottom: '15px', color: 'var(--color-text-primary)', fontSize: '1.1rem' }}>
+                                        Este livro está na sua <strong>Lista de Desejos</strong>.
+                                    </p>
+                                    <button
+                                        onClick={() => {
+                                            if (onUpdate) {
+                                                onUpdate(book.id, {
+                                                    isWishlist: false,
+                                                    startDate: new Date().toISOString(),
+                                                    coverType: 'brochura' // Default or keep existing if handled
+                                                });
+                                                showNotification("Livro movido para sua estante! Boa leitura.", "success");
+                                                onClose();
+                                            }
+                                        }}
+                                        style={{
+                                            background: 'var(--color-accent)',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '12px 24px',
+                                            borderRadius: '8px',
+                                            fontSize: '1rem',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                            transition: 'transform 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                                    >
+                                        📖 Começar Leitura
+                                    </button>
                                 </div>
+                            ) : (
+                                book.pageCount > 0 && (
+                                    <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
+                                            <p style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>Progresso de Leitura</p>
+                                            <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{Math.round(progress)}%</span>
+                                        </div>
+
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-bg-tertiary)', padding: '5px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                                                <input
+                                                    type="number"
+                                                    value={currentPage}
+                                                    onChange={(e) => setCurrentPage(e.target.value)}
+                                                    style={{
+                                                        width: '60px',
+                                                        padding: '5px',
+                                                        border: 'none',
+                                                        background: 'transparent',
+                                                        textAlign: 'center',
+                                                        fontWeight: '600',
+                                                        fontSize: '1rem',
+                                                        color: 'var(--color-text-primary)'
+                                                    }}
+                                                />
+                                                <span style={{ color: 'var(--color-text-secondary)', marginRight: '8px', fontSize: '0.9rem' }}>/ {book.pageCount}</span>
+                                            </div>
+                                            <button
+                                                onClick={handleUpdateProgress}
+                                                style={{
+                                                    padding: '8px 20px',
+                                                    background: 'var(--color-accent)',
+                                                    border: 'none',
+                                                    borderRadius: '8px',
+                                                    color: 'white',
+                                                    cursor: 'pointer',
+                                                    fontWeight: '500',
+                                                    fontSize: '0.9rem',
+                                                    transition: 'background 0.2s'
+                                                }}
+                                            >
+                                                Atualizar
+                                            </button>
+                                        </div>
+                                        <div style={{ width: '100%', height: '10px', background: 'var(--color-bg-secondary)', borderRadius: '5px', overflow: 'hidden' }}>
+                                            <div style={{ width: `${progress}% `, height: '100%', background: 'linear-gradient(to right, var(--color-accent), #5ac8fa)', transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)', borderRadius: '5px' }}></div>
+                                        </div>
+                                    </div>
+                                )
                             )}
 
                             {/* Logs Details */}
-                            <div style={{
-                                fontSize: '0.9rem',
-                                color: 'var(--color-text-secondary)',
-                                background: 'var(--color-bg-tertiary)',
-                                padding: '15px',
-                                borderRadius: '8px',
-                                border: '1px solid var(--color-border)'
-                            }}>
-                                {(book.purchaseDate || book.loanedTo) && (
-                                    <div style={{ marginBottom: '15px', paddingBottom: '15px', borderBottom: '1px solid var(--color-border)' }}>
-                                        {book.purchaseDate && <p style={{ marginBottom: '4px' }}>🛒 Comprado em <strong>{new Date(book.purchaseDate).toLocaleDateString()}</strong> por <strong>R$ {book.purchasePrice}</strong></p>}
-                                        {book.loanedTo && <p>🤝 Emprestado para <strong>{book.loanedTo}</strong> em {new Date(book.loanDate).toLocaleDateString()}</p>}
-                                    </div>
-                                )}
+                            {!book.isWishlist && (
+                                <div style={{
+                                    fontSize: '0.9rem',
+                                    color: 'var(--color-text-secondary)',
+                                    background: 'var(--color-bg-tertiary)',
+                                    padding: '15px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--color-border)'
+                                }}>
+                                    {(book.purchaseDate || book.loanedTo) && (
+                                        <div style={{ marginBottom: '15px', paddingBottom: '15px', borderBottom: '1px solid var(--color-border)' }}>
+                                            {book.purchaseDate && <p style={{ marginBottom: '4px' }}>🛒 Comprado em <strong>{new Date(book.purchaseDate).toLocaleDateString()}</strong> por <strong>R$ {book.purchasePrice}</strong></p>}
+                                            {book.loanedTo && <p>🤝 Emprestado para <strong>{book.loanedTo}</strong> em {new Date(book.loanDate).toLocaleDateString()}</p>}
+                                        </div>
+                                    )}
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                    <div className="form-group" style={{ marginBottom: 0 }}>
-                                        <label style={{ fontSize: '0.8rem' }}>Início Leitura</label>
-                                        <input
-                                            type="date"
-                                            className="auth-input"
-                                            style={{ padding: '6px', fontSize: '0.9rem' }}
-                                            value={startDate}
-                                            onChange={(e) => handleDateUpdate('startDate', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="form-group" style={{ marginBottom: 0 }}>
-                                        <label style={{ fontSize: '0.8rem' }}>Término Leitura</label>
-                                        <input
-                                            type="date"
-                                            className="auth-input"
-                                            style={{ padding: '6px', fontSize: '0.9rem' }}
-                                            value={finishDate}
-                                            onChange={(e) => handleDateUpdate('finishDate', e.target.value)}
-                                        />
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                        <div className="form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '0.8rem' }}>Início Leitura</label>
+                                            <input
+                                                type="date"
+                                                className="auth-input"
+                                                style={{ padding: '6px', fontSize: '0.9rem' }}
+                                                value={startDate}
+                                                onChange={(e) => handleDateUpdate('startDate', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '0.8rem' }}>Término Leitura</label>
+                                            <input
+                                                type="date"
+                                                className="auth-input"
+                                                style={{ padding: '6px', fontSize: '0.9rem' }}
+                                                value={finishDate}
+                                                onChange={(e) => handleDateUpdate('finishDate', e.target.value)}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
 
                             <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
                                 <button className="delete-button" onClick={handleDelete} style={{ width: '100%' }}>
