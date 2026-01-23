@@ -569,7 +569,14 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                     </div>
 
                     {/* Bottom Section: Details & Logs */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: isWishlistMode ? '1fr' : '1fr 1fr',
+                        gap: '40px',
+                        maxWidth: isWishlistMode ? '600px' : 'none',
+                        margin: isWishlistMode ? '0 auto' : '0',
+                        width: isWishlistMode ? '100%' : 'auto'
+                    }}>
                         {/* Details Column */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                             <h3 style={{ fontSize: '1.2rem', fontWeight: '600', color: 'var(--color-text-primary)', borderBottom: '2px solid var(--color-bg-secondary)', paddingBottom: '10px' }}>
@@ -629,9 +636,9 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
                                         paddingRight: '1.5em'
                                     }}
                                 >
-                                    <option value="brochura" style={{ color: 'black' }}>Brochura</option>
-                                    <option value="dura" style={{ color: 'black' }}>Capa Dura</option>
-                                    <option value="aveludada" style={{ color: 'black' }}>Aveludada/Soft Touch</option>
+                                    <option value="brochura">Brochura</option>
+                                    <option value="dura">Capa Dura</option>
+                                    <option value="aveludada">Aveludada/Soft Touch</option>
                                 </select>
                             </div>
 
