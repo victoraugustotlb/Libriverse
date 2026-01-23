@@ -336,65 +336,65 @@ const AppContent = () => {
                 theme={theme}
                 onUpdateTheme={setTheme}
             />
-            {view === 'home' && <Home onNavigate={handleNavigate} />}
-            {view === 'login' && <Login onNavigate={handleNavigate} />}
-            {view === 'register' && <Register onNavigate={handleNavigate} />}
-            {view === 'forgot-password' && <ForgotPassword onNavigate={handleNavigate} />}
-            {view === 'account-settings' && (
-                <AccountSettings
-                    user={user}
-                    onUpdateUser={handleUpdateUser}
-                    onNavigate={handleNavigate}
-                />
-            )}
-            {view === 'terms' && <TermsOfUse onNavigate={handleNavigate} />}
-            {view === 'privacy' && <PrivacyPolicy onNavigate={handleNavigate} />}
-            {view === 'user-home' && (
-                <UserHome
-                    user={user}
-                    books={userBooks}
-                    onNavigate={handleNavigate}
-                    onUpdateBook={handleUpdateBook}
-                    onDeleteBook={handleDeleteBook}
-                    onOpenAddModal={() => setIsMethodModalOpen(true)}
-                />
-            )}
-            {view === 'library' && (
-                <Library
-                    onNavigate={handleNavigate}
-                    onOpenAddModal={() => setIsMethodModalOpen(true)}
-                    books={userBooks.filter(b => !b.isWishlist)} // [NEW] Filter out wishlist books from library
-                    onDeleteBook={handleDeleteBook}
-                    onUpdateBook={handleUpdateBook}
-                    user={user}
-                    onUpdatePreference={savePreferences}
-                />
-            )}
+            <main className="main-content">
+                {view === 'home' && <Home onNavigate={handleNavigate} />}
+                {view === 'login' && <Login onNavigate={handleNavigate} />}
+                {view === 'register' && <Register onNavigate={handleNavigate} />}
+                {view === 'forgot-password' && <ForgotPassword onNavigate={handleNavigate} />}
+                {view === 'account-settings' && (
+                    <AccountSettings
+                        user={user}
+                        onUpdateUser={handleUpdateUser}
+                        onNavigate={handleNavigate}
+                    />
+                )}
+                {view === 'terms' && <TermsOfUse onNavigate={handleNavigate} />}
+                {view === 'privacy' && <PrivacyPolicy onNavigate={handleNavigate} />}
+                {view === 'user-home' && (
+                    <UserHome
+                        user={user}
+                        books={userBooks}
+                        onNavigate={handleNavigate}
+                        onUpdateBook={handleUpdateBook}
+                        onDeleteBook={handleDeleteBook}
+                        onOpenAddModal={() => setIsMethodModalOpen(true)}
+                    />
+                )}
+                {view === 'library' && (
+                    <Library
+                        onNavigate={handleNavigate}
+                        onOpenAddModal={() => setIsMethodModalOpen(true)}
+                        books={userBooks.filter(b => !b.isWishlist)} // [NEW] Filter out wishlist books from library
+                        onDeleteBook={handleDeleteBook}
+                        onUpdateBook={handleUpdateBook}
+                        user={user}
+                        onUpdatePreference={savePreferences}
+                    />
+                )}
 
-            {view === 'wishlist' && (
-                <Wishlist
-                    books={userBooks}
-                    onNavigate={handleNavigate}
-                    onOpenAddModal={() => setIsMethodModalOpen(true)}
-                    onDeleteBook={handleDeleteBook}
-                    onUpdateBook={handleUpdateBook}
-                />
-            )}
+                {view === 'wishlist' && (
+                    <Wishlist
+                        books={userBooks}
+                        onNavigate={handleNavigate}
+                        onOpenAddModal={() => setIsMethodModalOpen(true)}
+                        onDeleteBook={handleDeleteBook}
+                        onUpdateBook={handleUpdateBook}
+                    />
+                )}
 
+                {view === 'notes' && (
+                    <Notes onNavigate={handleNavigate} onEditNote={handleEditNote} />
+                )}
 
-
-            {view === 'notes' && (
-                <Notes onNavigate={handleNavigate} onEditNote={handleEditNote} />
-            )}
-
-            {view === 'create-note' && (
-                <CreateNote
-                    onNavigate={handleNavigate}
-                    books={userBooks}
-                    noteToEdit={noteToEdit}
-                    onClearEdit={() => setNoteToEdit(null)}
-                />
-            )}
+                {view === 'create-note' && (
+                    <CreateNote
+                        onNavigate={handleNavigate}
+                        books={userBooks}
+                        noteToEdit={noteToEdit}
+                        onClearEdit={() => setNoteToEdit(null)}
+                    />
+                )}
+            </main>
 
             <Footer />
 

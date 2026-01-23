@@ -129,53 +129,40 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                 <div className="container" style={{ position: 'relative', zIndex: 1 }}>
                     <h1 className="hero-title" style={{ marginBottom: '40px' }}>Sua Biblioteca</h1>
 
-                    {/* Unified Control Bar */}
-                    <div className="library-control-bar">
+                    {/* Unified Control Bar - Refactored */}
+                    <div className="library-toolbar">
 
-                        {/* Top Row: Search (Full Width) */}
-                        <div className="library-search-container">
-                            <input
-                                type="text"
-                                placeholder="Buscar por título ou autor..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="library-search-input"
-                                onFocus={(e) => {
-                                    // kept minimal inline overrides if needed or move to CSS
-                                }}
-                                onBlur={(e) => {
-                                    // kept minimal inline overrides
-                                }}
-                            />
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="20" height="20" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                style={{
-                                    position: 'absolute',
-                                    left: '18px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    color: 'rgba(255,255,255,0.8)',
-                                    pointerEvents: 'none'
-                                }}
-                            >
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
+                        {/* Row 1: Search */}
+                        <div className="library-search-row">
+                            <div className="search-input-wrapper">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                    style={{ color: 'var(--color-text-secondary)' }}
+                                >
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar por título, autor ou ISBN..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="search-input-field"
+                                />
+                            </div>
                         </div>
 
-                        {/* Bottom Row: Controls */}
-                        <div className="library-controls-row">
+                        {/* Row 2: Filters & Actions */}
+                        <div className="library-filters-row">
 
-                            {/* Filters (Left) */}
-                            <div className="library-filters-group">
-                                {/* Author Filter */}
+                            {/* Left: Filters */}
+                            <div className="filters-group">
                                 <select
                                     value={selectedAuthor}
                                     onChange={(e) => setSelectedAuthor(e.target.value)}
-                                    className="library-select"
-                                    style={{ minWidth: '150px' }}
+                                    className="filter-select"
                                 >
                                     <option value="">Todos os Autores</option>
                                     {uniqueAuthors.map(author => (
@@ -183,12 +170,10 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                     ))}
                                 </select>
 
-                                {/* Tag Filter */}
                                 <select
                                     value={selectedTag}
                                     onChange={(e) => setSelectedTag(e.target.value)}
-                                    className="library-select"
-                                    style={{ minWidth: '150px' }}
+                                    className="filter-select"
                                 >
                                     <option value="">Todas as Tags</option>
                                     {BOOK_TAGS.map(tag => (
@@ -196,53 +181,36 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                     ))}
                                 </select>
 
-                                {/* Rating Filter */}
                                 <select
                                     value={selectedRating}
                                     onChange={(e) => setSelectedRating(e.target.value)}
-                                    className="library-select"
-                                    style={{ minWidth: '150px' }}
+                                    className="filter-select"
                                 >
                                     <option value="">Todas as Avaliações</option>
-                                    <option value="5">★★★★★ (5 Estrelas)</option>
-                                    <option value="4+">★★★★☆ (4+ Estrelas)</option>
-                                    <option value="3+">★★★☆☆ (3+ Estrelas)</option>
+                                    <option value="5">★★★★★ (5)</option>
+                                    <option value="4+">★★★★☆ (4+)</option>
+                                    <option value="3+">★★★☆☆ (3+)</option>
                                 </select>
 
-                                {/* Year Filter */}
                                 <select
                                     value={selectedYear}
                                     onChange={(e) => setSelectedYear(e.target.value)}
-                                    className="library-select"
-                                    style={{ minWidth: '100px' }}
+                                    className="filter-select"
+                                    style={{ width: '100px' }}
                                 >
                                     <option value="">Ano</option>
                                     {uniqueYears.map(year => (
                                         <option key={year} value={year}>{year}</option>
                                     ))}
                                 </select>
-
-                                {/* Month Filter */}
-                                <select
-                                    value={selectedMonth}
-                                    onChange={(e) => setSelectedMonth(e.target.value)}
-                                    className="library-select"
-                                    style={{ minWidth: '120px' }}
-                                >
-                                    <option value="">Mês</option>
-                                    {months.map(m => (
-                                        <option key={m.value} value={m.value}>{m.label}</option>
-                                    ))}
-                                </select>
                             </div>
 
-                            {/* Actions (Right) */}
-                            <div className="library-actions-group">
-                                {/* Sort */}
+                            {/* Right: Sort & Toggle */}
+                            <div className="actions-group">
                                 <select
                                     value={sortOption}
                                     onChange={(e) => setSortOption(e.target.value)}
-                                    className="library-select"
+                                    className="filter-select"
                                 >
                                     <option value="recent">Mais Recentes</option>
                                     <option value="oldest">Mais Antigos</option>
@@ -250,47 +218,18 @@ const Library = ({ onNavigate, onOpenAddModal, books = [], onDeleteBook, onUpdat
                                     <option value="za">Z-A</option>
                                 </select>
 
-                                {/* View Toggle */}
-                                <div style={{
-                                    display: 'flex',
-                                    background: 'rgba(255,255,255,0.1)',
-                                    padding: '4px',
-                                    borderRadius: '12px',
-                                    border: '1px solid rgba(255,255,255,0.1)'
-                                }}>
+                                <div className="view-toggle">
                                     <button
                                         onClick={() => setViewMode('shelves')}
-                                        style={{
-                                            background: viewMode === 'shelves' ? 'rgba(255,255,255,0.2)' : 'transparent',
-                                            border: 'none',
-                                            color: viewMode === 'shelves' ? '#fff' : 'rgba(255,255,255,0.6)',
-                                            padding: '8px 16px',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            fontSize: '0.9rem',
-                                            fontWeight: viewMode === 'shelves' ? '600' : '500',
-                                            transition: 'all 0.2s',
-                                            boxShadow: viewMode === 'shelves' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
-                                        }}
-                                        title="Visualizar Estante"
+                                        className={`toggle-btn ${viewMode === 'shelves' ? 'active' : ''}`}
+                                        title="Estante"
                                     >
                                         Estante
                                     </button>
                                     <button
                                         onClick={() => setViewMode('grid')}
-                                        style={{
-                                            background: viewMode === 'grid' ? 'rgba(255,255,255,0.2)' : 'transparent',
-                                            border: 'none',
-                                            color: viewMode === 'grid' ? '#fff' : 'rgba(255,255,255,0.6)',
-                                            padding: '8px 16px',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            fontSize: '0.9rem',
-                                            fontWeight: viewMode === 'grid' ? '600' : '500',
-                                            transition: 'all 0.2s',
-                                            boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(0,0,0,0.2)' : 'none'
-                                        }}
-                                        title="Visualizar Grade"
+                                        className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                                        title="Lista"
                                     >
                                         Lista
                                     </button>
