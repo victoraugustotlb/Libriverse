@@ -304,9 +304,11 @@ body {
 
 /* ===== HERO SECTION ===== */
 .hero {
-    background: linear-gradient(180deg, var(--color-bg-tertiary) 0%, var(--color-bg-primary) 100%);
+    background: transparent;
     padding: var(--spacing-2xl) 0;
     text-align: center;
+    position: relative;
+    z-index: 2;
 }
 
 .hero-title {
