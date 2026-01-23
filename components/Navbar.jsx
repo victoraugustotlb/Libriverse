@@ -62,15 +62,26 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                         </a>
                     </li>
                     {user && (
-                        <li>
-                            <a
-                                href="#"
-                                className="navbar-link"
-                                onClick={(e) => { e.preventDefault(); handleNavigate('notes'); }}
-                            >
-                                Anotações
-                            </a>
-                        </li>
+                        <>
+                            <li>
+                                <a
+                                    href="#"
+                                    className="navbar-link"
+                                    onClick={(e) => { e.preventDefault(); handleNavigate('notes'); }}
+                                >
+                                    Anotações
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    className="navbar-link"
+                                    onClick={(e) => { e.preventDefault(); handleNavigate('wishlist'); }}
+                                >
+                                    Lista de Desejos
+                                </a>
+                            </li>
+                        </>
                     )}
                     {view === 'library' && (
                         <li>

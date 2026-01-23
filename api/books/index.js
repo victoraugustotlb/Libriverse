@@ -101,6 +101,7 @@ export default async function handler(req, res) {
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS tags TEXT;`); // [NEW] overrides global tags if not null
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS rating INTEGER;`); // [NEW] 1-5 stars
             await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS review TEXT;`); // [NEW] User review
+            await pool.query(`ALTER TABLE user_books ADD COLUMN IF NOT EXISTS is_wishlist BOOLEAN DEFAULT FALSE;`); // [NEW] Wishlist flag
             // We don't strictly need to recreate the constraint here every time if it might fail, 
             // but for safety we can ignore if it fails or check existence. 
             // For now, let's leave the constraint definition in CREATE TABLE.
@@ -120,7 +121,7 @@ export default async function handler(req, res) {
                     ub.id, ub.user_id, ub.is_read, ub.current_page, 
                     ub.purchase_date, ub.purchase_price, ub.loaned_to, ub.loan_date,
                     ub.start_date, ub.finish_date,
-                    ub.rating, ub.review,
+                    ub.rating, ub.review, ub.is_wishlist,
                     ub.created_at, ub.custom_cover_url, ub.global_book_id, ub.old_book_id, ub.cover_type,
                     COALESCE(gb.title, ob.title) as title,
                     COALESCE(gb.author, ob.author) as author,
@@ -167,7 +168,8 @@ export default async function handler(req, res) {
                 translator: book.translator,
                 synopsis: book.synopsis, // [NEW]
                 tags: book.tags ? book.tags.split(',') : [], // [NEW]
-                coverType: book.cover_type
+                coverType: book.cover_type,
+                isWishlist: book.is_wishlist // [NEW]
             }));
 
             return res.status(200).json(books);
@@ -190,7 +192,8 @@ export default async function handler(req, res) {
                 startDate, finishDate, synopsis, // [NEW]
                 tags, // [NEW] array of strings
                 rating, review, // [NEW]
-                isOldBook // Boolean flag from frontend
+                isOldBook, // Boolean flag from frontend
+                isWishlist // [NEW]
             } = req.body;
 
             // --- REPORT HANDLING ---
@@ -328,14 +331,14 @@ export default async function handler(req, res) {
                     user_id, global_book_id, old_book_id, custom_cover_url,
                     is_read, current_page,
                     purchase_date, purchase_price, loaned_to, loan_date, cover_type,
-                    start_date, finish_date, tags, rating, review
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *`,
+                    start_date, finish_date, tags, rating, review, is_wishlist
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *`,
                 [
                     user.userId, globalBookId, oldBookId, coverUrl || null,
                     isRead || false, currentPage || 0,
                     purchaseDate || null, purchasePrice || null, loanedTo || null, loanDate || null,
                     coverType || null, startDate || new Date(), finishDate || null,
-                    userTags, rating || null, review || null
+                    userTags, rating || null, review || null, isWishlist || false
                 ]
             );
 
@@ -359,7 +362,8 @@ export default async function handler(req, res) {
                 finishDate: newBook.finish_date,
                 tags: (newBook.tags || (tags && Array.isArray(tags) ? tags.join(',') : '')).split(',').filter(Boolean),
                 rating: newBook.rating, // [NEW]
-                review: newBook.review // [NEW]
+                review: newBook.review, // [NEW]
+                isWishlist: newBook.is_wishlist // [NEW]
             });
 
         } catch (error) {
@@ -401,7 +405,7 @@ export default async function handler(req, res) {
         try {
             const {
                 currentPage, isRead, purchaseDate, purchasePrice, loanedTo, loanDate,
-                coverType, startDate, finishDate, tags, rating, review
+                coverType, startDate, finishDate, tags, rating, review, isWishlist // [NEW]
             } = req.body;
 
             // Build dynamic update query
@@ -421,6 +425,7 @@ export default async function handler(req, res) {
             if (tags !== undefined) { fields.push(`tags = $${idx++}`); values.push(Array.isArray(tags) ? tags.join(',') : tags); }
             if (rating !== undefined) { fields.push(`rating = $${idx++}`); values.push(rating); }
             if (review !== undefined) { fields.push(`review = $${idx++}`); values.push(review); }
+            if (isWishlist !== undefined) { fields.push(`is_wishlist = $${idx++}`); values.push(isWishlist); } // [NEW]
 
             if (fields.length === 0) {
                 return res.status(400).json({ error: 'No fields to update' });
@@ -448,7 +453,7 @@ export default async function handler(req, res) {
                     ub.id, ub.user_id, ub.is_read, ub.current_page, 
                     ub.purchase_date, ub.purchase_price, ub.loaned_to, ub.loan_date,
                     ub.start_date, ub.finish_date,
-                    ub.rating, ub.review,
+                    ub.rating, ub.review, ub.is_wishlist,
                     ub.created_at, ub.custom_cover_url, ub.global_book_id, ub.old_book_id, ub.cover_type,
                     COALESCE(gb.title, ob.title) as title,
                     COALESCE(gb.author, ob.author) as author,
@@ -494,7 +499,8 @@ export default async function handler(req, res) {
                 tags: fullBook.tags ? fullBook.tags.split(',').filter(Boolean) : [],
                 coverType: fullBook.cover_type,
                 rating: fullBook.rating, // [NEW]
-                review: fullBook.review // [NEW]
+                review: fullBook.review, // [NEW]
+                isWishlist: fullBook.is_wishlist // [NEW]
             });
 
         } catch (error) {

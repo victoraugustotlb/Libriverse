@@ -16,6 +16,7 @@ import Loading from './components/Loading.jsx';
 import Footer from './components/Footer.jsx';
 import Notes from './pages/Notes.jsx';
 import CreateNote from './pages/CreateNote.jsx';
+import Wishlist from './pages/Wishlist.jsx'; // [NEW]
 
 
 import { NotificationProvider, useNotification } from './context/NotificationContext';
@@ -217,6 +218,11 @@ const AppContent = () => {
 
     const handleAddBook = async (bookData) => {
         try {
+            // [NEW] Inject isWishlist if adding from Wishlist page
+            if (view === 'wishlist') {
+                bookData.isWishlist = true;
+            }
+
             const token = localStorage.getItem('libriverse_token');
             const response = await fetch('/api/books', {
                 method: 'POST',
@@ -357,11 +363,21 @@ const AppContent = () => {
                 <Library
                     onNavigate={handleNavigate}
                     onOpenAddModal={() => setIsMethodModalOpen(true)}
-                    books={userBooks}
+                    books={userBooks.filter(b => !b.isWishlist)} // [NEW] Filter out wishlist books from library
                     onDeleteBook={handleDeleteBook}
                     onUpdateBook={handleUpdateBook}
                     user={user}
                     onUpdatePreference={savePreferences}
+                />
+            )}
+
+            {view === 'wishlist' && (
+                <Wishlist
+                    books={userBooks}
+                    onNavigate={handleNavigate}
+                    onOpenAddModal={() => setIsMethodModalOpen(true)}
+                    onDeleteBook={handleDeleteBook}
+                    onUpdateBook={handleUpdateBook}
                 />
             )}
 
