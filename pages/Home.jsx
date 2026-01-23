@@ -36,7 +36,7 @@ const Home = ({ onNavigate }) => {
                 width: '100%',
                 height: '100%',
                 background: 'rgba(0, 0, 0, 0.7)', // Dark overlay
-                backdropFilter: 'blur(3px)', // Slight blur to reduce "pixelation" feel
+                backdropFilter: 'blur(1px)', // Reduced blur as requested
                 zIndex: -1
             }} />
 
