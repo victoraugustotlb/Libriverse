@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import mainLogo from '../images/main_logo.png';
 
 const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -38,7 +39,7 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                     className="navbar-logo"
                     onClick={(e) => { e.preventDefault(); handleNavigate(user ? 'user-home' : 'home'); }}
                 >
-                    Libriverse
+                    <img src={mainLogo} alt="Libriverse" className="navbar-logo-img" />
                 </a>
 
                 <button
