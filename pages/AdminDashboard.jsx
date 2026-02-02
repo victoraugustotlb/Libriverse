@@ -6,27 +6,43 @@ const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('tickets');
     const [reports, setReports] = useState([]);
     const [users, setUsers] = useState([]);
+    const [globalBooks, setGlobalBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [currentUser, setCurrentUser] = useState(null);
+
+    // Filters
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedAuthor, setSelectedAuthor] = useState('');
+
+    // Editing
+    const [editingBook, setEditingBook] = useState(null);
 
     useEffect(() => {
-        // Fetch current user details to know if master
-        const storedUser = localStorage.getItem('libriverse_user');
-        if (storedUser) {
-            setCurrentUser(JSON.parse(storedUser));
-        }
         fetchData();
-    }, [activeTab]);
+    }, [activeTab]); // Fetch when tab changes
+
+    // Debounced search for global books
+    useEffect(() => {
+        if (activeTab === 'global-books') {
+            const timer = setTimeout(() => {
+                fetchData();
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [searchTerm, selectedAuthor]);
 
     const fetchData = async () => {
         setLoading(true);
         setError('');
         try {
             const token = localStorage.getItem('libriverse_token');
-            const endpoint = activeTab === 'tickets'
-                ? '/api/admin?action=reports'
-                : '/api/admin?action=users';
+            let endpoint = '';
+
+            if (activeTab === 'tickets') endpoint = '/api/admin?action=reports';
+            else if (activeTab === 'users') endpoint = '/api/admin?action=users';
+            else if (activeTab === 'global-books') {
+                endpoint = `/api/admin?action=global-books&q=${encodeURIComponent(searchTerm)}&author=${encodeURIComponent(selectedAuthor)}`;
+            }
 
             const res = await fetch(endpoint, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -39,7 +55,8 @@ const AdminDashboard = () => {
 
             const data = await res.json();
             if (activeTab === 'tickets') setReports(data);
-            else setUsers(data);
+            else if (activeTab === 'users') setUsers(data);
+            else if (activeTab === 'global-books') setGlobalBooks(data);
 
         } catch (err) {
             setError(err.message);
@@ -59,7 +76,7 @@ const AdminDashboard = () => {
                 },
                 body: JSON.stringify({ reportId, status: newStatus })
             });
-            fetchData(); // Refresh
+            fetchData();
         } catch (err) {
             alert('Erro ao atualizar ticket');
         }
@@ -86,25 +103,42 @@ const AdminDashboard = () => {
         }
     };
 
-    if (loading && !reports.length && !users.length) return <div className="admin-container">Carregando...</div>;
-    if (error) return <div className="admin-container error">{error}</div>;
+    const handleSaveGlobalBook = async (e) => {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('libriverse_token');
+            const res = await fetch('/api/admin?action=edit-global-book', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(editingBook)
+            });
+
+            if (!res.ok) throw new Error('Falha ao atualizar livro');
+
+            setEditingBook(null);
+            fetchData(); // Refresh list
+            alert('Livro atualizado com sucesso!');
+        } catch (err) {
+            alert('Erro ao salvar livro: ' + err.message);
+        }
+    };
 
     return (
         <div className="admin-dashboard fade-in">
             <h1>Painel Administrativo 🛡️</h1>
 
             <div className="admin-tabs">
-                <button
-                    className={activeTab === 'tickets' ? 'active' : ''}
-                    onClick={() => setActiveTab('tickets')}
-                >
-                    Tickets de Erro
+                <button className={activeTab === 'tickets' ? 'active' : ''} onClick={() => setActiveTab('tickets')}>
+                    Tickets
                 </button>
-                <button
-                    className={activeTab === 'users' ? 'active' : ''}
-                    onClick={() => setActiveTab('users')}
-                >
-                    Gerenciar Usuários
+                <button className={activeTab === 'users' ? 'active' : ''} onClick={() => setActiveTab('users')}>
+                    Usuários
+                </button>
+                <button className={activeTab === 'global-books' ? 'active' : ''} onClick={() => setActiveTab('global-books')}>
+                    Livros Globais
                 </button>
             </div>
 
@@ -120,7 +154,6 @@ const AdminDashboard = () => {
                                         <th>Problema</th>
                                         <th>Descrição</th>
                                         <th>Status</th>
-                                        <th>Data</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
@@ -128,18 +161,13 @@ const AdminDashboard = () => {
                                     {reports.map(repo => (
                                         <tr key={repo.id} className={`status-${repo.status}`}>
                                             <td>#{repo.id}</td>
-                                            <td>{repo.user_name} <br /><small>{repo.user_email}</small></td>
+                                            <td>{repo.user_name}</td>
                                             <td>{repo.issue_type}</td>
                                             <td>{repo.description}</td>
-                                            <td>
-                                                <span className={`badge ${repo.status}`}>{repo.status}</span>
-                                            </td>
-                                            <td>{new Date(repo.created_at).toLocaleDateString()}</td>
+                                            <td><span className={`badge ${repo.status}`}>{repo.status}</span></td>
                                             <td>
                                                 {repo.status === 'open' && (
-                                                    <button onClick={() => handleResolveReport(repo.id, 'closed')} className="btn-resolve">
-                                                        Resolver
-                                                    </button>
+                                                    <button onClick={() => handleResolveReport(repo.id, 'closed')} className="btn-resolve">Resolver</button>
                                                 )}
                                             </td>
                                         </tr>
@@ -158,8 +186,8 @@ const AdminDashboard = () => {
                                     <th>ID</th>
                                     <th>Nome</th>
                                     <th>Email</th>
-                                    <th>Admin?</th>
-                                    <th>Master?</th>
+                                    <th>Admin</th>
+                                    <th>Master</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
@@ -172,13 +200,9 @@ const AdminDashboard = () => {
                                         <td>{u.is_admin ? '✅' : '❌'}</td>
                                         <td>{u.is_master ? '👑' : '-'}</td>
                                         <td>
-                                            {/* Only Master can promote/demote (except themselves) */}
                                             {!u.is_master && (
-                                                <button
-                                                    className={`btn-role ${u.is_admin ? 'demote' : 'promote'}`}
-                                                    onClick={() => handleToggleAdmin(u.id, u.is_admin)}
-                                                >
-                                                    {u.is_admin ? 'Remover Admin' : 'Tornar Admin'}
+                                                <button className={`btn-role ${u.is_admin ? 'demote' : 'promote'}`} onClick={() => handleToggleAdmin(u.id, u.is_admin)}>
+                                                    {u.is_admin ? 'Remover' : 'Promover'}
                                                 </button>
                                             )}
                                         </td>
@@ -188,7 +212,90 @@ const AdminDashboard = () => {
                         </table>
                     </div>
                 )}
+
+                {activeTab === 'global-books' && (
+                    <div className="global-books-view">
+                        {/* Search Bar - Reusing styles */}
+                        <div className="library-toolbar" style={{ marginBottom: '20px' }}>
+                            <div className="search-input-wrapper" style={{ flex: 1, maxWidth: '600px' }}>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar livro global..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="search-input-field"
+                                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--card-bg)' }}
+                                />
+                            </div>
+                        </div>
+
+                        {loading ? <p>Carregando livros...</p> : (
+                            <div className="books-grid-layout">
+                                {globalBooks.map(book => (
+                                    <div key={book.id} className="book-card-list-mode" onClick={() => setEditingBook(book)}>
+                                        <div className="book-cover-wrapper">
+                                            {book.cover_url ? (
+                                                <img src={book.cover_url} alt={book.title} />
+                                            ) : (
+                                                <div className="no-cover">Sem Capa</div>
+                                            )}
+                                        </div>
+                                        <div className="book-info">
+                                            <h3>{book.title}</h3>
+                                            <p>{book.author}</p>
+                                            <span className="edit-badge">✎ Editar</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
+
+            {/* Edit Modal */}
+            {editingBook && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h2>Editar Livro Global</h2>
+                        <form onSubmit={handleSaveGlobalBook}>
+                            <div className="form-group">
+                                <label>Título</label>
+                                <input
+                                    value={editingBook.title || ''}
+                                    onChange={e => setEditingBook({ ...editingBook, title: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Autor</label>
+                                <input
+                                    value={editingBook.author || ''}
+                                    onChange={e => setEditingBook({ ...editingBook, author: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Capa URL</label>
+                                <input
+                                    value={editingBook.cover_url || ''}
+                                    onChange={e => setEditingBook({ ...editingBook, cover_url: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Sinopse</label>
+                                <textarea
+                                    value={editingBook.synopsis || ''}
+                                    onChange={e => setEditingBook({ ...editingBook, synopsis: e.target.value })}
+                                    rows={4}
+                                />
+                            </div>
+                            <div className="modal-actions">
+                                <button type="button" onClick={() => setEditingBook(null)} className="btn-cancel">Cancelar</button>
+                                <button type="submit" className="btn-save">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             <style>{`
                 .admin-dashboard { padding: 40px; max-width: 1200px; margin: 0 auto; color: var(--text-color); }
@@ -207,10 +314,37 @@ const AdminDashboard = () => {
                 .badge.open { background: #e74c3c; color: white; }
                 .badge.closed { background: #2ecc71; color: white; }
                 
-                .btn-resolve { background: #2ecc71; border: none; padding: 5px 10px; color: white; border-radius: 4px; cursor: pointer; }
+                .btn-resolve, .btn-save { background: #2ecc71; border: none; padding: 5px 10px; color: white; border-radius: 4px; cursor: pointer; }
                 .btn-role { border: none; padding: 5px 10px; color: white; border-radius: 4px; cursor: pointer; }
                 .btn-role.promote { background: #3498db; }
                 .btn-role.demote { background: #e67e22; }
+                .btn-cancel { background: #95a5a6; border: none; padding: 5px 10px; color: white; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+
+                /* Grid Layout similar to Library List View */
+                .books-grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+                .book-card-list-mode {
+                    background: var(--color-card-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: 12px;
+                    padding: 15px;
+                    cursor: pointer;
+                    transition: transform 0.2s;
+                }
+                .book-card-list-mode:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+                .book-cover-wrapper { width: 100%; aspect-ratio: 2/3; background: #eee; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+                .book-cover-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+                .no-cover { display: flex; align-items: center; justifyContent: center; height: 100%; color: #888; }
+                .book-info h3 { font-size: 1rem; margin: 0 0 5px 0; color: var(--text-color); }
+                .book-info p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+                .edit-badge { font-size: 0.8rem; color: var(--primary-color); margin-top: 10px; display: inline-block; }
+
+                /* Modal */
+                .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+                .modal-content { background: var(--bg-color); padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; color: var(--text-color); }
+                .form-group { margin-bottom: 15px; }
+                .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+                .form-group input, .form-group textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; background: var(--input-bg); color: var(--text-color); }
+                .modal-actions { text-align: right; margin-top: 20px; }
             `}</style>
         </div>
     );
