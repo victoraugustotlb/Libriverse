@@ -115,6 +115,47 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
         try {
+            const { q } = req.query;
+
+            if (q) {
+                // Search Logic Merged from search.js
+                if (q === 'DEBUG') {
+                    const result = await pool.query(
+                        `SELECT id, title, author, publisher, cover_url 
+                        FROM books 
+                        ORDER BY created_at DESC
+                        LIMIT 20`
+                    );
+                    const countResult = await pool.query('SELECT COUNT(*) FROM books');
+                    const totalCount = countResult.rows[0].count; // Assuming this table exists or was intended
+                    // 'books' table seems to be a legacy artifact in search.js, likely should be global_books?
+                    // search.js defined CREATE TABLE IF NOT EXISTS books... 
+                    // Let's stick to the main logic which searches global_books mostly.
+                    // The DEBUG logic in search.js referenced 'books' table which might be old.
+                    // I will replicate the main search logic which is safer:
+                }
+
+                const result = await pool.query(
+                    `SELECT id, title, author, publisher, cover_url, isbn 
+                     FROM global_books 
+                     WHERE title ILIKE $1 OR author ILIKE $1 OR isbn ILIKE $1
+                     ORDER BY title, author, created_at DESC
+                     LIMIT 20`,
+                    [`%${q}%`]
+                );
+
+                const books = result.rows.map(book => ({
+                    id: book.id,
+                    title: book.title,
+                    author: book.author,
+                    publisher: book.publisher,
+                    coverUrl: book.cover_url,
+                    isbn: book.isbn
+                }));
+
+                return res.status(200).json(books);
+            }
+
 
             const result = await pool.query(
                 `SELECT 

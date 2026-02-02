@@ -136,7 +136,7 @@ const AddBookModal = ({ isOpen, onClose, onAddBook, initialData, onSwitchToSearc
         if (isbn && !initialData && !isOldBook) {
             try {
                 const token = localStorage.getItem('libriverse_token');
-                const response = await fetch(`/api/books/search?q=${encodeURIComponent(isbn)}`, {
+                const response = await fetch(`/api/books?q=${encodeURIComponent(isbn)}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (response.ok) {

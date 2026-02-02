@@ -25,7 +25,7 @@ const SearchBookModal = ({ isOpen, onClose, onSelectBook, initialQuery }) => {
         setLoading(true);
         try {
             const token = localStorage.getItem('libriverse_token');
-            const response = await fetch(`/api/books/search?q=${encodeURIComponent(searchTerm)}`, {
+            const response = await fetch(`/api/books?q=${encodeURIComponent(searchTerm)}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) throw new Error('Search failed');
