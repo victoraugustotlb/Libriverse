@@ -81,6 +81,18 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                                     Lista de Desejos
                                 </a>
                             </li>
+                            {user.is_admin && (
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="navbar-link"
+                                        style={{ color: '#e74c3c' }}
+                                        onClick={(e) => { e.preventDefault(); handleNavigate('admin'); }}
+                                    >
+                                        Admin
+                                    </a>
+                                </li>
+                            )}
                         </>
                     )}
                     {view === 'library' && (

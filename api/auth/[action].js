@@ -68,7 +68,9 @@ async function handleLogin(req, res) {
             name: user.name,
             email: user.email,
             theme: user.theme,
-            view_mode: user.view_mode
+            view_mode: user.view_mode,
+            is_admin: user.is_admin,
+            is_master: user.is_master
         }
     });
 }
