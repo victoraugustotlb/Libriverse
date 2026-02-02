@@ -17,6 +17,7 @@ import Footer from './components/Footer.jsx';
 import Notes from './pages/Notes.jsx';
 import CreateNote from './pages/CreateNote.jsx';
 import Wishlist from './pages/Wishlist.jsx'; // [NEW]
+import AdminDashboard from './pages/AdminDashboard.jsx'; // [NEW]
 
 
 import { NotificationProvider, useNotification } from './context/NotificationContext';
@@ -380,6 +381,10 @@ const AppContent = () => {
                         onDeleteBook={handleDeleteBook}
                         onUpdateBook={handleUpdateBook}
                     />
+                )}
+
+                {view === 'admin' && (
+                    <AdminDashboard />
                 )}
 
                 {view === 'notes' && (

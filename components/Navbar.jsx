@@ -115,6 +115,13 @@ const Navbar = ({ onNavigate, user, view, onOpenAddModal, theme, onUpdateTheme }
                                     <div className="dropdown-item-content">Dashboard</div>
                                 </a>
 
+                                {user.is_admin && (
+                                    <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); handleNavigate('admin'); setIsDropdownOpen(false); }}>
+                                        <div className="dropdown-item-content">Admin Panel</div>
+                                        <span className="kbd-shortcut">🛡️</span>
+                                    </a>
+                                )}
+
                                 <a href="#" className="dropdown-item" onClick={(e) => { e.preventDefault(); handleNavigate('account-settings'); setIsDropdownOpen(false); }}>
                                     <div className="dropdown-item-content">Account Settings</div>
                                 </a>
