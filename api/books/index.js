@@ -90,6 +90,10 @@ export default async function handler(req, res) {
             await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS synopsis TEXT;`); // [NEW]
             await pool.query(`ALTER TABLE global_books ADD COLUMN IF NOT EXISTS tags TEXT;`); // [NEW]
 
+            // Admin Migrations
+            await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;`);
+            await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_master BOOLEAN DEFAULT FALSE;`);
+
             await pool.query(`ALTER TABLE old_books ADD COLUMN IF NOT EXISTS synopsis TEXT;`); // [NEW]
             await pool.query(`ALTER TABLE old_books ADD COLUMN IF NOT EXISTS tags TEXT;`); // [NEW]
 
@@ -118,7 +122,6 @@ export default async function handler(req, res) {
             const { q } = req.query;
 
             if (q) {
-                // Search Logic Merged from search.js
                 if (q === 'DEBUG') {
                     const result = await pool.query(
                         `SELECT id, title, author, publisher, cover_url 
@@ -126,13 +129,16 @@ export default async function handler(req, res) {
                         ORDER BY created_at DESC
                         LIMIT 20`
                     );
-                    const countResult = await pool.query('SELECT COUNT(*) FROM books');
-                    const totalCount = countResult.rows[0].count; // Assuming this table exists or was intended
-                    // 'books' table seems to be a legacy artifact in search.js, likely should be global_books?
-                    // search.js defined CREATE TABLE IF NOT EXISTS books... 
-                    // Let's stick to the main logic which searches global_books mostly.
-                    // The DEBUG logic in search.js referenced 'books' table which might be old.
-                    // I will replicate the main search logic which is safer:
+
+                    const books = result.rows.map(book => ({
+                        id: book.id,
+                        title: book.title,
+                        author: book.author,
+                        publisher: book.publisher,
+                        coverUrl: book.cover_url
+                    }));
+
+                    return res.status(200).json(books);
                 }
 
                 const result = await pool.query(
@@ -310,8 +316,34 @@ export default async function handler(req, res) {
                         globalBookId = resNewGlobal.rows[0].id;
                     }
                 } catch (err) {
-                    console.error("Error handling global book:", err);
-                    throw err; // Re-throw to be caught by outer catch
+                    if (err.code === '23505') {
+                        // Race condition or lookup missed: Book exists globally. Recover ID.
+                        console.log("Global book exists (caught via constraint), fetching ID...");
+                        let existing;
+                        if (isbn) {
+                            const resExist = await pool.query('SELECT id FROM global_books WHERE isbn = $1', [isbn]);
+                            existing = resExist.rows[0];
+                        }
+                        if (!existing) {
+                            // Try title/author fallback if ISBN failed or wasn't present
+                            const resExistTA = await pool.query(
+                                'SELECT id FROM global_books WHERE title ILIKE $1 AND author ILIKE $2',
+                                [title, author]
+                            );
+                            existing = resExistTA.rows[0];
+                        }
+
+                        if (existing) {
+                            globalBookId = existing.id;
+                        } else {
+                            // Should not happen if constraint fired, but safety first
+                            console.error("Constraint violated but book not found?", err);
+                            throw err;
+                        }
+                    } else {
+                        console.error("Error handling global book:", err);
+                        throw err;
+                    }
                 }
             }
 
